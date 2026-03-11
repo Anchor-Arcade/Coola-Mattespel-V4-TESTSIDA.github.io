@@ -1,0 +1,1651 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Matte Plugg</title>
+  <link rel="icon" type="image/png" href="UGS-Files/icon.png">
+
+  <style>
+    * { box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      color: white;
+      transition: background .6s ease;
+    }
+
+    body {
+      background-size: 400% 400%;
+      animation: bgMove 25s ease infinite;
+    }
+
+    @keyframes bgMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    body.blue {
+      --accent: #1e4fa3; --accent-dark: #0e2a52;
+      background-image: linear-gradient(180deg, #0a2a6c, #000, #0a2a6c);
+    }
+    body.red {
+      --accent: #a30000; --accent-dark: #520000;
+      background-image: linear-gradient(180deg, #5a0000, #000, #5a0000);
+    }
+    body.green {
+      --accent: #00a300; --accent-dark: #004d00;
+      background-image: linear-gradient(180deg, #004d1a, #000, #004d1a);
+    }
+    body.yellow {
+      --accent: #ffd000; --accent-dark: #b89a00;
+      background-image: linear-gradient(180deg, #665500, #000, #665500);
+    }
+    body.orange {
+      --accent: #ff8c00; --accent-dark: #c45f00;
+      background-image: linear-gradient(180deg, #5a2a00, #000, #5a2a00);
+    }
+    body.gray {
+      --accent: #aaaaaa; --accent-dark: #666666;
+      background-image: linear-gradient(180deg, #2b2b2b, #000, #2b2b2b);
+    }
+    body.purple {
+      --accent: #8a2be2; --accent-dark: #4b0082;
+      background-image: linear-gradient(180deg, #2b0040, #000, #2b0040);
+    }
+    body.pink {
+      --accent: #ff69b4; --accent-dark: #c71585;
+      background-image: linear-gradient(180deg, #4a0028, #000, #4a0028);
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      inset: -40%;
+      z-index: -1;
+      filter: blur(120px);
+      opacity: .55;
+      animation: auroraMove 40s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    body::before {
+      background:
+        radial-gradient(circle at 30% 30%, var(--accent), transparent 60%),
+        radial-gradient(circle at 70% 40%, var(--accent-dark), transparent 65%),
+        radial-gradient(circle at 50% 70%, var(--accent), transparent 60%);
+    }
+
+    body::after {
+      background:
+        radial-gradient(circle at 60% 30%, var(--accent-dark), transparent 60%),
+        radial-gradient(circle at 20% 60%, var(--accent), transparent 65%);
+      animation-duration: 60s;
+      opacity: .4;
+    }
+
+    @keyframes auroraMove {
+      0% { transform: translate(0, 0) rotate(0deg); }
+      50% { transform: translate(10%, -8%) rotate(180deg); }
+      100% { transform: translate(0, 0) rotate(360deg); }
+    }
+
+    .app {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    .menu-toggle {
+      position: fixed;
+      top: 14px;
+      left: 14px;
+      width: 46px;
+      height: 46px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent-dark), var(--accent));
+      color: white;
+      font-size: 28px;
+      cursor: pointer;
+      z-index: 1200;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.4);
+    }
+
+    .sidebar-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .35);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s ease;
+      z-index: 1000;
+    }
+
+    .sidebar-overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .sidebar {
+      width: 210px;
+      background: rgba(0, 0, 0, .65);
+      backdrop-filter: blur(10px);
+      padding: 72px 8px 10px;
+      flex-shrink: 0;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      transform: translateX(-110%);
+      transition: transform .25s ease;
+      z-index: 1100;
+    }
+
+    .sidebar.open {
+      transform: translateX(0);
+    }
+
+    .sidebar-btn {
+      width: 100%;
+      margin-bottom: 6px;
+      padding: 10px 12px;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent-dark), var(--accent));
+      color: white;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 10px;
+      text-align: left;
+    }
+
+    .sidebar-btn .icon {
+      width: 24px;
+      text-align: center;
+      font-size: 20px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .sidebar-btn .label {
+      white-space: nowrap;
+      line-height: 1.1;
+    }
+
+       .chat-panel {
+      position: fixed;
+      top: 72px;
+      left: 224px;
+      width: 320px;
+      height: calc(100dvh - 84px);
+      background: rgba(0, 0, 0, .72);
+      border: 1px solid rgba(255, 255, 255, .16);
+      border-radius: 14px;
+      backdrop-filter: blur(10px);
+      display: flex;
+      flex-direction: column;
+      transform: translateX(-24px);
+      opacity: 0;
+      pointer-events: none;
+      transition: transform .25s ease, opacity .2s ease;
+      z-index: 1080;
+      overflow: hidden;
+    }
+
+
+
+    .sidebar.open + .chat-panel {
+      transform: translateX(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .chat-header {
+      padding: 10px 12px;
+      font-weight: 800;
+      letter-spacing: .5px;
+      border-bottom: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .chat-msg {
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      padding: 8px;
+    }
+
+    .chat-meta {
+      font-size: 11px;
+      opacity: .72;
+      margin-bottom: 4px;
+    }
+
+    .chat-text {
+      font-size: 13px;
+      line-height: 1.3;
+      word-break: break-word;
+    }
+
+    .chat-controls {
+      border-top: 1px solid rgba(255,255,255,.12);
+      padding: 10px;
+      background: rgba(255,255,255,.03);
+    }
+
+    .chat-name,
+    .chat-input {
+      width: 100%;
+      border: none;
+      border-radius: 8px;
+      padding: 8px;
+      margin-bottom: 8px;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .chat-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .chat-send {
+      border: none;
+      border-radius: 8px;
+      padding: 8px 12px;
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--accent-dark), var(--accent));
+      color: white;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .main {
+      width: 100%;
+      padding: 25px;
+      overflow-y: auto;
+    }
+
+    .header { text-align: center; margin-bottom: 20px; }
+
+    .header h1 {
+      font-size: 52px;
+      margin: 0;
+      background: linear-gradient(90deg, #4da3ff, #fff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      margin-top: 8px;
+      font-size: 18px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      opacity: 0.75;
+      background: linear-gradient(90deg, var(--accent), #ffffff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* NYTT: Aktiva spelare */
+    .active-players {
+      margin-top: 8px;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #fff;
+      background: linear-gradient(90deg, #ffffff, var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .search-box input {
+      margin-top: 20px;
+      padding: 14px;
+      width: 100%;
+      max-width: 420px;
+      border-radius: 12px;
+      border: none;
+      font-size: 16px;
+    }
+
+    #embedContainer {
+      display: none;
+      margin: 20px auto;
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: #000;
+      border-radius: 18px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    #embedContainer iframe { width: 100%; height: 100%; border: none; }
+
+    #iframeLoader {
+      position: absolute;
+      inset: 0;
+      z-index: 6;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.72);
+      backdrop-filter: blur(4px);
+      pointer-events: none;
+    }
+
+    #iframeLoader.show {
+      display: flex;
+    }
+
+    .loader-box {
+      width: min(460px, 85%);
+      text-align: center;
+      padding: 22px 20px 18px;
+      border-radius: 16px;
+      background: rgba(10, 10, 10, 0.78);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.45);
+    }
+
+    .loader-title {
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 12px;
+      letter-spacing: 1px;
+    }
+
+    .loader-track {
+      width: 100%;
+      height: 14px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.08));
+      border: 1px solid rgba(255,255,255,.24);
+      box-shadow: inset 0 2px 4px rgba(0,0,0,.35);
+    }
+
+    .loader-fill {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      transform-origin: left center;
+      transform: scaleX(0);
+      background:
+        linear-gradient(100deg, rgba(255,255,255,.32) 0%, rgba(255,255,255,0) 35%),
+        linear-gradient(90deg, var(--accent-dark), var(--accent), #ffffff);
+      background-size: 200% 100%, 100% 100%;
+      animation: loaderShine 1.4s linear infinite, loaderPulse 1.8s ease-in-out infinite;
+      will-change: transform;
+    }
+
+    .loader-fill::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        120deg,
+        rgba(255,255,255,.18) 0 8px,
+        rgba(255,255,255,0) 8px 16px
+      );
+      animation: loaderStripes 1.1s linear infinite;
+      mix-blend-mode: soft-light;
+      opacity: .55;
+    }
+
+    @keyframes loaderShine {
+      0% { background-position: -160% 0, 0 0; }
+      100% { background-position: 180% 0, 0 0; }
+    }
+
+    @keyframes loaderPulse {
+      0%, 100% { filter: brightness(.95) saturate(1); }
+      50% { filter: brightness(1.08) saturate(1.15); }
+    }
+
+    @keyframes loaderStripes {
+      0% { transform: translateX(-18px); }
+      100% { transform: translateX(18px); }
+    }
+
+    .loader-message {
+      margin-top: 10px;
+      font-size: 14px;
+      opacity: 0.9;
+      min-height: 20px;
+    }
+
+    .fullscreen-btn {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent-dark), var(--accent));
+      color: white;
+      cursor: pointer;
+      z-index: 7;
+    }
+
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 18px;
+    }
+
+    .group-header {
+      grid-column: 1 / -1;
+      margin: 8px 0 2px;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: var(--accent);
+      text-transform: uppercase;
+    }
+
+    .game-card { position: relative; }
+
+    .game-btn {
+      width: 100%;
+      padding: 22px;
+      border-radius: 16px;
+      border: none;
+      background: linear-gradient(135deg, var(--accent-dark), var(--accent));
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      position: relative;
+      box-shadow:
+        0 6px 14px rgba(0, 0, 0, 0.4),
+        inset 0 2px 4px rgba(255, 255, 255, 0.15);
+      transition:
+        transform .15s ease,
+        box-shadow .15s ease,
+        filter .2s ease;
+    }
+
+    .game-btn:hover {
+      transform: translateY(-4px) scale(1.03);
+      box-shadow:
+        0 12px 22px rgba(0, 0, 0, 0.55),
+        inset 0 2px 6px rgba(255, 255, 255, 0.25);
+      filter: brightness(1.1);
+    }
+
+    .game-btn:active {
+      transform: translateY(2px) scale(.97);
+      box-shadow:
+        0 3px 8px rgba(0, 0, 0, 0.45),
+        inset 0 3px 6px rgba(0, 0, 0, 0.35);
+    }
+
+    .game-btn:hover::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 16px;
+      pointer-events: none;
+      box-shadow: 0 0 12px var(--accent);
+      opacity: .5;
+    }
+
+    .favorite {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      font-size: 20px;
+      cursor: pointer;
+      opacity: .5;
+      user-select: none;
+    }
+
+    .favorite.active { opacity: 1; color: gold; }
+
+    #themePopup {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .theme-box {
+      background: #111;
+      padding: 25px;
+      border-radius: 18px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+    }
+
+    .theme-btn {
+      padding: 18px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      font-size: 22px;
+      background: linear-gradient(135deg, var(--accent-dark), var(--accent));
+    }
+
+    .recommended-section { margin: 20px 0 42px; }
+    .recommended-title {
+      margin: 0 0 10px;
+      font-size: 22px;
+      letter-spacing: 1px;
+      color: #fff;
+    }
+    .recommended-row {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+    .recommended-row .recommended-btn { min-width: 180px; }
+
+
+    .profile-btn{position:fixed;top:14px;right:14px;border:none;border-radius:12px;padding:10px 14px;background:linear-gradient(135deg,var(--accent-dark),var(--accent));color:#fff;font-weight:700;z-index:1200;cursor:pointer;}
+    .chat-msg{animation:chatPop .25s ease;}
+    @keyframes chatPop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .chat-mode-row{display:flex;gap:6px;margin-bottom:8px;align-items:center;}
+    .chat-tab{border:none;border-radius:8px;padding:6px 8px;background:rgba(255,255,255,.12);color:#fff;cursor:pointer;}
+    .chat-tab.active{background:linear-gradient(135deg,var(--accent-dark),var(--accent));}
+    .friend-select{flex:1;background:#fff;border:none;border-radius:8px;padding:6px;}
+    .chat-status{font-size:12px;opacity:.8;margin-bottom:8px;}
+    .app-modal{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;z-index:1300;}
+    .app-modal-box{width:min(500px,92vw);max-height:85vh;overflow:auto;background:#111;border:1px solid rgba(255,255,255,.2);border-radius:16px;padding:16px;}
+    .panel-page{margin:24px 0;}
+    .panel-card{background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:12px;margin-bottom:10px;}
+
+    @media (max-width: 768px) {
+      .header h1 { font-size: 34px; }
+      .subtitle { font-size: 14px; letter-spacing: 1px; }
+      .active-players { font-size: 12px; } /* NYTT */
+      .menu-toggle { top: 12px; left: 12px; width: 42px; height: 42px; font-size: 24px; }
+      .sidebar { width: 190px; padding-top: 66px; }
+      .sidebar-btn { font-size: 15px; padding: 10px; }
+      .sidebar-btn .icon { width: 22px; font-size: 18px; }
+      .main { padding: 16px; }
+      .loader-title { font-size: 20px; }
+      .loader-message { font-size: 13px; }
+
+      .chat-panel {
+        left: 10px;
+        right: 10px;
+        width: auto;
+        top: 66px;
+        height: 46dvh;
+      }
+    }
+  </style>
+<body class="blue">
+  <div class="app">
+    <button id="menuToggle" class="menu-toggle" onclick="toggleSidebar()" aria-label="Öppna meny" aria-expanded="false">☰</button>
+    <button id="profileBtn" class="profile-btn" onclick="openProfileModal()">👤 Profil</button>
+    <div id="sidebarOverlay" class="sidebar-overlay" onclick="closeSidebar()"></div>
+
+    <div class="sidebar" id="sidebar">
+      <button class="sidebar-btn" onclick="goHome()"><span class="icon">🏠</span><span class="label">Hem</span></button>
+      <button class="sidebar-btn" onclick="showFavorites()"><span class="icon">⭐</span><span class="label">Favoriter</span></button>
+      <button class="sidebar-btn" onclick="showRecent()"><span class="icon">⏱</span><span class="label">Senaste</span></button>
+      <button class="sidebar-btn" onclick="openIframe('https://alv3333.github.io/Coola-Mattespel-Soundboard.github.io/')"><span class="icon">🔊</span><span class="label">Soundboard</span></button>
+      <button class="sidebar-btn" onclick="openIframe('https://studio.pickaxe.co/STUDIOGX4LHRY55GYHQ15/295XP68K97')"><span class="icon">🤖</span><span class="label">AI</span></button>
+      <button class="sidebar-btn" onclick="openIframe('https://mattematikpluggeri.joe.dj')"><span class="icon">🔎</span><span class="label">Browser</span></button>
+      <button class="sidebar-btn" onclick="openIframe('https://docs.google.com/forms/d/e/1FAIpQLScUxR7Ychb0ivMguYI-3BHwb8D3ZH2x7n1vkpXuYjNeVlU3Cg/viewform?usp=header')"><span class="icon">📩</span><span class="label">Förslag</span></button>
+     <button class="sidebar-btn" onclick="showUpdates()"><span class="icon">⬆</span><span class="label">Uppdateringar</span></button>
+      <button class="sidebar-btn" onclick="showQuestPage()"><span class="icon">🎯</span><span class="label">Quests</span></button>
+      <button class="sidebar-btn" onclick="showShopPage()"><span class="icon">🛒</span><span class="label">Shop</span></button>
+      <button class="sidebar-btn" onclick="openAdminModal()"><span class="icon">🛡️</span><span class="label">Admin</span></button>
+      <button class="sidebar-btn" onclick="openThemePopup()"><span class="icon">🎨</span><span class="label">Tema</span></button>
+    </div>
+
+    <div class="chat-panel" id="chatPanel">
+      <div class="chat-header">💬 Live Chat</div>
+      <div class="chat-messages" id="chatMessages"></div>
+      <div class="chat-controls">
+        <div class="chat-mode-row">
+          <button id="globalChatBtn" class="chat-tab active" onclick="switchChatMode('global')">Global</button>
+          <button id="privateChatBtn" class="chat-tab" onclick="switchChatMode('private')">Privat</button>
+          <select id="friendSelect" class="friend-select"></select>
+        </div>
+        <div id="chatStatus" class="chat-status">Logga in för att chatta.</div>
+        <div class="chat-row">
+          <input id="chatInput" class="chat-input" maxlength="200" placeholder="Skriv meddelande..." />
+          <button id="chatSend" class="chat-send">Skicka</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="main">
+      <div class="header">
+        <h1>Coola Mattespel V4</h1>
+        <p class="subtitle">Cool sida med coola mattespel!</p>
+        <p id="activePlayers" class="active-players">Aktiva spelare: ...</p> <!-- NYTT -->
+        <div class="search-box">
+         <input id="searchInput" placeholder="Sök spel..." oninput="filterGames()" />
+        </div>
+      </div>
+
+      <div id="embedContainer">
+        <div id="iframeLoader">
+          <div class="loader-box">
+            <div class="loader-title">Laddar</div>
+            <div class="loader-track">
+              <div id="loaderFill" class="loader-fill"></div>
+            </div>
+            <div id="loaderMessage" class="loader-message"></div>
+          </div>
+        </div>
+        <iframe id="gameFrame"></iframe>
+        <button class="fullscreen-btn" onclick="toggleFullscreen()">Fullscreen</button>
+      </div>
+
+      <div id="recommendedSection" class="recommended-section">
+        <h2 class="recommended-title">Rekommenderade spel:</h2>
+        <div id="recommendedRow" class="recommended-row"></div>
+      </div>
+<div id="updatesPage" style="display:none;margin-top:30px;">
+  <h2 style="font-size:28px;margin-bottom:15px;">⬆ Uppdateringar</h2>
+
+  <div id="updatesList" style="
+    background:rgba(0,0,0,.6);
+    padding:20px;
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,.15);
+    line-height:1.6;
+    font-size:16px;
+  ">
+  </div>
+</div>
+      <div id="questPage" class="panel-page" style="display:none;">
+        <h2>🎯 Quests</h2>
+        <div class="panel-card">
+          <p>Spela <b>Snow Rider 3D</b> i 15 min och få <b>10 coins</b>.</p>
+          <button class="chat-send" onclick="claimSnowQuest()">Claim quest</button>
+          <p id="questStatus"></p>
+        </div>
+      </div>
+      <div id="shopPage" class="panel-page" style="display:none;">
+        <h2>🛒 Shop</h2>
+        <div class="panel-card">
+          <p>Glownamn (25 coins)</p>
+          <button class="chat-send" onclick="buyItem('glow',25)">Köp</button>
+        </div>
+        <div class="panel-card">
+          <p>Regnbågsbadge 🌈 (40 coins)</p>
+          <button class="chat-send" onclick="buyItem('rainbow',40)">Köp</button>
+        </div>
+      </div>
+      <div class="games-grid" id="gamesGrid"></div>
+    </div>
+  </div>
+
+
+  <div id="profileModal" class="app-modal" onclick="if(event.target===this)closeProfileModal()">
+    <div class="app-modal-box">
+      <h3>👤 Profil</h3>
+      <input id="profileEmail" class="chat-input" placeholder="Mail" />
+      <input id="profileUsername" class="chat-input" placeholder="Username" />
+      <input id="profilePassword" class="chat-input" type="password" placeholder="Lösenord" />
+      <div class="chat-row">
+        <button class="chat-send" onclick="registerUser()">Registrera</button>
+        <button class="chat-send" onclick="loginUser()">Logga in</button>
+        <button class="chat-send" onclick="requestLoginCode()">Skicka kod</button>
+      </div>
+      <input id="profileOtp" class="chat-input" maxlength="6" placeholder="6-siffrig kod" />
+      <div class="chat-row">
+        <button class="chat-send" onclick="loginUser()">Logga in med kod</button>
+      </div>
+      <p id="profileInfo"></p>
+      <hr>
+      <input id="friendInput" class="chat-input" placeholder="Lägg till kompis via username" />
+      <button class="chat-send" onclick="addFriend()">Lägg till kompis</button>
+      <div id="friendList"></div>
+    </div>
+  </div>
+
+  <div id="adminModal" class="app-modal" onclick="if(event.target===this)closeAdminModal()">
+    <div class="app-modal-box">
+      <h3>🛡️ Admin Panel</h3>
+      <input id="adminPassword" class="chat-input" type="password" placeholder="Admin lösenord" />
+      <input id="adminTarget" class="chat-input" placeholder="Username" />
+      <div class="chat-row"><button class="chat-send" onclick="adminAction('kick')">Kick</button><button class="chat-send" onclick="adminAction('timeout')">Timeout 10m</button></div>
+      <div class="chat-row"><button class="chat-send" onclick="adminAction('ban')">Ban 24h</button><button class="chat-send" onclick="adminAction('verify')">Verifiera ✔️</button></div>
+      <div class="chat-row"><input id="adminCoins" class="chat-input" placeholder="Coins" /><button class="chat-send" onclick="adminAction('coins')">Ge coins</button></div>
+      <p id="adminInfo"></p>
+    </div>
+  </div>
+
+  <div id="themePopup" onclick="if(event.target===this)this.style.display='none'">
+    <div class="theme-box">
+      <button class="theme-btn" onclick="setTheme('blue')">🔵</button>
+      <button class="theme-btn" onclick="setTheme('red')">🔴</button>
+      <button class="theme-btn" onclick="setTheme('green')">🟢</button>
+      <button class="theme-btn" onclick="setTheme('yellow')">🟡</button>
+      <button class="theme-btn" onclick="setTheme('orange')">🟠</button>
+      <button class="theme-btn" onclick="setTheme('gray')">⚪</button>
+      <button class="theme-btn" onclick="setTheme('purple')">🟣</button>
+      <button class="theme-btn" onclick="setTheme('pink')">🌸</button>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+  <script>
+    const files = [
+      // Kortad lista för enklare redigering (lägg in hela listan själv vid behov)
+      'clsummerRider3D',
+      'climposter',
+      'clworldguessr',
+      'clslopeplus',
+      'clUltimatecardrivingsimulator',
+      'clmathgame',
+      'clmathgamev2',
+      'clroblox',
+      'cltunnelrush',
+      'cltinyfishing'
+
+    ]
+
+    const recommendedGames = [
+      "climposter",
+      "clworldguessr",
+      "clslopeplus",
+      "clUltimatecardrivingsimulator",
+      "clsummerRider3D"
+    ];
+
+    files.sort((a, b) => a.localeCompare(b, "sv", { sensitivity: "base" }));
+
+    let recentGames = JSON.parse(localStorage.getItem("recentGames") || "[]");
+    let favoriteGames = JSON.parse(localStorage.getItem("favoriteGames") || "[]");
+
+    const gamesGrid = document.getElementById("gamesGrid");
+    const embedContainer = document.getElementById("embedContainer");
+    const gameFrame = document.getElementById("gameFrame");
+    const recommendedSection = document.getElementById("recommendedSection");
+    const recommendedRow = document.getElementById("recommendedRow");
+    const sidebar = document.getElementById("sidebar");
+    const sidebarOverlay = document.getElementById("sidebarOverlay");
+    const menuToggle = document.getElementById("menuToggle");
+    const iframeLoader = document.getElementById("iframeLoader");
+    const loaderFill = document.getElementById("loaderFill");
+    const loaderMessage = document.getElementById("loaderMessage");
+    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+
+    const chatMessagesEl = document.getElementById("chatMessages");
+    const chatInputEl = document.getElementById("chatInput");
+    const chatSendEl = document.getElementById("chatSend");
+    const globalChatBtn = document.getElementById("globalChatBtn");
+    const privateChatBtn = document.getElementById("privateChatBtn");
+    const friendSelectEl = document.getElementById("friendSelect");
+    const chatStatusEl = document.getElementById("chatStatus");
+    const activePlayersEl = document.getElementById("activePlayers"); // NYTT
+    const updates = [
+      "Här kommer uppdateringar synas, varje uppdatering kommer ungefär varje söndag. 👍",
+      "Nästa uppdatering (SÖN 14/3) --> V4.1 ⬆",
+      "KANSKE en discord server (om fler vill ha en)",
+      "Quest och shop system där man kan göra quests ex: spela snowrider 3d 15 min. Så får man ex 10 coins som man kan spendera i shoppen på ex nåt till sin profil",
+      "Profil/kompis system där man kan logga in och göra sin egna profil. Man ska även kunna lägga till kompisar och ha privata chattar med de",
+      "Chatt-förbättringar jag ska lägga till bättre filter och göra chatten snyggare, man måste även vara inloggad för att kunna chatta",
+      "Admin-panel där JAG kan timeouta, banna och kicka folk från chatten. Kanske nåt mer????",
+      "SKICKA FÖRSLAG!!!"
+
+];
+    const firebaseConfig = {
+      apiKey: "AIzaSyDRnICpSXjxHQDqhGMZzFGvmcBjJC5RNaw",
+      authDomain: "chatt-4d3c7.firebaseapp.com",
+      databaseURL: "https://chatt-4d3c7-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "chatt-4d3c7",
+      appId: "1:348935217920:web:05883b914adf5bf10849e5"
+    };
+
+    const requiredMailDomain = "@edu.lomma.se";
+    const emailProviderConfig = {
+      endpoint: "", // ex: https://din-mail-funktion/send-login-code
+      bearerToken: ""
+    };
+
+    let chatRef = null;
+    let db = null;
+    let currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
+    let userRef = null;
+    let currentUserData = null;
+    let chatMode = "global";
+    let privateChatUnsub = null;
+    let lastChatSentAt = 0;
+    let snowRideStartedAt = null;
+
+    const loadingMessages = [
+      "Laddar laddningen som laddar laddningen",
+      "Ingen vet vem jag är förutom de som vet vem jag är",
+      ":(",
+      "Detta är helt värdelöst",
+      "Laddar kanske något",
+      "V2 eller V4?",
+      "Coola Mattespel är bästa spelsidan",
+      "Sprid denna sidan till alla ni känner!!!!!!!!!",
+      "Just nu är det 01:67 på natten",
+      "Laddar absolut inget",
+      "Jag heter Bengt",
+      "Five nights at freddis",
+      "Skriv gärna i live chatten!",
+      "Hej alla gooners!",
+      "Willem var här",
+      "(¤_¤)"
+    ];
+
+    let fakeLoadTimeout = null;
+    let fakeLoadRaf = null;
+    let currentLoadId = 0;
+
+    const displayName = (f) => {
+      const raw = f.replace(/^cl/i, "").trim();
+      return raw.replace(/^([^A-Za-zÅÄÖåäö]*)([a-zåäö])/, (_, prefix, letter) => {
+        return prefix + letter.toUpperCase();
+      });
+    };
+
+    function openSidebar() {
+      sidebar.classList.add("open");
+      sidebarOverlay.classList.add("show");
+      menuToggle.textContent = "✕";
+      menuToggle.setAttribute("aria-expanded", "true");
+      menuToggle.setAttribute("aria-label", "Stäng meny");
+    }
+
+    function closeSidebar() {
+      sidebar.classList.remove("open");
+      sidebarOverlay.classList.remove("show");
+      menuToggle.textContent = "☰";
+      menuToggle.setAttribute("aria-expanded", "false");
+      menuToggle.setAttribute("aria-label", "Öppna meny");
+    }
+
+    function toggleSidebar() {
+      if (sidebar.classList.contains("open")) closeSidebar();
+      else openSidebar();
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeSidebar();
+    });
+    function showUpdates(){
+
+  gamesGrid.style.display="none";
+  recommendedSection.style.display="none";
+  embedContainer.style.display="none";
+  hidePages();
+
+  const page=document.getElementById("updatesPage");
+  const list=document.getElementById("updatesList");
+
+  page.style.display="block";
+
+  list.innerHTML="";
+
+  updates.forEach(u=>{
+    const item=document.createElement("div");
+    item.style.marginBottom="8px";
+    item.textContent="• "+u;
+    list.appendChild(item);
+  });
+
+}
+
+    function stopFakeLoaderTimers() {
+      clearTimeout(fakeLoadTimeout);
+      if (fakeLoadRaf !== null) {
+        cancelAnimationFrame(fakeLoadRaf);
+        fakeLoadRaf = null;
+      }
+    }
+
+    function startFakeLoader() {
+      currentLoadId += 1;
+      const loadId = currentLoadId;
+
+      stopFakeLoaderTimers();
+
+      const randomDuration = Math.floor(Math.random() * 6000) + 3000;
+      const slowDownStart = Math.floor(randomDuration * 0.82);
+
+      loaderFill.style.transform = "scaleX(0)";
+      loaderMessage.textContent = loadingMessages[Math.floor(Math.random() * loadingMessages.length)];
+      iframeLoader.classList.add("show");
+
+      let startTs = null;
+
+      const animate = (ts) => {
+        if (loadId !== currentLoadId) return;
+        if (startTs === null) startTs = ts;
+
+        const elapsed = ts - startTs;
+        let progress;
+
+        if (elapsed < slowDownStart) {
+          const t = elapsed / slowDownStart;
+          progress = 95 * (1 - Math.pow(1 - t, 3));
+        } else if (elapsed < randomDuration) {
+          const t = (elapsed - slowDownStart) / (randomDuration - slowDownStart);
+          progress = 95 + 3 * (1 - Math.pow(1 - t, 2));
+        } else {
+          finishFakeLoader(loadId);
+          return;
+        }
+
+        loaderFill.style.transform = `scaleX(${Math.min(progress, 98) / 100})`;
+        fakeLoadRaf = requestAnimationFrame(animate);
+      };
+
+      fakeLoadRaf = requestAnimationFrame(animate);
+      fakeLoadTimeout = setTimeout(() => finishFakeLoader(loadId), randomDuration + 1200);
+
+      return loadId;
+    }
+
+    function finishFakeLoader(loadId) {
+      if (loadId !== currentLoadId) return;
+
+      stopFakeLoaderTimers();
+      loaderFill.style.transform = "scaleX(1)";
+
+      setTimeout(() => {
+        if (loadId !== currentLoadId) return;
+        iframeLoader.classList.remove("show");
+        loaderFill.style.transform = "scaleX(0)";
+      }, 260);
+    }
+
+    function sanitizeName(v) {
+      const s = (v || "").replace(/[^a-zA-Z0-9åäöÅÄÖ _-]/g, "").trim().slice(0, 20);
+      return s || "Gäst";
+    }
+
+    function sanitizeText(v) {
+      return (v || "").replace(/\s+/g, " ").trim().slice(0, 200);
+    }
+const bannedWords = [
+  "nigger",
+  "hitler",
+  "alve",
+  "bernflo", 
+  "epsteien",
+  "fitta", 
+  "neger", 
+  "hor",
+  "fuck",
+  "horunge",
+  "goon",
+  "sperm",
+  "runk",
+  "dö",
+  "snopp",
+  "kuk",
+  "penis",
+  "nigga",
+  "k4k",
+  "dih",
+  "dräng",
+  "snippa",
+  "niger"
+];
+
+function containsBannedWord(text) {
+  const lower = text.toLowerCase();
+  return bannedWords.some(word => lower.includes(word));
+}
+    function addChatMessage(msg) {
+      const box = document.createElement("div");
+      box.className = "chat-msg";
+
+      const meta = document.createElement("div");
+      meta.className = "chat-meta";
+      const t = new Date(msg.ts || Date.now()).toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit" });
+      meta.textContent = `${(msg.name || "Gäst").slice(0, 20)} • ${t}`;
+
+      const text = document.createElement("div");
+      text.className = "chat-text";
+      text.textContent = (msg.text || "").slice(0, 200);
+
+      box.append(meta, text);
+      chatMessagesEl.appendChild(box);
+      chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+    }
+
+    function addSystemChatMessage(text) {
+      addChatMessage({ name: "System", text, ts: Date.now() });
+    }
+
+function getSafeUsername(v) {
+  return (v || "").replace(/[^a-zA-Z0-9åäöÅÄÖ_-]/g, "").trim().slice(0, 20);
+}
+
+function getChatDisplayName() {
+  if (!currentUserData) return "Gäst";
+  return `${currentUserData.username}${currentUserData.verified ? " ✔️" : ""}`;
+}
+
+function setChatEnabledState() {
+  const loggedIn = !!(currentUser && currentUser.username);
+  chatInputEl.disabled = !loggedIn;
+  chatSendEl.disabled = !loggedIn;
+  privateChatBtn.disabled = !loggedIn;
+  chatStatusEl.textContent = loggedIn
+    ? `Inloggad som ${getChatDisplayName()} • Cooldown 3s`
+    : "Logga in för att chatta. Du kan fortfarande läsa global chat.";
+}
+
+function getPrivateChatPath(a, b) {
+  return [a, b].sort((x, y) => x.localeCompare(y, "sv", { sensitivity: "base" })).join("__");
+}
+
+function switchChatMode(mode) {
+  chatMode = mode;
+  globalChatBtn.classList.toggle("active", mode === "global");
+  privateChatBtn.classList.toggle("active", mode === "private");
+  friendSelectEl.style.display = mode === "private" ? "block" : "none";
+  chatMessagesEl.innerHTML = "";
+
+  if (chatRef) chatRef.off();
+  if (privateChatUnsub) {
+    privateChatUnsub.off();
+    privateChatUnsub = null;
+  }
+  if (!db) return;
+
+  if (mode === "global") {
+    chatRef.limitToLast(120).on("child_added", (snap) => addChatMessage(snap.val() || {}));
+    return;
+  }
+
+  if (!currentUser) {
+    addSystemChatMessage("Logga in för privat chatt.");
+    return;
+  }
+
+  const friend = friendSelectEl.value;
+  if (!friend) {
+    addSystemChatMessage("Välj en kompis för privat chatt.");
+    return;
+  }
+
+  const room = getPrivateChatPath(currentUser.username, friend);
+  privateChatUnsub = db.ref(`private-chats/${room}`);
+  privateChatUnsub.limitToLast(120).on("child_added", (snap) => addChatMessage(snap.val() || {}));
+}
+
+function sendChatMessage() {
+  const text = sanitizeText(chatInputEl.value);
+  if (!text || !db || !currentUser) return;
+
+  if (Date.now() - lastChatSentAt < 3000) {
+    alert("Vänta 3 sekunder mellan meddelanden.");
+    return;
+  }
+
+  if (containsBannedWord(text)) {
+    alert("Ditt meddelande innehåller ord som inte är tillåtna.");
+    return;
+  }
+
+  if (currentUserData?.bannedUntil && Date.now() < currentUserData.bannedUntil) {
+    alert("Du är bannad tillfälligt.");
+    return;
+  }
+  if (currentUserData?.timeoutUntil && Date.now() < currentUserData.timeoutUntil) {
+    alert("Du har timeout just nu.");
+    return;
+  }
+
+  const payload = {
+    name: getChatDisplayName(),
+    username: currentUser.username,
+    text,
+    ts: Date.now()
+  };
+
+  if (chatMode === "private") {
+    const friend = friendSelectEl.value;
+    if (!friend) return alert("Välj en kompis först.");
+    const room = getPrivateChatPath(currentUser.username, friend);
+    db.ref(`private-chats/${room}`).push(payload);
+  } else if (chatRef) {
+    chatRef.push(payload);
+  }
+
+  lastChatSentAt = Date.now();
+  chatInputEl.value = "";
+}
+
+function openProfileModal() {
+  document.getElementById("profileModal").style.display = "flex";
+  renderFriendList();
+}
+
+function closeProfileModal() {
+  document.getElementById("profileModal").style.display = "none";
+}
+
+function openAdminModal() {
+  document.getElementById("adminModal").style.display = "flex";
+}
+
+function closeAdminModal() {
+  document.getElementById("adminModal").style.display = "none";
+}
+
+function validateUsername(username) {
+  if (!username || username.length < 3) return "Username måste vara minst 3 tecken.";
+  if (containsBannedWord(username)) return "Username innehåller förbjudna ord.";
+  return "";
+}
+
+async function registerUser() {
+  if (!db) return;
+  const email = sanitizeText(document.getElementById("profileEmail").value).toLowerCase();
+  const username = getSafeUsername(document.getElementById("profileUsername").value);
+  const password = sanitizeText(document.getElementById("profilePassword").value);
+  const info = document.getElementById("profileInfo");
+
+  const uErr = validateUsername(username);
+  if (uErr) return (info.textContent = uErr);
+  if (!email.includes("@")) return (info.textContent = "Skriv en giltig mail.");
+  if (!email.endsWith(requiredMailDomain)) return (info.textContent = `Mail måste sluta med ${requiredMailDomain}`);
+  if (password.length < 4) return (info.textContent = "Lösenord minst 4 tecken.");
+
+  const exists = await db.ref(`users/${username}`).get();
+  if (exists.exists()) return (info.textContent = "Username är redan taget.");
+
+  const allUsersSnap = await db.ref("users").get();
+  const allUsers = allUsersSnap.val() || {};
+  const duplicateEmail = Object.values(allUsers).some((u) => (u?.email || "").toLowerCase() === email);
+  if (duplicateEmail) return (info.textContent = "Mail används redan av ett annat konto.");
+
+  await db.ref(`users/${username}`).set({
+    email,
+    password,
+    username,
+    coins: 0,
+    verified: false,
+    friends: {},
+    inventory: {},
+    createdAt: Date.now()
+  });
+  info.textContent = "Konto skapat! Logga in nu.";
+  info.textContent = "Konto skapat! Klicka på 'Skicka kod' för inloggning.";
+}
+
+async function sendLoginCodeEmail(email, code) {
+  if (!emailProviderConfig.endpoint) return false;
+  try {
+    const res = await fetch(emailProviderConfig.endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(emailProviderConfig.bearerToken ? { Authorization: `Bearer ${emailProviderConfig.bearerToken}` } : {})
+      },
+      body: JSON.stringify({
+        to: email,
+        subject: "Din inloggningskod",
+        text: `Din kod är: ${code}`
+      })
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
+async function requestLoginCode() {
+  if (!db) return;
+  const email = sanitizeText(document.getElementById("profileEmail").value).toLowerCase();
+  const username = getSafeUsername(document.getElementById("profileUsername").value);
+  const password = sanitizeText(document.getElementById("profilePassword").value);
+  const info = document.getElementById("profileInfo");
+
+  if (!email.endsWith(requiredMailDomain)) return (info.textContent = `Du måste använda ${requiredMailDomain}`);
+
+  const snap = await db.ref(`users/${username}`).get();
+  if (!snap.exists()) return (info.textContent = "Användaren finns inte.");
+  const data = snap.val();
+  if ((data.email || "").toLowerCase() !== email) return (info.textContent = "Fel mail för detta konto.");
+  if (data.password !== password) return (info.textContent = "Fel lösenord.");
+
+  const code = String(Math.floor(100000 + Math.random() * 900000));
+  const expiresAt = Date.now() + 10 * 60 * 1000;
+
+  await db.ref(`login-codes/${username}`).set({
+    code,
+    expiresAt,
+    createdAt: Date.now(),
+    email
+  });
+
+  const sent = await sendLoginCodeEmail(email, code);
+  if (sent) {
+    info.textContent = `Kod skickad till ${email}.`;
+  } else {
+    info.textContent = `Kod skapad men mail-provider saknas. Lägg till endpoint i emailProviderConfig.`;
+    alert(`Utvecklingsläge: din kod är ${code}`);
+  }
+}
+
+async function loginUser() {
+  if (!db) return;
+  const email = sanitizeText(document.getElementById("profileEmail").value).toLowerCase();
+  const username = getSafeUsername(document.getElementById("profileUsername").value);
+  const password = sanitizeText(document.getElementById("profilePassword").value);
+  const otp = sanitizeText(document.getElementById("profileOtp").value);
+  const info = document.getElementById("profileInfo");
+
+  if (!email.includes("@")) return (info.textContent = "Skriv mail för att logga in.");
+  if (!email.endsWith(requiredMailDomain)) return (info.textContent = `Skriv ett giltigt ${requiredMailDomain}-mail.`);
+  if (!/^\d{6}$/.test(otp)) return (info.textContent = "Skriv 6-siffrig kod.");
+
+  const snap = await db.ref(`users/${username}`).get();
+  if (!snap.exists()) return (info.textContent = "Användaren finns inte.");
+  const data = snap.val();
+  if ((data.email || "").toLowerCase() !== email) return (info.textContent = "Fel mail för detta konto.");
+  if (data.password !== password) return (info.textContent = "Fel lösenord.");
+  if (data.bannedUntil && Date.now() < data.bannedUntil) return (info.textContent = "Du är bannad just nu.");
+
+  const codeSnap = await db.ref(`login-codes/${username}`).get();
+  const codeData = codeSnap.val();
+  if (!codeData) return (info.textContent = "Ingen kod hittades. Klicka på 'Skicka kod'.");
+  if (Date.now() > (codeData.expiresAt || 0)) return (info.textContent = "Koden har gått ut. Skicka ny kod.");
+  if (String(codeData.code) !== otp) return (info.textContent = "Fel kod.");
+
+  await db.ref(`login-codes/${username}`).remove();
+
+  currentUser = { username };
+  currentUserData = data;
+  localStorage.setItem("currentUser", JSON.stringify(currentUser));
+  info.textContent = `Inloggad som ${username}`;
+  setChatEnabledState();
+  bindUserRef();
+  renderFriendList();
+  populateFriendSelect();
+}
+
+
+function bindUserRef() {
+  if (!db || !currentUser) return;
+  if (userRef) userRef.off();
+  userRef = db.ref(`users/${currentUser.username}`);
+  userRef.on("value", (snap) => {
+    currentUserData = snap.val() || null;
+    setChatEnabledState();
+    renderFriendList();
+    populateFriendSelect();
+  });
+}
+
+async function addFriend() {
+  if (!db || !currentUser) return;
+  const friend = getSafeUsername(document.getElementById("friendInput").value);
+  if (!friend || friend === currentUser.username) return;
+  const fSnap = await db.ref(`users/${friend}`).get();
+  if (!fSnap.exists()) return alert("Den användaren finns inte.");
+  await db.ref(`users/${currentUser.username}/friends/${friend}`).set(true);
+  await db.ref(`users/${friend}/friends/${currentUser.username}`).set(true);
+  document.getElementById("friendInput").value = "";
+}
+
+function renderFriendList() {
+  const box = document.getElementById("friendList");
+  if (!box) return;
+  box.innerHTML = "";
+  const friends = Object.keys(currentUserData?.friends || {});
+  if (!friends.length) {
+    box.textContent = "Inga kompisar ännu.";
+    return;
+  }
+  friends.forEach((f) => {
+    const el = document.createElement("div");
+    el.textContent = `• ${f}`;
+    box.appendChild(el);
+  });
+}
+
+function populateFriendSelect() {
+  friendSelectEl.innerHTML = "";
+  const friends = Object.keys(currentUserData?.friends || {});
+  const opt = document.createElement("option");
+  opt.value = "";
+  opt.textContent = friends.length ? "Välj kompis" : "Inga kompisar";
+  friendSelectEl.appendChild(opt);
+  friends.forEach((f) => {
+    const o = document.createElement("option");
+    o.value = f;
+    o.textContent = f;
+    friendSelectEl.appendChild(o);
+  });
+}
+
+function hidePages() {
+  document.getElementById("updatesPage").style.display = "none";
+  document.getElementById("questPage").style.display = "none";
+  document.getElementById("shopPage").style.display = "none";
+}
+
+function showQuestPage() {
+  gamesGrid.style.display = "none";
+  recommendedSection.style.display = "none";
+  embedContainer.style.display = "none";
+  hidePages();
+  document.getElementById("questPage").style.display = "block";
+}
+
+function showShopPage() {
+  gamesGrid.style.display = "none";
+  recommendedSection.style.display = "none";
+  embedContainer.style.display = "none";
+  hidePages();
+  document.getElementById("shopPage").style.display = "block";
+}
+
+function claimSnowQuest() {
+  if (!currentUser) return alert("Logga in först.");
+  const status = document.getElementById("questStatus");
+  if (!snowRideStartedAt) {
+    status.textContent = "Starta Snow Rider 3D först för att börja questen.";
+    return;
+  }
+  if (Date.now() - snowRideStartedAt < 15 * 60 * 1000) {
+    status.textContent = "Inte klart än. Fortsätt spela Snow Rider 3D!";
+    return;
+  }
+  snowRideStartedAt = null;
+  const coins = (currentUserData?.coins || 0) + 10;
+  db.ref(`users/${currentUser.username}/coins`).set(coins);
+  status.textContent = "Quest klar! +10 coins";
+}
+
+function buyItem(item, cost) {
+  if (!currentUser) return alert("Logga in först.");
+  const coins = currentUserData?.coins || 0;
+  if (coins < cost) return alert("Du har inte tillräckligt med coins.");
+  db.ref(`users/${currentUser.username}/coins`).set(coins - cost);
+  db.ref(`users/${currentUser.username}/inventory/${item}`).set(true);
+  alert("Köp lyckades!");
+}
+
+async function adminAction(action) {
+  if (!db) return;
+  const pw = document.getElementById("adminPassword").value;
+  const target = getSafeUsername(document.getElementById("adminTarget").value);
+  const info = document.getElementById("adminInfo");
+  if (pw !== "SigmaAdmin1234!") return (info.textContent = "Fel admin-lösenord.");
+  if (!target) return (info.textContent = "Skriv username.");
+
+  const ref = db.ref(`users/${target}`);
+  const snap = await ref.get();
+  if (!snap.exists()) return (info.textContent = "Användaren finns inte.");
+
+  if (action === "kick") {
+    await ref.update({ timeoutUntil: Date.now() + 60 * 1000 });
+    info.textContent = `${target} kickad (1 min timeout).`;
+  } else if (action === "timeout") {
+    await ref.update({ timeoutUntil: Date.now() + 10 * 60 * 1000 });
+    info.textContent = `${target} timeoutad 10 min.`;
+  } else if (action === "ban") {
+    await ref.update({ bannedUntil: Date.now() + 24 * 60 * 60 * 1000 });
+    info.textContent = `${target} bannad 24h.`;
+  } else if (action === "verify") {
+    await ref.update({ verified: true });
+    info.textContent = `${target} är nu verifierad.`;
+  } else if (action === "coins") {
+    const amount = Number(document.getElementById("adminCoins").value || 0);
+    const base = snap.val().coins || 0;
+    await ref.update({ coins: base + amount });
+    info.textContent = `${target} fick ${amount} coins.`;
+  }
+}
+
+    function renderRecommended() {
+      recommendedRow.innerHTML = "";
+      const picks = recommendedGames.filter(g => files.includes(g)).slice(0, 5);
+
+      picks.forEach((file) => {
+        const btn = document.createElement("button");
+        btn.className = "game-btn recommended-btn";
+        btn.textContent = displayName(file);
+        btn.onclick = () => openGame(file);
+        recommendedRow.appendChild(btn);
+      });
+    }
+
+    function getGroupLabel(file) {
+      const name = displayName(file).trim();
+      const first = (name[0] || "").toUpperCase();
+      return /^[A-Z]$/.test(first) ? first : "#";
+    }
+
+    function renderGames(list) {
+      gamesGrid.innerHTML = "";
+      gamesGrid.style.display = "grid";
+      recommendedSection.style.display = "block";
+
+      const groups = { "#": [] };
+      alphabet.forEach((letter) => (groups[letter] = []));
+
+      list.forEach((file) => {
+        groups[getGroupLabel(file)].push(file);
+      });
+
+      const order = ["#", ...alphabet];
+
+      order.forEach((groupKey) => {
+        const groupItems = groups[groupKey];
+        if (!groupItems.length) return;
+
+        groupItems.sort((a, b) =>
+          displayName(a).localeCompare(displayName(b), "sv", {
+            sensitivity: "base",
+            numeric: true
+          })
+        );
+
+        const header = document.createElement("div");
+        header.className = "group-header";
+        header.textContent = groupKey;
+        gamesGrid.appendChild(header);
+
+        groupItems.forEach((file) => {
+          const c = document.createElement("div");
+          c.className = "game-card";
+
+          const b = document.createElement("button");
+          b.className = "game-btn";
+          b.textContent = displayName(file);
+          b.onclick = () => openGame(file);
+
+          const f = document.createElement("span");
+          f.className = "favorite";
+          f.textContent = "★";
+          if (favoriteGames.includes(file)) f.classList.add("active");
+
+          f.onclick = (e) => {
+            e.stopPropagation();
+            if (favoriteGames.includes(file)) {
+              favoriteGames = favoriteGames.filter((g) => g !== file);
+            } else {
+              favoriteGames.push(file);
+            }
+            localStorage.setItem("favoriteGames", JSON.stringify(favoriteGames));
+            renderGames(list);
+          };
+
+          c.append(b, f);
+          gamesGrid.appendChild(c);
+        });
+      });
+    }
+
+    function openGame(game) {
+      startFakeLoader();
+
+      embedContainer.style.display = "block";
+      gameFrame.onload = null;
+      gameFrame.src = `UGS-Files/${game}.html`;
+
+      requestAnimationFrame(() => {
+        embedContainer.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+
+      if (game === "clsummerRider3D") {
+        if (!snowRideStartedAt) snowRideStartedAt = Date.now();
+      }
+
+      if (!recentGames.includes(game)) {
+        recentGames.unshift(game);
+        recentGames = recentGames.slice(0, 10);
+        localStorage.setItem("recentGames", JSON.stringify(recentGames));
+      }
+    }
+
+ function filterGames() {
+  const q = document.getElementById("searchInput").value.toLowerCase();
+  renderGames(files.filter((f) => displayName(f).toLowerCase().includes(q)));
+}
+
+    function goHome() {
+      location.reload();
+    }
+
+    function showFavorites() {
+      renderGames(favoriteGames);
+    }
+
+    function showRecent() {
+      renderGames(recentGames);
+    }
+
+    function openIframe(url) {
+      startFakeLoader();
+
+      embedContainer.style.display = "block";
+      gameFrame.onload = null;
+      gameFrame.src = url;
+
+      gamesGrid.style.display = "none";
+      recommendedSection.style.display = "none";
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        embedContainer.requestFullscreen();
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    function setTheme(t) {
+      document.body.className = t;
+      localStorage.setItem("theme", t);
+      document.getElementById("themePopup").style.display = "none";
+    }
+
+    function openThemePopup() {
+      document.getElementById("themePopup").style.display = "flex";
+    }
+
+    (function init() {
+      const saved = localStorage.getItem("theme");
+      if (saved) document.body.className = saved;
+      renderRecommended();
+      renderGames(files);
+
+      document.querySelectorAll(".sidebar .sidebar-btn").forEach((btn) => {
+        btn.addEventListener("click", closeSidebar);
+      });
+
+      chatSendEl.addEventListener("click", sendChatMessage);
+      chatInputEl.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") sendChatMessage();
+      });
+      friendSelectEl.addEventListener("change", () => { if (chatMode === "private") switchChatMode("private"); });
+
+      const notConfigured = (
+        !firebaseConfig.apiKey || firebaseConfig.apiKey.includes("DIN_") ||
+        !firebaseConfig.databaseURL || firebaseConfig.databaseURL.includes("DITT_PROJEKT")
+      );
+
+      if (notConfigured) {
+        activePlayersEl.textContent = "Aktiva spelare: --";
+        addSystemChatMessage("Chatten är inte kopplad ännu. Fyll i firebaseConfig i koden.");
+        return;
+      }
+
+      setChatEnabledState();
+
+      try {
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        db = firebase.database();
+
+        // NYTT: Aktiva spelare (presence)
+        const presenceRef = db.ref("presence");
+        const tabKey = "presenceTabId";
+        let tabId = sessionStorage.getItem(tabKey);
+        if (!tabId) {
+          tabId = `tab_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+          sessionStorage.setItem(tabKey, tabId);
+        }
+
+        const myPresenceRef = presenceRef.child(tabId);
+
+        db.ref(".info/connected").on("value", (snap) => {
+          if (snap.val() === true) {
+            myPresenceRef.onDisconnect().remove();
+            myPresenceRef.set({
+              online: true,
+              ts: firebase.database.ServerValue.TIMESTAMP
+            });
+          }
+        });
+
+        presenceRef.on("value", (snap) => {
+          activePlayersEl.textContent = `Aktiva spelare: ${snap.numChildren()}`;
+        }, () => {
+          activePlayersEl.textContent = "Aktiva spelare: --";
+        });
+      chatRef = db.ref("global-chat");
+      switchChatMode("global");
+      setChatEnabledState();
+      if (currentUser && currentUser.username) {
+        bindUserRef();
+      }
+      } catch (err) {
+        activePlayersEl.textContent = "Aktiva spelare: --";
+        addSystemChatMessage("Kunde inte ansluta chatten.");
+      }
+
+    })();
+  </script>
+</body>
+</html>
