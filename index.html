@@ -763,16 +763,24 @@
     .intro-overlay {
       position: fixed;
       inset: 0;
+      width: 100vw;
+      height: 100dvh;
       z-index: 5000;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: radial-gradient(circle at center, rgba(28,40,95,.55), rgba(0,0,0,.95));
+      background: transparent;
       opacity: 1;
       transition: opacity .45s ease;
     }
 
     .intro-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .app.intro-hidden {
+      visibility: hidden;
       opacity: 0;
       pointer-events: none;
     }
@@ -829,7 +837,7 @@
     </div>
   </div>
 
-  <div class="app">
+  <div class="app intro-hidden" id="appRoot">
     <button class="top-profile-btn" id="profileBtn">👤 Profil</button>
 
     <button id="menuToggle" class="menu-toggle" onclick="toggleSidebar()" aria-label="Öppna meny" aria-expanded="false">☰</button>
@@ -932,7 +940,10 @@
   <div class="modal-card profile-modal-card">
     <div class="profile-hero">
       <h2 style="margin:0;">👤 Profil & Kompisar</h2>
-      <p id="profileStateText" style="margin:0;font-weight:700;">Inte inloggad.</p>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+        <p id="profileStateText" style="margin:0;font-weight:700;">Inte inloggad.</p>
+        <button class="mini-btn" onclick="logoutAccount()">Logga ut</button>
+      </div>
     </div>
 
     <div class="profile-columns">
@@ -1076,11 +1087,11 @@
 
 ];
     const firebaseConfig = {
-      apiKey: "AIzaSyCrH08zlZ1txjBYigckjG_QYyVRwiKb7rI",
-      authDomain: "tuffboi123-ccf1b.firebaseapp.com",
-      databaseURL: "https://tuffboi123-ccf1b-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "tuffboi123-ccf1b",
-      appId: "1:459268006887:web:09451f9121642e6dbf5342"
+      apiKey: "AIzaSyDRnICpSXjxHQDqhGMZzFGvmcBjJC5RNaw",
+      authDomain: "chatt-4d3c7.firebaseapp.com",
+      databaseURL: "https://chatt-4d3c7-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "chatt-4d3c7",
+      appId: "1:348935217920:web:05883b914adf5bf10849e5"
     };
 
     let chatRef = null;
@@ -1531,10 +1542,8 @@ function sendChatMessage() {
     const CHAT_COOLDOWN_MS = 3000;
   const PROFILE_BANNED_WORDS = ["admin","moderator",...bannedWords];
   let db = null;
-  localStorage.removeItem("currentUser");
-  localStorage.removeItem("sessionToken");
-  let currentUser = null;
-  let currentSessionToken = null;
+  let currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
+  let currentSessionToken = localStorage.getItem("sessionToken") || null;
   let isAdmin = false;
   let chatCooldownUntil = 0;
   let snowQuestMs = Number(localStorage.getItem("snowQuestMs") || 0);
@@ -1642,10 +1651,24 @@ function sendChatMessage() {
     if (!user || user.password !== password) return showToast("Fel mail eller lösenord.");
     if (user.banned) return showToast("Du är bannad.");
 
+    const existingToken = user.sessionToken || null;
+    const deviceToken = localStorage.getItem("sessionToken") || null;
+
+    if (existingToken && existingToken !== deviceToken) {
+      return showToast("detta kontot är upptaget!");
+    }
+
     currentUser = user;
     localStorage.setItem("currentUser", JSON.stringify(currentUser));
     chatNameEl.value = currentUser.username;
-    await activateSession(currentUser.uid);
+
+    if (!existingToken) {
+      await activateSession(currentUser.uid);
+    } else {
+      currentSessionToken = existingToken;
+      localStorage.setItem("sessionToken", currentSessionToken);
+    }
+
     await refreshUserData();
     await updatePresenceUser();
     watchSession();
@@ -1842,6 +1865,18 @@ function sendChatMessage() {
     document.getElementById("privateMessageInput").value = "";
   };
 
+
+  window.logoutAccount = async ()=>{
+    if (!currentUser || !db) {
+      forceLogout("Du är nu utloggad.");
+      return;
+    }
+    try {
+      await ref(`accounts/${currentUser.uid}/sessionToken`).remove();
+    } catch (e) {}
+    forceLogout("Du är nu utloggad.");
+  };
+
   window.adminLogin = ()=>{
     const pass = document.getElementById("adminPassword").value;
     if (pass !== ADMIN_PASSWORD) return showToast("Fel admin lösenord.");
@@ -1924,6 +1959,7 @@ function sendChatMessage() {
   const introOverlay = document.getElementById("introOverlay");
   const introFill = document.getElementById("introFill");
   const introLoadingText = document.getElementById("introLoadingText");
+  const appRoot = document.getElementById("appRoot");
   if (!introOverlay || !introFill || !introLoadingText) return;
 
   const introMessages = [
@@ -1952,6 +1988,7 @@ function sendChatMessage() {
       clearInterval(timer);
       setTimeout(() => {
         introOverlay.classList.add("hidden");
+        if (appRoot) appRoot.classList.remove("intro-hidden");
         setTimeout(() => introOverlay.remove(), 520);
       }, 250);
     }
@@ -1961,3 +1998,7 @@ function sendChatMessage() {
 
 </body>
 </html>
+
+
+
+
