@@ -589,18 +589,23 @@
 
     .top-profile-btn {
       position: fixed;
-      top: 14px;
-      right: 14px;
-      border: none;
-      border-radius: 12px;
-      padding: 10px 14px;
-      font-weight: 700;
+      top: 12px;
+      right: 12px;
+      border: 1px solid rgba(255,255,255,.28);
+      border-radius: 16px;
+      padding: 14px 20px;
+      font-weight: 800;
+      font-size: 19px;
+      letter-spacing: .4px;
       color: #fff;
-      background: linear-gradient(135deg, var(--accent-dark), var(--accent));
-      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+      background: linear-gradient(135deg, #1d2f60, var(--accent), #74beff);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255,255,255,.2);
       cursor: pointer;
       z-index: 1250;
+      transition: transform .15s ease, filter .2s ease;
     }
+
+    .top-profile-btn:hover { transform: translateY(-2px) scale(1.02); filter: brightness(1.06); }
 
     .panel-page {
       display: none;
@@ -695,6 +700,65 @@
       to { transform: translateY(0); opacity: 1; }
     }
 
+
+    .profile-modal-card {
+      width: min(980px, 96vw);
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.24);
+      background: radial-gradient(circle at top right, rgba(90,130,255,.24), transparent 30%), rgba(9,11,22,.95);
+      box-shadow: 0 20px 60px rgba(0,0,0,.45);
+    }
+
+    .profile-hero {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.16);
+    }
+
+    .profile-columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .profile-section {
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .profile-section h3 { margin: 0 0 10px; }
+
+    .private-chat-box {
+      max-height: 210px;
+      overflow: auto;
+      background: rgba(255,255,255,.05);
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.1);
+    }
+
+    .shop-coins {
+      display: inline-block;
+      margin-bottom: 12px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-weight: 800;
+      background: rgba(255, 215, 0, .18);
+      border: 1px solid rgba(255,215,0,.35);
+    }
+
+    @media (max-width: 900px) {
+      .profile-columns { grid-template-columns: 1fr; }
+    }
+
   </style>
 <body class="blue">
   <div class="app">
@@ -784,6 +848,7 @@
 
 <div id="shopPage" class="panel-page">
   <h2>🛒 Shop</h2>
+  <div id="shopCoins" class="shop-coins">Coins: 0</div>
   <div class="shop-item">
     <div><strong>⭐ Guld-badge</strong><br><small>Kostar 25 coins.</small></div>
     <button class="mini-btn" onclick="buyItem('goldBadge',25)">Köp</button>
@@ -796,39 +861,56 @@
 </div>
 
 <div id="profileModal" class="modal" onclick="if(event.target===this)this.classList.remove('show')">
-  <div class="modal-card">
-    <h2>👤 Profil & Kompisar</h2>
-    <p id="profileStateText">Inte inloggad.</p>
-    <div class="form-grid">
-      <input id="regEmail" placeholder="Mail" />
-      <input id="regUsername" placeholder="Username" />
-      <input id="regPassword" type="password" placeholder="Lösenord" />
-      <button class="mini-btn" onclick="registerAccount()">Skapa konto</button>
+  <div class="modal-card profile-modal-card">
+    <div class="profile-hero">
+      <h2 style="margin:0;">👤 Profil & Kompisar</h2>
+      <p id="profileStateText" style="margin:0;font-weight:700;">Inte inloggad.</p>
     </div>
-    <div class="form-grid">
-      <input id="loginEmail" placeholder="Mail" />
-      <input id="loginPassword" type="password" placeholder="Lösenord" />
-      <button class="mini-btn" onclick="startLogin()">Logga in</button>
-      <input id="loginCode" placeholder="6-siffrig kod" maxlength="6" />
-      <button class="mini-btn" onclick="verifyLoginCode()">Verifiera kod</button>
+
+    <div class="profile-columns">
+      <div class="profile-section">
+        <h3>📝 Skapa konto</h3>
+        <div class="form-grid">
+          <input id="regEmail" placeholder="Mail" />
+          <input id="regUsername" placeholder="Username" />
+          <input id="regPassword" type="password" placeholder="Lösenord" />
+          <button class="mini-btn" onclick="registerAccount()">Skapa konto</button>
+        </div>
+      </div>
+
+      <div class="profile-section">
+        <h3>🔐 Logga in</h3>
+        <div class="form-grid">
+          <input id="loginEmail" placeholder="Mail" />
+          <input id="loginPassword" type="password" placeholder="Lösenord" />
+          <button class="mini-btn" onclick="startLogin()">Logga in</button>
+        </div>
+      </div>
     </div>
-    <hr>
-    <h3>➕ Lägg till kompis</h3>
-    <div class="form-grid">
-      <input id="friendUsername" placeholder="Username" />
-      <button class="mini-btn" onclick="sendFriendRequest()">Skicka förfrågan</button>
+
+    <div class="profile-columns" style="margin-top:12px;">
+      <div class="profile-section">
+        <h3>➕ Lägg till kompis</h3>
+        <div class="form-grid">
+          <input id="friendUsername" placeholder="Username" />
+          <button class="mini-btn" onclick="sendFriendRequest()">Skicka förfrågan</button>
+        </div>
+        <h3>📨 Förfrågningar</h3>
+        <div id="friendRequests"></div>
+        <h3>👥 Kompisar</h3>
+        <div id="friendsList"></div>
+      </div>
+
+      <div class="profile-section">
+        <h3>🔒 Privat chatt</h3>
+        <div class="form-grid">
+          <select id="privateChatFriend"></select>
+          <input id="privateMessageInput" placeholder="Meddelande..." maxlength="200" />
+          <button class="mini-btn" onclick="sendPrivateMessage()">Skicka privat</button>
+        </div>
+        <div id="privateChatMessages" class="private-chat-box"></div>
+      </div>
     </div>
-    <h3>📨 Förfrågningar</h3>
-    <div id="friendRequests"></div>
-    <h3>👥 Kompisar</h3>
-    <div id="friendsList"></div>
-    <h3>🔒 Privat chatt</h3>
-    <div class="form-grid">
-      <select id="privateChatFriend"></select>
-      <input id="privateMessageInput" placeholder="Meddelande..." maxlength="200" />
-      <button class="mini-btn" onclick="sendPrivateMessage()">Skicka privat</button>
-    </div>
-    <div id="privateChatMessages" style="max-height:180px;overflow:auto;background:rgba(255,255,255,.05);padding:8px;border-radius:8px;"></div>
   </div>
 </div>
 
@@ -1378,12 +1460,11 @@ function sendChatMessage() {
 <script>
 (function(){
   const ADMIN_PASSWORD = "SigmaAdmin1234!";
-  const LOGIN_CODE_TTL_MS = 5 * 60 * 1000;
-  const CHAT_COOLDOWN_MS = 3000;
+    const CHAT_COOLDOWN_MS = 3000;
   const PROFILE_BANNED_WORDS = ["admin","moderator",...bannedWords];
   let db = null;
   let currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
-  let pendingLogin = null;
+  let currentSessionToken = localStorage.getItem("sessionToken") || null;
   let isAdmin = false;
   let chatCooldownUntil = 0;
   let snowQuestMs = Number(localStorage.getItem("snowQuestMs") || 0);
@@ -1463,6 +1544,26 @@ function sendChatMessage() {
     showToast("Konto skapat! Nu kan du logga in.");
   };
 
+  function generateSessionToken(){
+    if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+    return `sess_${Date.now()}_${Math.random().toString(36).slice(2,10)}`;
+  }
+
+  async function activateSession(uid){
+    currentSessionToken = generateSessionToken();
+    localStorage.setItem("sessionToken", currentSessionToken);
+    await ref(`accounts/${uid}/sessionToken`).set(currentSessionToken);
+  }
+
+  function forceLogout(message){
+    currentUser = null;
+    currentSessionToken = null;
+    localStorage.removeItem("currentUser");
+    localStorage.removeItem("sessionToken");
+    updateProfileUI();
+    if (message) showToast(message);
+  }
+
   window.startLogin = async ()=>{
     if (!db) return;
     const email = document.getElementById("loginEmail").value.trim().toLowerCase();
@@ -1470,22 +1571,14 @@ function sendChatMessage() {
     const user = await loadUserByEmail(email);
     if (!user || user.password !== password) return showToast("Fel mail eller lösenord.");
     if (user.banned) return showToast("Du är bannad.");
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-    pendingLogin = { user, code, expiresAt: now() + LOGIN_CODE_TTL_MS };
-    showToast(`6-siffrig kod skickad till ${email}. (Demo-kod: ${code})`);
-  };
 
-  window.verifyLoginCode = async ()=>{
-    const code = document.getElementById("loginCode").value.trim();
-    if (!pendingLogin) return showToast("Starta login först.");
-    if (now() > pendingLogin.expiresAt) return showToast("Koden har gått ut.");
-    if (code !== pendingLogin.code) return showToast("Fel kod.");
-    currentUser = pendingLogin.user;
-    pendingLogin = null;
+    currentUser = user;
     localStorage.setItem("currentUser", JSON.stringify(currentUser));
     chatNameEl.value = currentUser.username;
+    await activateSession(currentUser.uid);
     await refreshUserData();
     await updatePresenceUser();
+    watchSession();
     profileModal.classList.remove("show");
     showToast("Inloggad!");
   };
@@ -1713,10 +1806,18 @@ function sendChatMessage() {
     ref(`accounts/${currentUser.uid}/kickAt`).on("value", snap=>{
       const v = Number(snap.val()||0);
       if (v > 0) {
-        localStorage.removeItem("currentUser");
-        currentUser = null;
-        showToast("Du blev kickad av admin.");
-        updateProfileUI();
+        forceLogout("Du blev kickad av admin.");
+      }
+    });
+  }
+
+  function watchSession(){
+    if (!currentUser || !db) return;
+    ref(`accounts/${currentUser.uid}/sessionToken`).on("value", snap=>{
+      const token = snap.val();
+      if (!token || !currentSessionToken) return;
+      if (token !== currentSessionToken) {
+        forceLogout("Du loggades ut eftersom kontot loggade in på en annan enhet.");
       }
     });
   }
@@ -1724,7 +1825,9 @@ function sendChatMessage() {
   function updateProfileUI(){
     const name = currentUser ? `${currentUser.username}${currentUser.verified ? ' ✔️' : ''}` : "Inte inloggad";
     const coins = currentUser ? Number(currentUser.coins || 0) : 0;
-    profileStateText.textContent = `Status: ${name} | Coins: ${coins}`;
+    profileStateText.textContent = `Status: ${name} | 🪙 ${coins} coins`;
+    const shopCoinsEl = document.getElementById("shopCoins");
+    if (shopCoinsEl) shopCoinsEl.textContent = `Coins: ${coins}`;
     updateChatLock();
     loadFriendsUI();
   }
@@ -1738,6 +1841,7 @@ function sendChatMessage() {
       refreshUserData().then(updateProfileUI);
       if (currentUser) chatNameEl.value = currentUser.username;
       watchKick();
+      watchSession();
     }
   },200);
 
@@ -1746,3 +1850,7 @@ function sendChatMessage() {
 
 </body>
 </html>
+
+
+
+
