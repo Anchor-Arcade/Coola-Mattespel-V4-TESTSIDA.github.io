@@ -702,6 +702,43 @@
     .quest-progress-track { height: 10px; border-radius: 999px; background: rgba(255,255,255,.1); overflow:hidden; border:1px solid rgba(255,255,255,.15); }
     .quest-progress-fill { height: 100%; width: 0; border-radius: inherit; background: linear-gradient(90deg, var(--accent-dark), var(--accent), #fff); transition: width .25s ease; }
 
+    .shop-shell {
+      background: linear-gradient(165deg, rgba(8,10,20,.82), rgba(15,23,42,.72));
+      border: 1px solid rgba(148, 163, 184, .32);
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 14px 32px rgba(0,0,0,.35);
+    }
+    .shop-balance {
+      font-weight: 800;
+      font-size: 18px;
+      margin-bottom: 12px;
+      letter-spacing: .4px;
+    }
+    .shop-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+    .shop-item {
+      background: linear-gradient(165deg, rgba(30,41,59,.72), rgba(30,41,59,.4));
+      border: 1px solid rgba(148,163,184,.28);
+      border-radius: 14px;
+      padding: 12px;
+      display: grid;
+      gap: 8px;
+      transition: transform .16s ease, border-color .16s ease;
+    }
+    .shop-item:hover { transform: translateY(-3px); border-color: rgba(255,255,255,.45); }
+    .shop-item.owned { border-color: rgba(34,197,94,.55); }
+    .shop-item-top { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+    .shop-item-title { font-weight: 800; }
+    .shop-item-desc { font-size: 12px; opacity: .86; min-height: 34px; }
+    .shop-item-price { font-size: 13px; opacity: .9; }
+    .tag { font-size: 11px; border-radius: 999px; padding: 4px 8px; border: 1px solid rgba(255,255,255,.25); }
+    .tag.owned { border-color: rgba(34,197,94,.7); color: #bbf7d0; }
+    .tag.missing { border-color: rgba(251,191,36,.5); color: #fde68a; }
+
 
     @media (max-width: 768px) {
       .header h1 { font-size: 34px; }
@@ -739,9 +776,10 @@
       <button class="sidebar-btn" onclick="openIframe('https://alv3333.github.io/Coola-Mattespel-Soundboard.github.io/')"><span class="icon">🔊</span><span class="label">Soundboard</span></button>
       <button class="sidebar-btn" onclick="openIframe('https://studio.pickaxe.co/STUDIOGX4LHRY55GYHQ15/295XP68K97')"><span class="icon">🤖</span><span class="label">AI</span></button>
       <button class="sidebar-btn" onclick="openIframe('https://docs.google.com/forms/d/e/1FAIpQLScUxR7Ychb0ivMguYI-3BHwb8D3ZH2x7n1vkpXuYjNeVlU3Cg/viewform?usp=header')"><span class="icon">📩</span><span class="label">Förslag</span></button>
-     <button class="sidebar-btn" onclick="showUpdates()"><span class="icon">⬆</span><span class="label">Uppdateringar</span></button>
+      <button class="sidebar-btn" onclick="showUpdates()"><span class="icon">⬆</span><span class="label">Uppdateringar</span></button>
       <button class="sidebar-btn" onclick="showQuests()"><span class="icon">🎯</span><span class="label">Quests</span></button>
       <button class="sidebar-btn" onclick="showShop()"><span class="icon">🛒</span><span class="label">Shop</span></button>
+      <button class="sidebar-btn" onclick="showInventory()"><span class="icon">🎒</span><span class="label">Inventory</span></button>
       <button class="sidebar-btn" onclick="openAdminGate()"><span class="icon">🛡️</span><span class="label">Admin</span></button>
       <button class="sidebar-btn" onclick="openThemePopup()"><span class="icon">🎨</span><span class="label">Tema</span></button>
     </div>
@@ -824,7 +862,11 @@
 </div>
 <div id="shopPage" style="display:none;margin-top:30px;">
   <h2 style="font-size:28px;margin-bottom:15px;">🛒 Shop</h2>
-  <div id="shopList" class="info-card"></div>
+  <div id="shopList" class="shop-shell"></div>
+</div>
+<div id="inventoryPage" style="display:none;margin-top:30px;">
+  <h2 style="font-size:28px;margin-bottom:15px;">🎒 Inventory</h2>
+  <div id="inventoryList" class="shop-shell"></div>
 </div>
       <div class="games-grid" id="gamesGrid"></div>
     </div>
@@ -965,13 +1007,14 @@
       "SKICKA FÖRSLAG!!!"
 
 ];
- const firebaseConfig = {
+    const firebaseConfig = {
       apiKey: "AIzaSyAZAaNITSnkwfCEkYI5NGUyEWiuSEGhfp4",
       authDomain: "project-4243346869068615583.firebaseapp.com",
       databaseURL: "https://project-4243346869068615583-default-rtdb.europe-west1.firebasedatabase.app",
       projectId: "project-4243346869068615583",
       appId: "1:40272837740:web:3f908e419e625a3077ac49"
     };
+
 
     let chatRef = null;
     let db = null;
@@ -1002,16 +1045,16 @@
       { id: "tinyfish6", game: "cltinyfishing", label: "Spela Tiny Fishing 6 min", targetMs: 6*60*1000, reward: 5 }
     ];
     const shopItems = [
-      { id: "sparkle", title: "✨ Namn-effekt", price: 15 },
-      { id: "vip", title: "👑 VIP-tag", price: 25 },
-      { id: "rainbow", title: "🌈 Rainbow-tag", price: 30 },
-      { id: "glow", title: "💡 Glow-namn", price: 22 },
-      { id: "avatarFrame", title: "🖼️ Profilram", price: 20 },
-      { id: "chatBubble", title: "💬 Chat-bubbla", price: 18 },
-      { id: "titleLegend", title: "🏆 Titel: Legend", price: 35 },
-      { id: "nameFire", title: "🔥 Fire-namn", price: 28 },
-      { id: "iconStar", title: "⭐ Stjärnikon", price: 12 },
-      { id: "bgNebula", title: "🌌 Nebula-bakgrund", price: 40 }
+      { id: "sparkle", title: "✨ Namn-effekt", price: 15, desc: "Lägger till extra sparkle i ditt namn." },
+      { id: "vip", title: "👑 VIP-tag", price: 25, desc: "Ger dig VIP-prefix i chatten." },
+      { id: "rainbow", title: "🌈 Rainbow-tag", price: 30, desc: "Gör namnet neon/rainbow i chatten." },
+      { id: "glow", title: "💡 Glow-namn", price: 22, desc: "Ger lysande namn-effekt." },
+      { id: "avatarFrame", title: "🖼️ Profilram", price: 20, desc: "Visar en ram runt ditt chattnamn." },
+      { id: "chatBubble", title: "💬 Chat-bubbla", price: 18, desc: "Snygg rundad bubbla runt dina meddelanden." },
+      { id: "titleLegend", title: "🏆 Titel: Legend", price: 35, desc: "Lägger till [Legend] efter namnet." },
+      { id: "nameFire", title: "🔥 Fire-namn", price: 28, desc: "Lägger till fire-badge vid ditt namn." },
+      { id: "iconStar", title: "⭐ Stjärnikon", price: 12, desc: "Visar en stjärna efter ditt namn." },
+      { id: "bgNebula", title: "🌌 Nebula-bakgrund", price: 40, desc: "Nebula-bakgrund på dina meddelanden." }
     ];
 
     const loadingMessages = [
@@ -1302,19 +1345,20 @@ function refreshChatStatus() {
 
 function getCurrentUserChatStyle() {
   const inv = currentUser?.inventory || {};
+  const equipped = currentUser?.equipped || inv;
   return {
-    sparkle: !!inv.sparkle,
-    vip: !!inv.vip,
-    rainbow: !!inv.rainbow,
-    glow: !!inv.glow,
-    avatarFrame: !!inv.avatarFrame,
-    chatBubble: !!inv.chatBubble,
-    titleLegend: !!inv.titleLegend,
-    nameFire: !!inv.nameFire,
-    iconStar: !!inv.iconStar,
-    bgNebula: !!inv.bgNebula,
-    fireBadge: !!(inv.nameFire || inv.rainbow),
-    neonName: !!(inv.glow || inv.chatBubble || inv.rainbow)
+    sparkle: !!(inv.sparkle && equipped.sparkle),
+    vip: !!(inv.vip && equipped.vip),
+    rainbow: !!(inv.rainbow && equipped.rainbow),
+    glow: !!(inv.glow && equipped.glow),
+    avatarFrame: !!(inv.avatarFrame && equipped.avatarFrame),
+    chatBubble: !!(inv.chatBubble && equipped.chatBubble),
+    titleLegend: !!(inv.titleLegend && equipped.titleLegend),
+    nameFire: !!(inv.nameFire && equipped.nameFire),
+    iconStar: !!(inv.iconStar && equipped.iconStar),
+    bgNebula: !!(inv.bgNebula && equipped.bgNebula),
+    fireBadge: !!((inv.nameFire && equipped.nameFire) || (inv.rainbow && equipped.rainbow)),
+    neonName: !!((inv.glow && equipped.glow) || (inv.chatBubble && equipped.chatBubble) || (inv.rainbow && equipped.rainbow))
   };
 }
 
@@ -1372,6 +1416,7 @@ function hidePages() {
   document.getElementById("updatesPage").style.display = "none";
   document.getElementById("questsPage").style.display = "none";
   document.getElementById("shopPage").style.display = "none";
+  document.getElementById("inventoryPage").style.display = "none";
 }
 
 function showQuests() {
@@ -1384,6 +1429,12 @@ function showShop() {
   hidePages();
   document.getElementById("shopPage").style.display = "block";
   renderShop();
+}
+
+function showInventory() {
+  hidePages();
+  document.getElementById("inventoryPage").style.display = "block";
+  renderInventory();
 }
 
     function renderRecommended() {
@@ -1517,6 +1568,7 @@ function showShop() {
       document.getElementById("updatesPage").style.display = "none";
       document.getElementById("questsPage").style.display = "none";
       document.getElementById("shopPage").style.display = "none";
+      document.getElementById("inventoryPage").style.display = "none";
     }
 
     function toggleFullscreen() {
@@ -1586,7 +1638,7 @@ function showShop() {
       const ref = db.ref("accounts").push();
       const quests = {};
       questsConfig.forEach((q) => { quests[q.id] = { progressMs: 0, claimed: false }; });
-      await ref.set({ email, username, usernameLower: username.toLowerCase(), password, coins: 0, verified: false, banned: false, timeoutUntil: 0, sessionActive: false, createdAt: Date.now(), quests, inventory: {} });
+      await ref.set({ email, username, usernameLower: username.toLowerCase(), password, coins: 0, verified: false, banned: false, timeoutUntil: 0, sessionActive: false, createdAt: Date.now(), quests, inventory: {}, equipped: {} });
       alert("Konto skapat! Logga in nu.");
     }
 
@@ -1650,6 +1702,7 @@ function showShop() {
         renderPrivateFriendsBar();
         renderQuest();
         renderShop();
+        renderInventory();
       });
     }
 
@@ -1751,10 +1804,10 @@ function showShop() {
       privateInputEl.value = "";
     }
 
-    function getOwnedShopEffects(inv) {
+    function getOwnedShopEffects(inv, equipped = {}) {
       if (!inv) return [];
       const owned = shopItems.filter((item) => inv[item.id]);
-      return owned.map((item) => item.title);
+      return owned.map((item) => `${item.title}${equipped[item.id] ? " (på)" : " (av)"}`);
     }
 
     function renderProfile() {
@@ -1765,7 +1818,7 @@ function showShop() {
         privateChatEl.style.display = "none";
         return;
       }
-      const ownedEffects = getOwnedShopEffects(currentUser.inventory || {});
+      const ownedEffects = getOwnedShopEffects(currentUser.inventory || {}, currentUser.equipped || {});
       profileInfoEl.innerHTML = `Inloggad som <b>${getDisplayUsername()}</b><br>Mail: ${currentUser.email}<br>Coins: ${currentUser.coins || 0}<br>Shop-effekter i chatten/profilen: ${ownedEffects.length ? ownedEffects.join(", ") : "Inga köpta ännu."}`;
       db.ref(`friend-requests/${currentUser.id}`).on("value", (snap) => {
         friendRequestsEl.innerHTML = "<b>Vänförfrågningar (måste accepteras)</b><br>";
@@ -1837,18 +1890,66 @@ function showShop() {
       const list = document.getElementById("shopList");
       if (!currentUser) { list.textContent = "Logga in för shoppen."; return; }
       const inv = currentUser.inventory || {};
-      list.innerHTML = `Coins: <b>${currentUser.coins || 0}</b><br><br>`;
-      shopItems.forEach((item) => {
-        list.innerHTML += `<div class="info-card"><b>${item.title}</b> — ${item.price} coins<br>${inv[item.id] ? "✅ Köpt" : `<button onclick="buyItem('${item.id}', ${item.price})">Köp</button>`}</div>`;
-      });
+      const rows = shopItems.map((item) => {
+        const owned = !!inv[item.id];
+        return `
+          <div class="shop-item ${owned ? "owned" : ""}">
+            <div class="shop-item-top">
+              <div class="shop-item-title">${item.title}</div>
+              <div class="tag ${owned ? "owned" : "missing"}">${owned ? "Köpt" : "Till salu"}</div>
+            </div>
+            <div class="shop-item-desc">${item.desc || "Kosmetisk effekt för chatt/profil."}</div>
+            <div class="shop-item-price">Pris: <b>${item.price} coins</b></div>
+            <div>${owned ? "✅ Redan i inventory" : `<button class="chat-send" onclick="buyItem('${item.id}', ${item.price})">Köp</button>`}</div>
+          </div>
+        `;
+      }).join("");
+      list.innerHTML = `<div class="shop-balance">🪙 Coins: ${currentUser.coins || 0}</div><div class="shop-grid">${rows}</div>`;
     }
 
     async function buyItem(item, price) {
       if (!currentUser || (currentUser.coins || 0) < price) return alert("Inte tillräckligt med coins.");
       const inv = currentUser.inventory || {};
+      const equipped = currentUser.equipped || {};
       if (inv[item]) return alert("Du har redan denna item.");
       inv[item] = true;
-      await db.ref(`accounts/${currentUser.id}`).update({ coins: (currentUser.coins || 0) - price, inventory: inv });
+      equipped[item] = true;
+      await db.ref(`accounts/${currentUser.id}`).update({ coins: (currentUser.coins || 0) - price, inventory: inv, equipped });
+    }
+
+    function renderInventory() {
+      const list = document.getElementById("inventoryList");
+      if (!currentUser) { list.textContent = "Logga in för inventory."; return; }
+      const inv = currentUser.inventory || {};
+      const equipped = currentUser.equipped || {};
+      const ownedItems = shopItems.filter((item) => inv[item.id]);
+      if (!ownedItems.length) {
+        list.innerHTML = `<div class="shop-balance">Du har inga items ännu.</div><div class="shop-item-desc">Köp saker i shoppen för att kunna aktivera dem här.</div>`;
+        return;
+      }
+      const rows = ownedItems.map((item) => {
+        const isOn = !!equipped[item.id];
+        return `
+          <div class="shop-item owned">
+            <div class="shop-item-top">
+              <div class="shop-item-title">${item.title}</div>
+              <div class="tag ${isOn ? "owned" : "missing"}">${isOn ? "På" : "Av"}</div>
+            </div>
+            <div class="shop-item-desc">${item.desc || "Kosmetisk effekt för chatt/profil."}</div>
+            <div><button class="chat-send" onclick="toggleEquipItem('${item.id}')">${isOn ? "Ta av" : "Sätt på"}</button></div>
+          </div>
+        `;
+      }).join("");
+      list.innerHTML = `<div class="shop-balance">🎒 Dina items (${ownedItems.length})</div><div class="shop-grid">${rows}</div>`;
+    }
+
+    async function toggleEquipItem(itemId) {
+      if (!currentUser) return;
+      const inv = currentUser.inventory || {};
+      if (!inv[itemId]) return alert("Du äger inte denna item.");
+      const equipped = { ...(currentUser.equipped || {}) };
+      equipped[itemId] = !equipped[itemId];
+      await db.ref(`accounts/${currentUser.id}/equipped`).set(equipped);
     }
 
     async function adminAction(action) {
