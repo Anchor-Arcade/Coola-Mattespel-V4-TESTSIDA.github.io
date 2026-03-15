@@ -913,13 +913,14 @@
       "SKICKA FÖRSLAG!!!"
 
 ];
-      const firebaseConfig = {
+    const firebaseConfig = {
       apiKey: "AIzaSyAZAaNITSnkwfCEkYI5NGUyEWiuSEGhfp4",
       authDomain: "project-4243346869068615583.firebaseapp.com",
       databaseURL: "https://project-4243346869068615583-default-rtdb.europe-west1.firebasedatabase.app",
       projectId: "project-4243346869068615583",
       appId: "1:40272837740:web:3f908e419e625a3077ac49"
     };
+
 
     let chatRef = null;
     let db = null;
@@ -935,6 +936,7 @@
     let adminUnlocked = false;
     let activeChatTab = "global";
     let privateListenerRef = null;
+    const SESSION_KEY = "v4AuthSession";
     const questsConfig = [
       { id: "snow15", game: "clsummerRider3D", label: "Spela Snow Rider 3D 15 min", targetMs: 15*60*1000, reward: 10 },
       { id: "imposter10", game: "climposter", label: "Spela Imposter 10 min", targetMs: 10*60*1000, reward: 8 },
@@ -1428,12 +1430,17 @@ function showShop() {
       snap.forEach((c) => { if (!found) found = { id: c.key, ...c.val() }; });
       if (!found || found.password !== password) return alert("Fel lösenord.");
       if (found.banned) return alert("Detta konto är bannat.");
-      if (found.sessionActive) return alert("Kontot är redan inloggat på en annan enhet.");
-      const sessionId = `sess_${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
+      const existingSessionRaw = localStorage.getItem(SESSION_KEY);
+      let existingSession = null;
+      try { existingSession = existingSessionRaw ? JSON.parse(existingSessionRaw) : null; } catch (e) {}
+      if (found.sessionActive && (!existingSession || existingSession.accountId !== found.id || existingSession.sessionId !== found.sessionId)) {
+        return alert("Kontot är redan inloggat på en annan enhet.");
+      }
+      const sessionId = found.sessionId || `sess_${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
       await db.ref(`accounts/${found.id}`).update({ sessionActive: true, sessionId, lastSeen: Date.now(), forcedLogout: false });
+      localStorage.setItem(SESSION_KEY, JSON.stringify({ accountId: found.id, sessionId }));
       currentUser = { ...found, sessionId };
       userRef = db.ref(`accounts/${found.id}`);
-      userRef.onDisconnect().update({ sessionActive: false, lastSeen: Date.now() });
       watchCurrentUser();
       renderProfile();
       refreshChatStatus();
@@ -1444,6 +1451,7 @@ function showShop() {
     async function logoutAccount() {
       if (!currentUser || !db) return;
       await db.ref(`accounts/${currentUser.id}`).update({ sessionActive: false, sessionId: null });
+      localStorage.removeItem(SESSION_KEY);
       if (userRef) userRef.off();
       if (privateListenerRef) privateListenerRef.off();
       currentUser = null;
@@ -1463,6 +1471,7 @@ function showShop() {
         currentUser = { id: snap.key, ...data };
         if (data.forcedLogout) {
           alert("Du blev utloggad av admin.");
+          localStorage.removeItem(SESSION_KEY);
           logoutAccount();
           return;
         }
@@ -1706,6 +1715,32 @@ function showShop() {
       requestAnimationFrame(animate);
     }
 
+    async function restoreSessionFromStorage() {
+      if (!db) return;
+      const raw = localStorage.getItem(SESSION_KEY);
+      if (!raw) return;
+      let sess = null;
+      try { sess = JSON.parse(raw); } catch (e) { localStorage.removeItem(SESSION_KEY); return; }
+      if (!sess || !sess.accountId || !sess.sessionId) { localStorage.removeItem(SESSION_KEY); return; }
+
+      const snap = await db.ref(`accounts/${sess.accountId}`).once("value");
+      if (!snap.exists()) { localStorage.removeItem(SESSION_KEY); return; }
+      const acc = snap.val() || {};
+      if (acc.sessionId !== sess.sessionId && acc.sessionActive) {
+        localStorage.removeItem(SESSION_KEY);
+        return;
+      }
+      if (acc.banned) { localStorage.removeItem(SESSION_KEY); return; }
+
+      await db.ref(`accounts/${sess.accountId}`).update({ sessionActive: true, sessionId: sess.sessionId, lastSeen: Date.now(), forcedLogout: false });
+      currentUser = { id: sess.accountId, ...acc, sessionId: sess.sessionId };
+      userRef = db.ref(`accounts/${sess.accountId}`);
+      watchCurrentUser();
+      renderProfile();
+      refreshChatStatus();
+      setChatTab(activeChatTab);
+    }
+
     (function init() {
       const saved = localStorage.getItem("theme");
       if (saved) {
@@ -1776,6 +1811,7 @@ function showShop() {
       chatRef = db.ref("global-chat");
         chatRef.limitToLast(120).on("child_added", (snap) => { addChatMessage(snap.val() || {}); });
         startGameTracker();
+        restoreSessionFromStorage();
       } catch (err) {
         activePlayersEl.textContent = "Aktiva spelare: --";
         addSystemChatMessage("Kunde inte ansluta chatten.");
@@ -1785,8 +1821,3 @@ function showShop() {
   </script>
 </body>
 </html>
-
-
-
-
-
