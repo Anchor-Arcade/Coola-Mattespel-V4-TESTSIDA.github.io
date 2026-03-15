@@ -250,10 +250,32 @@
       margin-bottom: 4px;
     }
 
+    .chat-meta.neon {
+      font-weight: 800;
+      background: linear-gradient(90deg,#00fff7,#6f7bff,#ff5bf2,#00fff7);
+      background-size: 220% 100%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: loaderShine 2.6s linear infinite;
+    }
+
     .chat-text {
       font-size: 13px;
       line-height: 1.3;
       word-break: break-word;
+    }
+
+    .chat-msg.style-chatBubble {
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.24);
+      box-shadow: 0 4px 14px rgba(0,0,0,.35);
+    }
+
+    .chat-msg.style-bgNebula {
+      background:
+        radial-gradient(circle at 20% 20%, rgba(95, 0, 161, .35), transparent 55%),
+        radial-gradient(circle at 80% 70%, rgba(0, 98, 255, .28), transparent 60%),
+        rgba(255,255,255,.05);
     }
 
     .chat-controls {
@@ -650,6 +672,36 @@
     .profile-section { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:10px; }
     .profile-section h4 { margin:0 0 8px; }
 
+    .quest-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      background: transparent;
+      border: none;
+      padding: 0;
+    }
+
+    .quest-item {
+      background: linear-gradient(160deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 14px;
+      padding: 12px;
+      box-shadow: 0 8px 18px rgba(0,0,0,.28);
+      display: grid;
+      gap: 8px;
+    }
+
+    .quest-head { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+    .quest-title { font-weight: 800; font-size: 14px; line-height: 1.3; }
+    .quest-reward { font-size: 12px; opacity:.9; }
+    .quest-status { font-size: 11px; padding: 4px 8px; border-radius: 999px; border:1px solid rgba(255,255,255,.2); }
+    .quest-status.done { background: rgba(34,197,94,.2); color:#bbf7d0; border-color: rgba(34,197,94,.45); }
+    .quest-status.claimed { background: rgba(56,189,248,.2); color:#bae6fd; border-color: rgba(56,189,248,.45); }
+    .quest-status.progress { background: rgba(250,204,21,.18); color:#fef08a; border-color: rgba(250,204,21,.35); }
+    .quest-progress { font-size: 12px; opacity: .88; }
+    .quest-progress-track { height: 10px; border-radius: 999px; background: rgba(255,255,255,.1); overflow:hidden; border:1px solid rgba(255,255,255,.15); }
+    .quest-progress-fill { height: 100%; width: 0; border-radius: inherit; background: linear-gradient(90deg, var(--accent-dark), var(--accent), #fff); transition: width .25s ease; }
+
 
     @media (max-width: 768px) {
       .header h1 { font-size: 34px; }
@@ -768,7 +820,7 @@
 </div>
       <div id="questsPage" style="display:none;margin-top:30px;">
   <h2 style="font-size:28px;margin-bottom:15px;">🎯 Quests</h2>
-  <div id="questCard" class="info-card"></div>
+  <div id="questCard" class="info-card quest-list"></div>
 </div>
 <div id="shopPage" style="display:none;margin-top:30px;">
   <h2 style="font-size:28px;margin-bottom:15px;">🛒 Shop</h2>
@@ -913,14 +965,13 @@
       "SKICKA FÖRSLAG!!!"
 
 ];
-    const firebaseConfig = {
+ const firebaseConfig = {
       apiKey: "AIzaSyAZAaNITSnkwfCEkYI5NGUyEWiuSEGhfp4",
       authDomain: "project-4243346869068615583.firebaseapp.com",
       databaseURL: "https://project-4243346869068615583-default-rtdb.europe-west1.firebasedatabase.app",
       projectId: "project-4243346869068615583",
       appId: "1:40272837740:web:3f908e419e625a3077ac49"
     };
-
 
     let chatRef = null;
     let db = null;
@@ -929,10 +980,11 @@
     let chatCooldownUntil = 0;
     let selectedFriend = null;
     let activeGame = null;
-    let activeGameStartedAt = null;
+    let activeGameLastTick = null;
     let gameTrackerInterval = null;
     const ADMIN_PASSWORD = "SigmaAdmin1234!";
     const USER_BANNED_WORDS = ["admin", "mod", "owner", "support"];
+    const ALLOWED_EMAIL_SUFFIXES = ["@edu.lomma.se", "@gmail.com", "@icloud.com"];
     let adminUnlocked = false;
     let activeChatTab = "global";
     let privateListenerRef = null;
@@ -998,6 +1050,7 @@
       menuToggle.textContent = "✕";
       menuToggle.setAttribute("aria-expanded", "true");
       menuToggle.setAttribute("aria-label", "Stäng meny");
+      addSystemChatMessage("Välkommen till chatten, om det finns någon som säger att de är Coola Mattespel och de inte har \"✔️\" i sitt namn så är den personen oftast inte Coola Mattespel så lita EJ på vad de säger.");
     }
 
     function closeSidebar() {
@@ -1130,21 +1183,88 @@ const bannedWords = [
   "dih",
   "dräng",
   "snippa",
-  "niger"
+  "niger",
+  "nazist",
+  "nazism",
+  "heil",
+  "kkk",
+  "isis",
+  "terrorist",
+  "självmord",
+  "suicide",
+  "kill yourself",
+  "kys",
+  "cp",
+  "mongo",
+  "retard",
+  "retarded",
+  "bitch",
+  "asshole",
+  "motherfucker",
+  "mf",
+  "slampa",
+  "hora",
+  "porr",
+  "porn",
+  "xxx",
+  "rape",
+  "rapist",
+  "våldta",
+  "våldt",
+  "pedo",
+  "pedofil",
+  "groom",
+  "groomer",
+  "knulla",
+  "knull",
+  "jävla",
+  "helvete",
+  "idiot",
+  "dumbass",
+  "fucking",
+  "shit",
+  "bullshit",
+  "cunt",
+  "whore",
+  "fag",
+  "faggot",
+  "tranny",
+  "wetback",
+  "chink",
+  "paki",
+  "spic",
+  "beaner",
+  "n1gger",
+  "n!gger",
+  "n igger"
 ];
 
 function containsBannedWord(text) {
   const lower = text.toLowerCase();
   return bannedWords.some(word => lower.includes(word));
 }
+
+function hasDisallowedUsernameChars(username) {
+  return /[^a-zA-Z0-9åäöÅÄÖ _-]/.test(username || "");
+}
+
+function validateUsernameInput(rawUsername) {
+  const trimmed = (rawUsername || "").trim();
+  if (!trimmed) return "Du måste skriva ett username.";
+  if (hasDisallowedUsernameChars(trimmed)) return "Du kan inte ha emojis eller specialtecken i ditt username.";
+  if (containsBannedWord(trimmed) || USER_BANNED_WORDS.some((w) => trimmed.toLowerCase().includes(w))) {
+    return "Username innehåller förbjudet ord.";
+  }
+  return "";
+}
     function addChatMessage(msg) {
       const box = document.createElement("div");
       box.className = "chat-msg";
+      applyChatMessageVisuals(box, msg);
 
       const meta = document.createElement("div");
       meta.className = "chat-meta";
-      const t = new Date(msg.ts || Date.now()).toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit" });
-      meta.textContent = `${(msg.name || "Gäst").slice(0, 20)} • ${t}`;
+      renderChatMeta(meta, msg, "name");
 
       const text = document.createElement("div");
       text.className = "chat-text";
@@ -1180,6 +1300,48 @@ function refreshChatStatus() {
   chatStatusEl.textContent = msg || `Inloggad som ${getDisplayUsername()}`;
 }
 
+function getCurrentUserChatStyle() {
+  const inv = currentUser?.inventory || {};
+  return {
+    sparkle: !!inv.sparkle,
+    vip: !!inv.vip,
+    rainbow: !!inv.rainbow,
+    glow: !!inv.glow,
+    avatarFrame: !!inv.avatarFrame,
+    chatBubble: !!inv.chatBubble,
+    titleLegend: !!inv.titleLegend,
+    nameFire: !!inv.nameFire,
+    iconStar: !!inv.iconStar,
+    bgNebula: !!inv.bgNebula,
+    fireBadge: !!(inv.nameFire || inv.rainbow),
+    neonName: !!(inv.glow || inv.chatBubble || inv.rainbow)
+  };
+}
+
+function buildStyledChatIdentity(baseName, style) {
+  let name = baseName || "Gäst";
+  if (style.vip) name = `👑 ${name}`;
+  if (style.titleLegend) name = `${name} [Legend]`;
+  if (style.iconStar) name = `${name} ⭐`;
+  return name;
+}
+
+function renderChatMeta(metaEl, msg, fallbackNameKey = "name") {
+  const t = new Date(msg.ts || Date.now()).toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit" });
+  const baseName = (msg[fallbackNameKey] || "Gäst").slice(0, 28);
+  const identity = buildStyledChatIdentity(baseName, msg);
+  metaEl.textContent = `${identity} • ${t}`;
+  if (msg.fireBadge) metaEl.textContent += " 🔥";
+  if (msg.sparkle) metaEl.textContent += " ✨";
+  if (msg.avatarFrame) metaEl.textContent = `[◈ ${metaEl.textContent} ◈]`;
+  if (msg.neonName || msg.glow || msg.rainbow) metaEl.classList.add("neon");
+}
+
+function applyChatMessageVisuals(box, msg) {
+  if (msg.chatBubble) box.classList.add("style-chatBubble");
+  if (msg.bgNebula) box.classList.add("style-bgNebula");
+}
+
 function sendChatMessage() {
   const text = sanitizeText(chatInputEl.value);
   if (!text || !chatRef) return;
@@ -1193,7 +1355,8 @@ function sendChatMessage() {
     return;
   }
 
-  chatRef.push({ uid: currentUser.id, name: getDisplayUsername(), text, ts: Date.now() });
+  const chatStyle = getCurrentUserChatStyle();
+  chatRef.push({ uid: currentUser.id, name: getDisplayUsername(), text, ts: Date.now(), ...chatStyle });
   chatCooldownUntil = Date.now() + 3000;
   chatInputEl.value = "";
   refreshChatStatus();
@@ -1204,6 +1367,8 @@ function hidePages() {
   gamesGrid.style.display = "none";
   recommendedSection.style.display = "none";
   embedContainer.style.display = "none";
+  activeGame = null;
+  activeGameLastTick = null;
   document.getElementById("updatesPage").style.display = "none";
   document.getElementById("questsPage").style.display = "none";
   document.getElementById("shopPage").style.display = "none";
@@ -1304,7 +1469,7 @@ function showShop() {
     function openGame(game) {
       startFakeLoader();
       activeGame = game;
-      activeGameStartedAt = Date.now();
+      activeGameLastTick = Date.now();
 
       embedContainer.style.display = "block";
       gameFrame.onload = null;
@@ -1340,6 +1505,8 @@ function showShop() {
 
     function openIframe(url) {
       startFakeLoader();
+      activeGame = null;
+      activeGameLastTick = null;
 
       embedContainer.style.display = "block";
       gameFrame.onload = null;
@@ -1405,10 +1572,13 @@ function showShop() {
     async function registerAccount() {
       if (!db) return;
       const email = (document.getElementById("authEmail").value || "").trim().toLowerCase();
-      const username = sanitizeName(document.getElementById("authUsername").value);
+      const rawUsername = document.getElementById("authUsername").value || "";
+      const usernameError = validateUsernameInput(rawUsername);
+      if (usernameError) return alert(usernameError);
+      const username = sanitizeName(rawUsername);
       const password = (document.getElementById("authPassword").value || "").trim();
       if (!email || !username || !password) return alert("Fyll i mail, username och lösenord.");
-      if (containsBannedWord(username) || USER_BANNED_WORDS.some((w) => username.toLowerCase().includes(w))) return alert("Username innehåller förbjudet ord.");
+      if (!ALLOWED_EMAIL_SUFFIXES.some((suffix) => email.endsWith(suffix))) return alert("Mail måste sluta med @edu.lomma.se, @gmail.com eller @icloud.com.");
       const existing = await db.ref("accounts").orderByChild("usernameLower").equalTo(username.toLowerCase()).once("value");
       if (existing.exists()) return alert("Det username är upptaget.");
       const emailExists = await db.ref("accounts").orderByChild("email").equalTo(email).once("value");
@@ -1532,7 +1702,14 @@ function showShop() {
         const msg = snap.val() || {};
         const row = document.createElement("div");
         row.className = "chat-msg";
-        row.innerHTML = `<div class="chat-meta">${msg.fromName || "Okänd"}</div><div class="chat-text">${(msg.text || "").slice(0,200)}</div>`;
+        applyChatMessageVisuals(row, msg);
+        const meta = document.createElement("div");
+        meta.className = "chat-meta";
+        renderChatMeta(meta, msg, "fromName");
+        const text = document.createElement("div");
+        text.className = "chat-text";
+        text.textContent = (msg.text || "").slice(0, 200);
+        row.append(meta, text);
         privateMessagesEl.appendChild(row);
         privateMessagesEl.scrollTop = privateMessagesEl.scrollHeight;
       });
@@ -1569,8 +1746,15 @@ function showShop() {
       if (!text) return;
       if (containsBannedWord(text)) return alert("Ditt meddelande innehåller ord som inte är tillåtna.");
       const cid = getPrivateChatId(currentUser.id, selectedFriend.id);
-      db.ref(`private-chats/${cid}/messages`).push({ from: currentUser.id, fromName: currentUser.username, text, ts: Date.now() });
+      const chatStyle = getCurrentUserChatStyle();
+      db.ref(`private-chats/${cid}/messages`).push({ from: currentUser.id, fromName: getDisplayUsername(), text, ts: Date.now(), ...chatStyle });
       privateInputEl.value = "";
+    }
+
+    function getOwnedShopEffects(inv) {
+      if (!inv) return [];
+      const owned = shopItems.filter((item) => inv[item.id]);
+      return owned.map((item) => item.title);
     }
 
     function renderProfile() {
@@ -1581,7 +1765,8 @@ function showShop() {
         privateChatEl.style.display = "none";
         return;
       }
-      profileInfoEl.innerHTML = `Inloggad som <b>${getDisplayUsername()}</b><br>Mail: ${currentUser.email}<br>Coins: ${currentUser.coins || 0}`;
+      const ownedEffects = getOwnedShopEffects(currentUser.inventory || {});
+      profileInfoEl.innerHTML = `Inloggad som <b>${getDisplayUsername()}</b><br>Mail: ${currentUser.email}<br>Coins: ${currentUser.coins || 0}<br>Shop-effekter i chatten/profilen: ${ownedEffects.length ? ownedEffects.join(", ") : "Inga köpta ännu."}`;
       db.ref(`friend-requests/${currentUser.id}`).on("value", (snap) => {
         friendRequestsEl.innerHTML = "<b>Vänförfrågningar (måste accepteras)</b><br>";
         if (!snap.exists()) { friendRequestsEl.innerHTML += "Inga."; return; }
@@ -1610,11 +1795,32 @@ function showShop() {
       questsConfig.forEach((q) => {
         const st = questState[q.id] || { progressMs: 0, claimed: false };
         const done = st.progressMs >= q.targetMs;
+        const pct = Math.max(0, Math.min(100, (st.progressMs / q.targetMs) * 100));
+        const statusClass = st.claimed ? "claimed" : done ? "done" : "progress";
+        const statusText = st.claimed ? "Claimad" : done ? "Klar att claima" : "Pågår";
         const row = document.createElement("div");
-        row.className = "info-card";
-        row.innerHTML = `<b>${q.label}</b><br>Reward: ${q.reward} coins<br>Progress: ${(st.progressMs/60000).toFixed(1)} / ${(q.targetMs/60000).toFixed(0)} min<br>${st.claimed ? "✅ Claimad" : done ? `<button onclick="claimQuest('${q.id}')">Claim ${q.reward}</button>` : "Spela mer..."}`;
+        row.className = "quest-item";
+        row.innerHTML = `
+          <div class="quest-head">
+            <div class="quest-title">${q.label}</div>
+            <div class="quest-status ${statusClass}">${statusText}</div>
+          </div>
+          <div class="quest-reward">Reward: <b>${q.reward} coins</b></div>
+          <div class="quest-progress">${(st.progressMs/60000).toFixed(1)} / ${(q.targetMs/60000).toFixed(0)} min</div>
+          <div class="quest-progress-track"><div class="quest-progress-fill" style="width:${pct.toFixed(1)}%"></div></div>
+          <div>${st.claimed ? "✅ Claimad" : done ? `<button class="chat-send" onclick="claimQuest('${q.id}')">Claim ${q.reward}</button>` : "Spela mer för att låsa upp reward."}</div>
+        `;
         card.appendChild(row);
       });
+    }
+
+    function isActivelyPlayingGame() {
+      return !!(
+        currentUser && db && activeGame &&
+        embedContainer.style.display !== "none" &&
+        !document.hidden &&
+        gameFrame.src && gameFrame.src.includes("UGS-Files/")
+      );
     }
 
     async function claimQuest(questId) {
@@ -1667,18 +1873,23 @@ function showShop() {
     function startGameTracker() {
       if (gameTrackerInterval) clearInterval(gameTrackerInterval);
       gameTrackerInterval = setInterval(async () => {
-        if (!currentUser || !activeGame || !activeGameStartedAt || !db) return;
+        if (!isActivelyPlayingGame()) {
+          activeGameLastTick = Date.now();
+          return;
+        }
         const now = Date.now();
-        const delta = Math.min(now - activeGameStartedAt, 5000);
-        activeGameStartedAt = now;
+        if (!activeGameLastTick) activeGameLastTick = now;
+        const delta = Math.max(0, Math.min(now - activeGameLastTick, 1500));
+        activeGameLastTick = now;
         const matching = questsConfig.filter((q) => q.game === activeGame);
         if (!matching.length) return;
         for (const q of matching) {
           const current = currentUser.quests?.[q.id] || { progressMs: 0, claimed: false };
           const next = Math.min(current.progressMs + delta, q.targetMs);
+          if (next === current.progressMs) continue;
           await db.ref(`accounts/${currentUser.id}/quests/${q.id}`).update({ progressMs: next, claimed: !!current.claimed });
         }
-      }, 5000);
+      }, 1000);
     }
 
     function startIntroLoader() {
