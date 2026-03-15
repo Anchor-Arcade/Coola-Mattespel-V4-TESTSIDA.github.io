@@ -602,18 +602,23 @@
 
     .profile-btn {
       position: fixed;
-      top: 14px;
-      right: 14px;
+      top: 12px;
+      right: 12px;
       z-index: 1200;
-      border: none;
-      border-radius: 12px;
-      padding: 11px 14px;
-      font-weight: 700;
+      border: 1px solid rgba(255,255,255,.35);
+      border-radius: 16px;
+      padding: 14px 20px;
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: .2px;
       color: white;
-      background: linear-gradient(135deg, var(--accent-dark), var(--accent));
+      background: linear-gradient(135deg, color-mix(in srgb, var(--accent-dark) 78%, #000), var(--accent), #ffffff1a);
       cursor: pointer;
-      box-shadow: 0 8px 18px rgba(0,0,0,.4);
+      box-shadow: 0 12px 28px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.22);
+      transition: transform .16s ease, box-shadow .16s ease, filter .16s ease;
     }
+    .profile-btn:hover { transform: translateY(-2px); box-shadow: 0 16px 32px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.26); filter: brightness(1.06); }
+    .profile-btn:active { transform: translateY(1px) scale(.98); }
     .chat-status { font-size: 12px; margin-bottom: 8px; opacity: .9; }
     .chat-msg { animation: popIn .25s ease; }
     @keyframes popIn { from { transform: translateY(8px); opacity: 0;} to { transform: translateY(0); opacity: 1; } }
@@ -668,10 +673,29 @@
     .private-friends { display:flex; gap:6px; overflow-x:auto; padding:8px; border-bottom:1px solid rgba(255,255,255,.12); }
     .private-friend-btn { border:none; border-radius:999px; padding:6px 12px; cursor:pointer; color:#fff; background:rgba(255,255,255,.14); white-space:nowrap; }
     .private-friend-btn.active { background: linear-gradient(135deg, var(--accent-dark), var(--accent)); }
-    .profile-modal-box { background: linear-gradient(155deg, rgba(10,10,16,.95), rgba(18,26,40,.95)); border:1px solid rgba(120,180,255,.35); box-shadow: 0 20px 40px rgba(0,0,0,.45); }
-    .profile-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-    .profile-section { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:10px; }
-    .profile-section h4 { margin:0 0 8px; }
+    .profile-modal-box {
+      background:
+        radial-gradient(circle at 0% 0%, rgba(99,102,241,.22), transparent 40%),
+        radial-gradient(circle at 100% 0%, rgba(236,72,153,.16), transparent 34%),
+        linear-gradient(155deg, rgba(10,10,16,.96), rgba(18,26,40,.95));
+      border: 1px solid rgba(120,180,255,.4);
+      box-shadow: 0 24px 44px rgba(0,0,0,.52);
+      padding: 18px;
+    }
+    .profile-modal-header { margin-bottom: 12px; }
+    .profile-modal-title { margin: 0; font-size: 26px; letter-spacing: .4px; }
+    .profile-modal-subtitle { margin: 6px 0 0; opacity: .82; font-size: 13px; }
+    .profile-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .profile-section {
+      background: linear-gradient(165deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      border:1px solid rgba(255,255,255,.2);
+      border-radius:14px;
+      padding:12px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+    }
+    .profile-section h4 { margin:0 0 10px; font-size: 16px; }
+    .profile-actions { display:flex; flex-wrap:wrap; gap:8px; margin-bottom: 6px; }
+    .profile-actions .chat-send { flex:1; min-width: 110px; }
 
     .quest-list {
       display: grid;
@@ -753,7 +777,9 @@
       .loader-title { font-size: 20px; }
       .loader-message { font-size: 13px; }
 
+      .profile-btn { top: 10px; right: 10px; padding: 12px 14px; font-size: 15px; border-radius: 13px; }
       .profile-grid { grid-template-columns: 1fr; }
+      .profile-actions .chat-send { min-width: 100%; }
 
       .chat-panel {
         left: 10px;
@@ -898,14 +924,17 @@
 
   <div id="profileModal" class="modal" onclick="closeModalOnBackdrop(event, 'profileModal')">
     <div class="modal-box wide profile-modal-box">
-      <h3>👤 Min Profil</h3>
+      <div class="profile-modal-header">
+        <h3 class="profile-modal-title">👤 Min Profil</h3>
+        <p class="profile-modal-subtitle">Hantera konto, vänner och din personliga stil.</p>
+      </div>
       <div class="profile-grid">
         <div class="profile-section">
-          <h4>Inloggning</h4>
+          <h4>🔐 Inloggning</h4>
           <input id="authEmail" class="auth-input" type="email" placeholder="Mail" />
           <input id="authUsername" class="auth-input" maxlength="20" placeholder="Username (vid registrering)" />
           <input id="authPassword" class="auth-input" type="password" placeholder="Lösenord" />
-          <div class="chat-row">
+          <div class="profile-actions">
             <button class="chat-send" onclick="registerAccount()">Registrera</button>
             <button class="chat-send" onclick="loginAccount()">Logga in</button>
             <button class="chat-send" onclick="logoutAccount()">Logga ut</button>
@@ -913,7 +942,7 @@
           <div id="profileInfo" class="info-card"></div>
         </div>
         <div class="profile-section">
-          <h4>Kompisar</h4>
+          <h4>🤝 Kompisar</h4>
           <div class="chat-row">
             <input id="friendInput" class="chat-input" placeholder="Lägg till vän via username" />
             <button class="chat-send" onclick="sendFriendRequest()">Lägg till</button>
@@ -923,7 +952,9 @@
           <div id="privateChat" class="info-card" style="display:none;"></div>
         </div>
       </div>
-      <button class="chat-send" onclick="closeProfileModal()">Stäng</button>
+      <div class="profile-actions" style="margin-top:10px;">
+        <button class="chat-send" onclick="closeProfileModal()">Stäng</button>
+      </div>
     </div>
   </div>
 
@@ -1015,7 +1046,6 @@
       projectId: "project-4243346869068615583",
       appId: "1:40272837740:web:3f908e419e625a3077ac49"
     };
-
 
     let chatRef = null;
     let db = null;
