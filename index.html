@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="sv">
 <head>
@@ -590,9 +591,11 @@
     .modal-box.wide { width: min(760px, 94vw); }
     .auth-input { width: 100%; margin-bottom: 8px; border: none; border-radius: 8px; padding: 9px; }
     .info-card { margin-top: 10px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.12); border-radius: 10px; padding: 10px; }
-    .intro-overlay { position: fixed; inset: 0; background: radial-gradient(circle at center, rgba(20,20,20,.4), rgba(0,0,0,.92)); z-index: 2000; display:flex; align-items:center; justify-content:center; animation: introFade 1.8s ease forwards; }
-    .intro-box { text-align:center; background: rgba(0,0,0,.45); padding: 24px; border: 1px solid rgba(255,255,255,.2); border-radius: 14px; }
-    @keyframes introFade { 0%,70% { opacity:1; } 100% { opacity:0; visibility:hidden; } }
+    .intro-overlay { position: fixed; inset: 0; background: radial-gradient(circle at center, rgba(20,20,20,.35), rgba(0,0,0,.97)); z-index: 2200; display:flex; align-items:center; justify-content:center; }
+    .intro-box { text-align:center; background: rgba(0,0,0,.55); padding: 26px; border: 1px solid rgba(255,255,255,.24); border-radius: 16px; width:min(520px,88vw); }
+    .intro-loader-box .loader-title { margin-bottom: 14px; }
+    .intro-overlay.fade-out { animation: introFadeOut .55s ease forwards; }
+    @keyframes introFadeOut { from { opacity:1; } to { opacity:0; visibility:hidden; } }
     .admin-actions { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px; }
 
     .chat-tabs { display:flex; gap:6px; }
@@ -749,9 +752,12 @@
   </div>
 
   <div id="introOverlay" class="intro-overlay">
-    <div class="intro-box">
-      <h2>Coola Mattespel V4</h2>
-      <p>Laddar upp din session...</p>
+    <div class="intro-box intro-loader-box">
+      <div class="loader-title">Laddar Coola Mattespel V4</div>
+      <div class="loader-track">
+        <div id="introLoaderFill" class="loader-fill"></div>
+      </div>
+      <div id="introLoaderMessage" class="loader-message"></div>
     </div>
   </div>
 
@@ -838,6 +844,8 @@
     const iframeLoader = document.getElementById("iframeLoader");
     const loaderFill = document.getElementById("loaderFill");
     const loaderMessage = document.getElementById("loaderMessage");
+    const introLoaderFill = document.getElementById("introLoaderFill");
+    const introLoaderMessage = document.getElementById("introLoaderMessage");
     const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
     const chatMessagesEl = document.getElementById("chatMessages");
@@ -865,7 +873,7 @@
       "SKICKA FÖRSLAG!!!"
 
 ];
- const firebaseConfig = {
+    const firebaseConfig = {
       apiKey: "AIzaSyAZAaNITSnkwfCEkYI5NGUyEWiuSEGhfp4",
       authDomain: "project-4243346869068615583.firebaseapp.com",
       databaseURL: "https://project-4243346869068615583-default-rtdb.europe-west1.firebasedatabase.app",
@@ -1628,12 +1636,46 @@ function showShop() {
       }, 5000);
     }
 
+    function startIntroLoader() {
+      const intro = document.getElementById("introOverlay");
+      if (!intro || !introLoaderFill || !introLoaderMessage) return;
+      const duration = Math.floor(Math.random() * 3000) + 3000; // 3-6s
+      const slowDownStart = Math.floor(duration * 0.82);
+      introLoaderFill.style.transform = "scaleX(0)";
+      introLoaderMessage.textContent = loadingMessages[Math.floor(Math.random() * loadingMessages.length)];
+      let startTs = null;
+
+      const animate = (ts) => {
+        if (startTs === null) startTs = ts;
+        const elapsed = ts - startTs;
+        let progress = 0;
+        if (elapsed < slowDownStart) {
+          const t = elapsed / slowDownStart;
+          progress = 95 * (1 - Math.pow(1 - t, 3));
+        } else if (elapsed < duration) {
+          const t = (elapsed - slowDownStart) / (duration - slowDownStart);
+          progress = 95 + 5 * (1 - Math.pow(1 - t, 2));
+        } else {
+          introLoaderFill.style.transform = "scaleX(1)";
+          setTimeout(() => {
+            intro.classList.add("fade-out");
+            setTimeout(() => intro.remove(), 560);
+          }, 180);
+          return;
+        }
+        introLoaderFill.style.transform = `scaleX(${Math.min(progress, 100) / 100})`;
+        requestAnimationFrame(animate);
+      };
+
+      requestAnimationFrame(animate);
+    }
+
     (function init() {
       const saved = localStorage.getItem("theme");
       if (saved) document.body.className = saved;
       renderRecommended();
       renderGames(files);
-      setTimeout(() => { const intro = document.getElementById("introOverlay"); if (intro) intro.remove(); }, 1900);
+      startIntroLoader();
       refreshChatStatus();
 
       document.querySelectorAll(".sidebar .sidebar-btn").forEach((btn) => {
@@ -1703,8 +1745,3 @@ function showShop() {
   </script>
 </body>
 </html>
-
-
-
-
-
