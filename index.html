@@ -1169,6 +1169,27 @@
       });
     };
 
+    function nameVariantsForThumbLookup(file) {
+      const base = file.replace(/^cl/i, "").trim();
+      const splitCamel = base.replace(/([a-zåäö])([A-ZÅÄÖ])/g, "$1 $2");
+      const cleaned = splitCamel.replace(/[_-]+/g, " ").replace(/\s+/g, " ").trim();
+      const shown = displayName(file);
+      return [...new Set([shown, cleaned, base].filter(Boolean))];
+    }
+
+    function getRemoteGameThumbCandidates(file) {
+      const variants = nameVariantsForThumbLookup(file);
+      const urls = [];
+
+      variants.forEach((variant) => {
+        urls.push(`https://thumbnails.gamenora.com/${encodeURIComponent(variant)}.webp`);
+        urls.push(`https://source.unsplash.com/640x360/?${encodeURIComponent(`${variant} gameplay screenshot`)}`);
+      });
+
+      urls.push(`https://picsum.photos/seed/${encodeURIComponent(file)}/640/360`);
+      return urls;
+    }
+
     function getGameThumbCandidates(file) {
       return [
         `UGS-Files/thumbnails/${file}.webp`,
@@ -1176,8 +1197,44 @@
         `UGS-Files/${file}.webp`,
         `UGS-Files/${file}.png`,
         `UGS-Files/${file}.jpg`,
-        `UGS-Files/${file}.jpeg`
+        `UGS-Files/${file}.jpeg`,
+        ...getRemoteGameThumbCandidates(file)
       ];
+    }
+
+    function createGeneratedThumbDataUri(file) {
+      const name = displayName(file);
+      const hueSeed = [...file].reduce((acc, ch) => acc + ch.charCodeAt(0), 0) % 360;
+      const secondaryHue = (hueSeed + 55) % 360;
+      const initials = name
+        .split(/\s+/)
+        .map((p) => p[0] || "")
+        .join("")
+        .slice(0, 2)
+        .toUpperCase() || "🎮";
+
+      const safeName = name
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .slice(0, 24);
+
+      const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+          <defs>
+            <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="hsl(${hueSeed},70%,35%)"/>
+              <stop offset="100%" stop-color="hsl(${secondaryHue},80%,18%)"/>
+            </linearGradient>
+          </defs>
+          <rect width="320" height="180" fill="url(#bg)" rx="12"/>
+          <circle cx="264" cy="38" r="56" fill="rgba(255,255,255,.14)"/>
+          <circle cx="42" cy="150" r="60" fill="rgba(255,255,255,.08)"/>
+          <text x="20" y="84" font-size="56" font-family="Arial, sans-serif" font-weight="700" fill="rgba(255,255,255,.92)">${initials}</text>
+          <text x="20" y="157" font-size="18" font-family="Arial, sans-serif" font-weight="700" fill="white">${safeName}</text>
+        </svg>`;
+
+      return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
     }
 
     function createGameThumb(file) {
@@ -1187,14 +1244,13 @@
       img.alt = `Förhandsbild för ${displayName(file)}`;
       img.loading = "lazy";
 
+      const generatedThumb = createGeneratedThumbDataUri(file);
       let i = 0;
       const tryNext = () => {
         if (i >= candidates.length) {
-          const fallback = document.createElement("div");
-          fallback.className = "game-thumb fallback";
-          const initials = displayName(file).split(/\s+/).map((p) => p[0] || "").join("").slice(0, 2).toUpperCase();
-          fallback.textContent = initials || "🎮";
-          return fallback;
+          img.onerror = null;
+          img.src = generatedThumb;
+          return img;
         }
         img.src = candidates[i++];
         return img;
