@@ -14,6 +14,7 @@
       } catch (e) {}
     })();
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
   <style>
     * { box-sizing: border-box; }
@@ -499,15 +500,41 @@
 
     .game-card { position: relative; }
 
+    .game-preview {
+      position: relative;
+      width: 100%;
+      border-radius: 12px;
+      margin-bottom: 10px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.25);
+    }
+
+
     .game-thumb {
       width: 100%;
       aspect-ratio: 16 / 9;
-      border-radius: 12px;
-      margin-bottom: 10px;
       background: linear-gradient(135deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
-      border: 1px solid rgba(255,255,255,.16);
       object-fit: cover;
       display: block;
+    }
+
+    .game-preview-frame {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+      object-fit: cover;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s ease;
+      background: #000;
+    }
+
+    .game-preview.live .game-preview-frame,
+    .game-btn:focus-visible .game-preview-frame {
+      opacity: 1;
     }
 
     .game-thumb.fallback {
@@ -1169,8 +1196,12 @@
       });
     };
 
-    function getGameThumbCandidates(file) {
+    function getGamePreviewImageCandidates(file) {
       return [
+        `UGS-Files/previews/${file}.webp`,
+        `UGS-Files/previews/${file}.png`,
+        `UGS-Files/previews/${file}.jpg`,
+        `UGS-Files/previews/${file}.jpeg`,
         `UGS-Files/thumbnails/${file}.webp`,
         `UGS-Files/thumbnails/${file}.png`,
         `UGS-Files/${file}.webp`,
@@ -1180,32 +1211,86 @@
       ];
     }
 
+    function createFallbackPreviewDataUri() {
+      return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+          <rect width="320" height="180" fill="#111"/>
+          <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" font-size="22" font-family="Arial" fill="white">Preview saknas</text>
+        </svg>
+      `);
+    }
+
     function createGameThumb(file) {
-      const candidates = getGameThumbCandidates(file);
+      const wrapper = document.createElement("div");
+      wrapper.className = "game-preview";
+
       const img = document.createElement("img");
       img.className = "game-thumb";
-      img.alt = `Förhandsbild för ${displayName(file)}`;
+      img.alt = `Preview-bild för ${displayName(file)}`;
       img.loading = "lazy";
+      img.src = createFallbackPreviewDataUri();
 
-      let i = 0;
-      const tryNext = () => {
-        if (i >= candidates.length) {
-          const fallback = document.createElement("div");
-          fallback.className = "game-thumb fallback";
-          const initials = displayName(file).split(/\s+/).map((p) => p[0] || "").join("").slice(0, 2).toUpperCase();
-          fallback.textContent = initials || "🎮";
-          return fallback;
+      const frame = document.createElement("iframe");
+      frame.className = "game-preview-frame";
+      frame.setAttribute("aria-hidden", "true");
+      frame.setAttribute("tabindex", "-1");
+      frame.setAttribute("loading", "lazy");
+      frame.setAttribute("sandbox", "allow-scripts allow-same-origin");
+
+      let previewBooted = false;
+      const bootPreview = () => {
+        if (previewBooted) return;
+        previewBooted = true;
+        frame.src = `UGS-Files/${file}.html?preview=1`;
+      };
+
+      const captureScreenshot = async () => {
+        try {
+          const doc = frame.contentDocument;
+          if (!doc || !doc.body || !window.html2canvas) return;
+          const canvas = await window.html2canvas(doc.body, {
+            backgroundColor: null,
+            scale: 0.5,
+            useCORS: true,
+            logging: false
+          });
+          img.src = canvas.toDataURL("image/webp", 0.8);
+        } catch (e) {
+          // ignore capture failures; fallback image remains
         }
-        img.src = candidates[i++];
-        return img;
       };
 
-      img.onerror = () => {
-        const next = tryNext();
-        if (next !== img && img.parentElement) img.replaceWith(next);
+      frame.addEventListener("load", () => {
+        setTimeout(() => captureScreenshot(), 900);
+      });
+
+      const startPreview = () => {
+        bootPreview();
+        wrapper.classList.add("live");
       };
 
-      return tryNext();
+      const stopPreview = () => {
+        wrapper.classList.remove("live");
+      };
+
+      wrapper.addEventListener("mouseenter", startPreview);
+      wrapper.addEventListener("focusin", startPreview);
+      wrapper.addEventListener("mouseleave", stopPreview);
+      wrapper.addEventListener("focusout", stopPreview);
+
+      if ("IntersectionObserver" in window) {
+        const obs = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            bootPreview();
+            obs.disconnect();
+          });
+        }, { rootMargin: "300px" });
+        obs.observe(wrapper);
+      }
+
+      wrapper.append(img, frame);
+      return wrapper;
     }
 
     function openSidebar() {
