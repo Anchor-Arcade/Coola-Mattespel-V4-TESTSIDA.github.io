@@ -14,7 +14,6 @@
       } catch (e) {}
     })();
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
   <style>
     * { box-sizing: border-box; }
@@ -499,53 +498,6 @@
     }
 
     .game-card { position: relative; }
-
-    .game-preview {
-      position: relative;
-      width: 100%;
-      border-radius: 12px;
-      margin-bottom: 10px;
-      overflow: hidden;
-      border: 1px solid rgba(255,255,255,.16);
-      background: rgba(0,0,0,.25);
-    }
-
-
-    .game-thumb {
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      background: linear-gradient(135deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
-      object-fit: cover;
-      display: block;
-    }
-
-    .game-preview-frame {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      border: none;
-      object-fit: cover;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity .2s ease;
-      background: #000;
-    }
-
-    .game-preview.live .game-preview-frame,
-    .game-btn:focus-visible .game-preview-frame {
-      opacity: 1;
-    }
-
-    .game-thumb.fallback {
-      display: grid;
-      place-items: center;
-      font-size: 28px;
-      font-weight: 900;
-      color: rgba(255,255,255,.9);
-      letter-spacing: 1px;
-      text-shadow: 0 4px 12px rgba(0,0,0,.45);
-    }
 
     .game-btn {
       width: 100%;
@@ -1086,14 +1038,13 @@
       "SKICKA FÖRSLAG!!!"
 
 ];
- const firebaseConfig = {
-      apiKey: "AIzaSyAZAaNITSnkwfCEkYI5NGUyEWiuSEGhfp4",
-      authDomain: "project-4243346869068615583.firebaseapp.com",
-      databaseURL: "https://project-4243346869068615583-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "project-4243346869068615583",
-      appId: "1:40272837740:web:3f908e419e625a3077ac49"
+    const firebaseConfig = {
+      apiKey: "AIzaSyAC_EFaFuRTGIWEQmMPhhI2Pq4CCkR7tMs",
+      authDomain: "v4-sigma.firebaseapp.com",
+      databaseURL: "https://v4-sigma-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "v4-sigma",
+      appId: "1:348091861694:web:ff6f9945fae5fee9412cef"
     };
-
 
     let chatRef = null;
     let db = null;
@@ -1195,103 +1146,6 @@
         return prefix + letter.toUpperCase();
       });
     };
-
-    function getGamePreviewImageCandidates(file) {
-      return [
-        `UGS-Files/previews/${file}.webp`,
-        `UGS-Files/previews/${file}.png`,
-        `UGS-Files/previews/${file}.jpg`,
-        `UGS-Files/previews/${file}.jpeg`,
-        `UGS-Files/thumbnails/${file}.webp`,
-        `UGS-Files/thumbnails/${file}.png`,
-        `UGS-Files/${file}.webp`,
-        `UGS-Files/${file}.png`,
-        `UGS-Files/${file}.jpg`,
-        `UGS-Files/${file}.jpeg`
-      ];
-    }
-
-    function createFallbackPreviewDataUri() {
-      return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
-          <rect width="320" height="180" fill="#111"/>
-          <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" font-size="22" font-family="Arial" fill="white">Preview saknas</text>
-        </svg>
-      `);
-    }
-
-    function createGameThumb(file) {
-      const wrapper = document.createElement("div");
-      wrapper.className = "game-preview";
-
-      const img = document.createElement("img");
-      img.className = "game-thumb";
-      img.alt = `Preview-bild för ${displayName(file)}`;
-      img.loading = "lazy";
-      img.src = createFallbackPreviewDataUri();
-
-      const frame = document.createElement("iframe");
-      frame.className = "game-preview-frame";
-      frame.setAttribute("aria-hidden", "true");
-      frame.setAttribute("tabindex", "-1");
-      frame.setAttribute("loading", "lazy");
-      frame.setAttribute("sandbox", "allow-scripts allow-same-origin");
-
-      let previewBooted = false;
-      const bootPreview = () => {
-        if (previewBooted) return;
-        previewBooted = true;
-        frame.src = `UGS-Files/${file}.html?preview=1`;
-      };
-
-      const captureScreenshot = async () => {
-        try {
-          const doc = frame.contentDocument;
-          if (!doc || !doc.body || !window.html2canvas) return;
-          const canvas = await window.html2canvas(doc.body, {
-            backgroundColor: null,
-            scale: 0.5,
-            useCORS: true,
-            logging: false
-          });
-          img.src = canvas.toDataURL("image/webp", 0.8);
-        } catch (e) {
-          // ignore capture failures; fallback image remains
-        }
-      };
-
-      frame.addEventListener("load", () => {
-        setTimeout(() => captureScreenshot(), 900);
-      });
-
-      const startPreview = () => {
-        bootPreview();
-        wrapper.classList.add("live");
-      };
-
-      const stopPreview = () => {
-        wrapper.classList.remove("live");
-      };
-
-      wrapper.addEventListener("mouseenter", startPreview);
-      wrapper.addEventListener("focusin", startPreview);
-      wrapper.addEventListener("mouseleave", stopPreview);
-      wrapper.addEventListener("focusout", stopPreview);
-
-      if ("IntersectionObserver" in window) {
-        const obs = new IntersectionObserver((entries) => {
-          entries.forEach((entry) => {
-            if (!entry.isIntersecting) return;
-            bootPreview();
-            obs.disconnect();
-          });
-        }, { rootMargin: "300px" });
-        obs.observe(wrapper);
-      }
-
-      wrapper.append(img, frame);
-      return wrapper;
-    }
 
     function openSidebar() {
       sidebar.classList.add("open");
@@ -1650,7 +1504,7 @@ function showInventory() {
       picks.forEach((file) => {
         const btn = document.createElement("button");
         btn.className = "game-btn recommended-btn";
-        btn.append(createGameThumb(file), document.createTextNode(displayName(file)));
+        btn.textContent = displayName(file);
         btn.onclick = () => openGame(file);
         recommendedRow.appendChild(btn);
       });
@@ -1698,7 +1552,7 @@ function showInventory() {
 
           const b = document.createElement("button");
           b.className = "game-btn";
-          b.append(createGameThumb(file), document.createTextNode(displayName(file)));
+          b.textContent = displayName(file);
           b.onclick = () => openGame(file);
 
           const f = document.createElement("span");
