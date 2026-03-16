@@ -36,8 +36,7 @@
       --theme-b: 163;
       background-size: 280% 280%;
       animation: bgMove 34s ease infinite;
-      transition: filter .25s ease;
-      filter: brightness(var(--theme-brightness));
+      transition: background .3s ease;
     }
 
     button, .chat-send, .sidebar-btn, .game-btn, .theme-btn {
@@ -91,7 +90,7 @@
       position: fixed;
       inset: -40%;
       z-index: -1;
-      filter: blur(120px);
+      filter: blur(120px) brightness(var(--theme-brightness));
       opacity: .55;
       animation: auroraMove 40s ease-in-out infinite;
       pointer-events: none;
@@ -379,12 +378,14 @@
     #embedContainer {
       display: none;
       margin: 20px auto;
-      width: 100%;
+      width: min(100%, 1080px);
       aspect-ratio: 16/9;
       background: #000;
       border-radius: 18px;
       overflow: hidden;
       position: relative;
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow: 0 20px 46px rgba(0,0,0,.45);
     }
 
     #embedContainer iframe { width: 100%; height: 100%; border: none; }
@@ -564,23 +565,25 @@
       width: 100%;
       padding: 16px;
       border-radius: 20px;
-      border: 1px solid rgba(255,255,255,.2);
-      background: linear-gradient(160deg, rgba(255,255,255,.16), rgba(255,255,255,.03));
+      border: 1px solid rgba(255,255,255,.24);
+      background:
+        linear-gradient(160deg, rgba(255,255,255,.18), rgba(255,255,255,.03)),
+        linear-gradient(120deg, color-mix(in oklab, var(--accent) 70%, #fff 8%), color-mix(in oklab, var(--accent-dark) 90%, #000 22%));
       color: white;
       font-size: 16px;
-      font-weight: 700;
+      font-weight: 800;
       cursor: pointer;
       position: relative;
-      backdrop-filter: blur(8px);
-      box-shadow: 0 16px 34px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.26);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 18px 38px rgba(0,0,0,.48), inset 0 1px 0 rgba(255,255,255,.28);
       transition: transform .16s ease, box-shadow .2s ease, filter .2s ease, border-color .2s ease;
     }
 
     .game-btn:hover {
-      transform: translateY(-3px) scale(1.015);
-      box-shadow: 0 18px 36px rgba(0,0,0,.52), inset 0 1px 0 rgba(255,255,255,.3);
-      border-color: rgba(255,255,255,.34);
-      filter: brightness(1.08);
+      transform: translateY(-4px) scale(1.018);
+      box-shadow: 0 24px 46px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.34);
+      border-color: rgba(255,255,255,.45);
+      filter: brightness(1.12) saturate(1.08);
     }
 
     .game-btn:active {
@@ -598,6 +601,19 @@
       pointer-events: none;
       box-shadow: 0 0 12px var(--accent);
       opacity: .5;
+    }
+
+    .sidebar-btn, .chat-send, .theme-btn, .fullscreen-btn, .profile-btn {
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.24);
+      box-shadow: 0 10px 26px rgba(0,0,0,.36), inset 0 1px 0 rgba(255,255,255,.2);
+      transition: transform .14s ease, filter .18s ease, box-shadow .18s ease;
+    }
+
+    .sidebar-btn:hover, .chat-send:hover, .theme-btn:hover, .fullscreen-btn:hover, .profile-btn:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.08);
+      box-shadow: 0 14px 32px rgba(0,0,0,.44), inset 0 1px 0 rgba(255,255,255,.26);
     }
 
     .favorite {
@@ -1923,19 +1939,36 @@ function showInventory() {
       applyThemeTuning();
     }
 
+    function applyThemeClass(t) {
+      document.body.className = t;
+      document.documentElement.classList.remove("theme-blue","theme-red","theme-green","theme-yellow","theme-orange","theme-gray","theme-purple","theme-pink","theme-cyan","theme-sunset","theme-neon");
+      document.documentElement.classList.add(`theme-${t}`);
+      localStorage.setItem("theme", t);
+    }
+
+    function deriveThemeFromRGB(r, g, b) {
+      if (r >= g && r >= b) return "red";
+      if (g >= r && g >= b) return "green";
+      return "blue";
+    }
+
     function setThemeRGB(ch, v) {
       const value = Math.max(0, Math.min(255, Number(v) || 0));
       if (ch === "r") localStorage.setItem("themeTintR", String(value));
       if (ch === "g") localStorage.setItem("themeTintG", String(value));
       if (ch === "b") localStorage.setItem("themeTintB", String(value));
+
+      const r = Number(localStorage.getItem("themeTintR") || 0);
+      const g = Number(localStorage.getItem("themeTintG") || 0);
+      const b = Number(localStorage.getItem("themeTintB") || 0);
+      const autoTheme = deriveThemeFromRGB(r, g, b);
+      applyThemeClass(autoTheme);
+
       applyThemeTuning();
     }
 
     function setTheme(t) {
-      document.body.className = t;
-      document.documentElement.classList.remove("theme-blue","theme-red","theme-green","theme-yellow","theme-orange","theme-gray","theme-purple","theme-pink","theme-cyan","theme-sunset","theme-neon");
-      document.documentElement.classList.add(`theme-${t}`);
-      localStorage.setItem("theme", t);
+      applyThemeClass(t);
 
       const defaults = getThemeDefaultTuning(t);
       localStorage.setItem("themeBrightness", String(defaults.brightness));
