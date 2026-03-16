@@ -16,21 +16,34 @@
   </script>
 
   <style>
+    @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap");
+
     * { box-sizing: border-box; }
 
     html, body {
       width: 100%;
       height: 100%;
       margin: 0;
-      font-family: Arial, sans-serif;
+      font-family: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
       color: white;
       transition: background .6s ease;
     }
 
     body {
-      background-size: 400% 400%;
-      animation: bgMove 25s ease infinite;
+      --theme-brightness: 1;
+      --theme-r: 30;
+      --theme-g: 79;
+      --theme-b: 163;
+      background-size: 280% 280%;
+      animation: bgMove 34s ease infinite;
+      transition: background .3s ease;
     }
+
+    button, .chat-send, .sidebar-btn, .game-btn, .theme-btn {
+      font-family: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
+      letter-spacing: .2px;
+    }
+
 
     @keyframes bgMove {
       0% { background-position: 0% 50%; }
@@ -77,7 +90,7 @@
       position: fixed;
       inset: -40%;
       z-index: -1;
-      filter: blur(120px);
+      filter: blur(120px) brightness(var(--theme-brightness));
       opacity: .55;
       animation: auroraMove 40s ease-in-out infinite;
       pointer-events: none;
@@ -93,9 +106,10 @@
     body::after {
       background:
         radial-gradient(circle at 60% 30%, var(--accent-dark), transparent 60%),
-        radial-gradient(circle at 20% 60%, var(--accent), transparent 65%);
+        radial-gradient(circle at 20% 60%, var(--accent), transparent 65%),
+        radial-gradient(circle at 50% 50%, rgba(var(--theme-r), var(--theme-g), var(--theme-b), .22), transparent 62%);
       animation-duration: 60s;
-      opacity: .4;
+      opacity: .45;
     }
 
     @keyframes auroraMove {
@@ -364,12 +378,14 @@
     #embedContainer {
       display: none;
       margin: 20px auto;
-      width: 100%;
+      width: min(100%, 1080px);
       aspect-ratio: 16/9;
       background: #000;
       border-radius: 18px;
       overflow: hidden;
       position: relative;
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow: 0 20px 46px rgba(0,0,0,.45);
     }
 
     #embedContainer iframe { width: 100%; height: 100%; border: none; }
@@ -499,52 +515,75 @@
 
     .game-card { position: relative; }
 
-    .game-thumb {
+    .game-preview {
       width: 100%;
       aspect-ratio: 16 / 9;
-      border-radius: 12px;
-      margin-bottom: 10px;
-      background: linear-gradient(135deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
-      border: 1px solid rgba(255,255,255,.16);
-      object-fit: cover;
-      display: block;
+      margin-bottom: 12px;
+      border-radius: 16px;
+      position: relative;
+      border: 1px solid rgba(255,255,255,.2);
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.2), rgba(255,255,255,.02) 45%),
+        linear-gradient(225deg, rgba(0,0,0,.35), rgba(255,255,255,.02)),
+        linear-gradient(120deg, color-mix(in oklab, var(--accent) 58%, #fff 10%), color-mix(in oklab, var(--accent-dark) 86%, #000 18%));
+      overflow: hidden;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.26), 0 12px 28px rgba(0,0,0,.32);
     }
 
-    .game-thumb.fallback {
-      display: grid;
-      place-items: center;
-      font-size: 28px;
-      font-weight: 900;
-      color: rgba(255,255,255,.9);
-      letter-spacing: 1px;
-      text-shadow: 0 4px 12px rgba(0,0,0,.45);
+    .game-preview::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        repeating-linear-gradient(115deg, rgba(255,255,255,.12) 0 6px, transparent 6px 18px),
+        linear-gradient(180deg, transparent 0 68%, rgba(0,0,0,.36) 100%);
+      opacity: .45;
+      pointer-events: none;
+    }
+
+    .game-name-chip {
+      position: absolute;
+      left: 10px;
+      right: 10px;
+      bottom: 10px;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      text-align: center;
+      padding: 7px 10px;
+      border-radius: 10px;
+      background: rgba(0,0,0,.44);
+      border: 1px solid rgba(255,255,255,.18);
+      backdrop-filter: blur(7px);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .game-btn {
       width: 100%;
-      padding: 22px;
-      border-radius: 16px;
-      border: none;
-      background: linear-gradient(135deg, var(--accent-dark), var(--accent));
+      padding: 16px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,.24);
+      background:
+        linear-gradient(160deg, rgba(255,255,255,.18), rgba(255,255,255,.03)),
+        linear-gradient(120deg, color-mix(in oklab, var(--accent) 70%, #fff 8%), color-mix(in oklab, var(--accent-dark) 90%, #000 22%));
       color: white;
       font-size: 16px;
+      font-weight: 800;
       cursor: pointer;
       position: relative;
-      box-shadow:
-        0 6px 14px rgba(0, 0, 0, 0.4),
-        inset 0 2px 4px rgba(255, 255, 255, 0.15);
-      transition:
-        transform .15s ease,
-        box-shadow .15s ease,
-        filter .2s ease;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 18px 38px rgba(0,0,0,.48), inset 0 1px 0 rgba(255,255,255,.28);
+      transition: transform .16s ease, box-shadow .2s ease, filter .2s ease, border-color .2s ease;
     }
 
     .game-btn:hover {
-      transform: translateY(-4px) scale(1.03);
-      box-shadow:
-        0 12px 22px rgba(0, 0, 0, 0.55),
-        inset 0 2px 6px rgba(255, 255, 255, 0.25);
-      filter: brightness(1.1);
+      transform: translateY(-4px) scale(1.018);
+      box-shadow: 0 24px 46px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.34);
+      border-color: rgba(255,255,255,.45);
+      filter: brightness(1.12) saturate(1.08);
     }
 
     .game-btn:active {
@@ -562,6 +601,19 @@
       pointer-events: none;
       box-shadow: 0 0 12px var(--accent);
       opacity: .5;
+    }
+
+    .sidebar-btn, .chat-send, .theme-btn, .fullscreen-btn, .profile-btn {
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.24);
+      box-shadow: 0 10px 26px rgba(0,0,0,.36), inset 0 1px 0 rgba(255,255,255,.2);
+      transition: transform .14s ease, filter .18s ease, box-shadow .18s ease;
+    }
+
+    .sidebar-btn:hover, .chat-send:hover, .theme-btn:hover, .fullscreen-btn:hover, .profile-btn:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.08);
+      box-shadow: 0 14px 32px rgba(0,0,0,.44), inset 0 1px 0 rgba(255,255,255,.26);
     }
 
     .favorite {
@@ -586,22 +638,89 @@
     }
 
     .theme-box {
-      background: #111;
-      padding: 25px;
-      border-radius: 18px;
+      width: min(760px, 94vw);
+      background: rgba(8,8,12,.92);
+      padding: 24px;
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,.18);
+      backdrop-filter: blur(14px);
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 15px;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 18px;
+    }
+
+    .theme-presets {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      align-content: start;
     }
 
     .theme-btn {
-      padding: 18px;
+      padding: 14px 10px;
       border-radius: 12px;
-      border: none;
+      border: 1px solid rgba(255,255,255,.16);
       cursor: pointer;
-      font-size: 22px;
-      background: linear-gradient(135deg, var(--accent-dark), var(--accent));
+      font-size: 12px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: .5px;
+      background: linear-gradient(135deg, color-mix(in oklab, var(--accent-dark) 80%, #000), var(--accent));
     }
+
+    .theme-controls {
+      display: grid;
+      gap: 10px;
+      align-content: start;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 14px;
+      padding: 12px;
+    }
+
+    .theme-controls label {
+      font-size: 12px;
+      font-weight: 700;
+      opacity: .95;
+      display: grid;
+      grid-template-columns: 56px 1fr 44px;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .theme-controls input[type="range"] {
+      width: 100%;
+      appearance: none;
+      -webkit-appearance: none;
+      height: 8px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(255,255,255,.5), rgba(255,255,255,.14));
+      outline: none;
+      border: 1px solid rgba(255,255,255,.2);
+    }
+
+    .theme-controls input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #fff;
+      border: 2px solid rgba(0,0,0,.35);
+      box-shadow: 0 2px 8px rgba(0,0,0,.45);
+      cursor: pointer;
+    }
+
+    .theme-controls input[type="range"]::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #fff;
+      border: 2px solid rgba(0,0,0,.35);
+      box-shadow: 0 2px 8px rgba(0,0,0,.45);
+      cursor: pointer;
+    }
+
 
     .recommended-section { margin: 20px 0 42px; }
     .recommended-title {
@@ -618,7 +737,29 @@
     }
     .recommended-row .recommended-btn { min-width: 180px; }
 
-    
+    #searchInput {
+      width: 100%;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(0,0,0,.38);
+      color: #fff;
+      padding: 12px 14px;
+      outline: none;
+      transition: border-color .15s ease, box-shadow .15s ease;
+    }
+
+    #searchInput:focus {
+      border-color: rgba(255,255,255,.42);
+      box-shadow: 0 0 0 3px rgba(255,255,255,.12);
+    }
+
+    .search-meta {
+      margin-top: 6px;
+      font-size: 12px;
+      opacity: .82;
+      min-height: 16px;
+    }
+
 
     .profile-btn {
       position: fixed;
@@ -643,7 +784,7 @@
     .chat-msg { animation: popIn .25s ease; }
     @keyframes popIn { from { transform: translateY(8px); opacity: 0;} to { transform: translateY(0); opacity: 1; } }
     .modal { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,.62); z-index: 1500; }
-    .modal-box { width: min(520px, 90vw); max-height: 85vh; overflow: auto; background: rgba(10,10,10,.95); border: 1px solid rgba(255,255,255,.18); border-radius: 14px; padding: 16px; }
+    .modal-box { width: min(520px, 90vw); max-height: 85vh; overflow: auto; background: linear-gradient(165deg, rgba(255,255,255,.08), rgba(0,0,0,.7)); border: 1px solid rgba(255,255,255,.22); border-radius: 18px; padding: 18px; box-shadow: 0 24px 60px rgba(0,0,0,.5); backdrop-filter: blur(14px); }
     .modal-box.wide { width: min(760px, 94vw); }
     .auth-input { width: 100%; margin-bottom: 8px; border: none; border-radius: 8px; padding: 9px; }
     .info-card { margin-top: 10px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.12); border-radius: 10px; padding: 10px; }
@@ -655,6 +796,9 @@
     html.theme-gray body { --accent: #aaaaaa; --accent-dark: #666666; background-image: linear-gradient(180deg, #2b2b2b, #000, #2b2b2b); }
     html.theme-purple body { --accent: #8a2be2; --accent-dark: #4b0082; background-image: linear-gradient(180deg, #2b0040, #000, #2b0040); }
     html.theme-pink body { --accent: #ff69b4; --accent-dark: #c71585; background-image: linear-gradient(180deg, #4a0028, #000, #4a0028); }
+    html.theme-cyan body { --accent: #00d4ff; --accent-dark: #005f7a; background-image: linear-gradient(180deg, #002c36, #000, #003d4d); }
+    html.theme-sunset body { --accent: #ff6b6b; --accent-dark: #7a1b4d; background-image: linear-gradient(180deg, #4a1736, #14010a, #6a2e25); }
+    html.theme-neon body { --accent: #39ff14; --accent-dark: #0f5a19; background-image: linear-gradient(180deg, #05210b, #000, #0a2d0f); }
 
     .intro-overlay { position: fixed; inset: 0; z-index: 2200; display:flex; align-items:center; justify-content:center; background-image: inherit; background-size: 400% 400%; animation: bgMove 25s ease infinite; overflow:hidden; }
     .intro-overlay::before,
@@ -868,7 +1012,8 @@
         <p class="subtitle">Cool sida med coola mattespel!</p>
         <p id="activePlayers" class="active-players">Aktiva spelare: ...</p> <!-- NYTT -->
         <div class="search-box">
-         <input id="searchInput" placeholder="Sök spel..." oninput="filterGames()" />
+         <input id="searchInput" placeholder="Sök spel snabbt..." oninput="filterGames()" />
+         <div id="searchMeta" class="search-meta"></div>
         </div>
       </div>
 
@@ -921,14 +1066,25 @@
 
   <div id="themePopup" onclick="if(event.target===this)this.style.display='none'">
     <div class="theme-box">
-      <button class="theme-btn" onclick="setTheme('blue')">🔵</button>
-      <button class="theme-btn" onclick="setTheme('red')">🔴</button>
-      <button class="theme-btn" onclick="setTheme('green')">🟢</button>
-      <button class="theme-btn" onclick="setTheme('yellow')">🟡</button>
-      <button class="theme-btn" onclick="setTheme('orange')">🟠</button>
-      <button class="theme-btn" onclick="setTheme('gray')">⚪</button>
-      <button class="theme-btn" onclick="setTheme('purple')">🟣</button>
-      <button class="theme-btn" onclick="setTheme('pink')">🌸</button>
+      <div class="theme-presets">
+        <button class="theme-btn" onclick="setTheme('blue')">BLUE</button>
+        <button class="theme-btn" onclick="setTheme('red')">RED</button>
+        <button class="theme-btn" onclick="setTheme('green')">GREEN</button>
+        <button class="theme-btn" onclick="setTheme('yellow')">YELLOW</button>
+        <button class="theme-btn" onclick="setTheme('orange')">ORANGE</button>
+        <button class="theme-btn" onclick="setTheme('gray')">GRAY</button>
+        <button class="theme-btn" onclick="setTheme('purple')">PURPLE</button>
+        <button class="theme-btn" onclick="setTheme('pink')">PINK</button>
+        <button class="theme-btn" onclick="setTheme('cyan')">CYAN</button>
+        <button class="theme-btn" onclick="setTheme('sunset')">SUNSET</button>
+        <button class="theme-btn" onclick="setTheme('neon')">NEON</button>
+      </div>
+      <div class="theme-controls">
+        <label>Ljus <input id="brightnessSlider" type="range" min="70" max="130" value="100" oninput="setThemeBrightness(this.value)"><span id="brightnessValue">100%</span></label>
+        <label>R <input id="rSlider" type="range" min="0" max="255" value="30" oninput="setThemeRGB('r', this.value)"><span id="rValue">30</span></label>
+        <label>G <input id="gSlider" type="range" min="0" max="255" value="79" oninput="setThemeRGB('g', this.value)"><span id="gValue">79</span></label>
+        <label>B <input id="bSlider" type="range" min="0" max="255" value="163" oninput="setThemeRGB('b', this.value)"><span id="bValue">163</span></label>
+      </div>
     </div>
   </div>
 
@@ -1169,43 +1325,16 @@
       });
     };
 
-    function getGameThumbCandidates(file) {
-      return [
-        `UGS-Files/thumbnails/${file}.webp`,
-        `UGS-Files/thumbnails/${file}.png`,
-        `UGS-Files/${file}.webp`,
-        `UGS-Files/${file}.png`,
-        `UGS-Files/${file}.jpg`,
-        `UGS-Files/${file}.jpeg`
-      ];
-    }
-
     function createGameThumb(file) {
-      const candidates = getGameThumbCandidates(file);
-      const img = document.createElement("img");
-      img.className = "game-thumb";
-      img.alt = `Förhandsbild för ${displayName(file)}`;
-      img.loading = "lazy";
+      const preview = document.createElement("div");
+      preview.className = "game-preview";
 
-      let i = 0;
-      const tryNext = () => {
-        if (i >= candidates.length) {
-          const fallback = document.createElement("div");
-          fallback.className = "game-thumb fallback";
-          const initials = displayName(file).split(/\s+/).map((p) => p[0] || "").join("").slice(0, 2).toUpperCase();
-          fallback.textContent = initials || "🎮";
-          return fallback;
-        }
-        img.src = candidates[i++];
-        return img;
-      };
+      const chip = document.createElement("div");
+      chip.className = "game-name-chip";
+      chip.textContent = displayName(file);
 
-      img.onerror = () => {
-        const next = tryNext();
-        if (next !== img && img.parentElement) img.replaceWith(next);
-      };
-
-      return tryNext();
+      preview.append(chip);
+      return preview;
     }
 
     function openSidebar() {
@@ -1658,10 +1787,53 @@ function showInventory() {
       }
     }
 
- function filterGames() {
-  const q = document.getElementById("searchInput").value.toLowerCase();
-  renderGames(files.filter((f) => displayName(f).toLowerCase().includes(q)));
-}
+    let searchDebounce = null;
+
+    function normalizeSearchText(value) {
+      return (value || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[̀-ͯ]/g, "")
+        .replace(/[^a-z0-9]/g, "");
+    }
+
+    function scoreGameMatch(file, query) {
+      const raw = displayName(file);
+      const name = normalizeSearchText(raw);
+      if (!query) return { score: 1, ok: true };
+      if (name.startsWith(query)) return { score: 1000 - name.length, ok: true };
+      const idx = name.indexOf(query);
+      if (idx !== -1) return { score: 700 - idx, ok: true };
+
+      let qi = 0;
+      for (let i = 0; i < name.length && qi < query.length; i++) {
+        if (name[i] === query[qi]) qi++;
+      }
+      if (qi === query.length) return { score: 300 - Math.max(0, name.length - query.length), ok: true };
+      return { score: -1, ok: false };
+    }
+
+    function runGameSearch() {
+      const q = normalizeSearchText(searchInput.value);
+      if (!q) {
+        searchMeta.textContent = "Visar alla spel";
+        renderGames(files);
+        return;
+      }
+
+      const ranked = files
+        .map((file) => ({ file, ...scoreGameMatch(file, q) }))
+        .filter((r) => r.ok)
+        .sort((a, b) => b.score - a.score || displayName(a.file).localeCompare(displayName(b.file), "sv", { sensitivity: "base" }));
+
+      searchMeta.textContent = `${ranked.length} träffar för "${searchInput.value.trim()}"`;
+      renderGames(ranked.map((r) => r.file));
+    }
+
+    function filterGames() {
+      if (searchDebounce) clearTimeout(searchDebounce);
+      searchDebounce = setTimeout(runGameSearch, 90);
+    }
 
     function goHome() {
       location.reload();
@@ -1700,15 +1872,116 @@ function showInventory() {
       }
     }
 
-    function setTheme(t) {
+    function updateSliderVisual(input, colorStart, colorEnd) {
+      if (!input) return;
+      const min = Number(input.min || 0);
+      const max = Number(input.max || 100);
+      const value = Number(input.value || min);
+      const pct = ((value - min) / (max - min || 1)) * 100;
+      input.style.background = `linear-gradient(90deg, ${colorStart} 0%, ${colorEnd} ${pct}%, rgba(255,255,255,.14) ${pct}%, rgba(255,255,255,.08) 100%)`;
+    }
+
+    function getThemeDefaultTuning(theme) {
+      const map = {
+        blue: { brightness: 100, r: 25, g: 95, b: 255 },
+        red: { brightness: 100, r: 255, g: 70, b: 70 },
+        green: { brightness: 100, r: 60, g: 230, b: 90 },
+        yellow: { brightness: 108, r: 255, g: 220, b: 65 },
+        orange: { brightness: 104, r: 255, g: 150, b: 50 },
+        gray: { brightness: 95, r: 170, g: 170, b: 185 },
+        purple: { brightness: 100, r: 150, g: 90, b: 255 },
+        pink: { brightness: 102, r: 255, g: 125, b: 210 },
+        cyan: { brightness: 98, r: 0, g: 215, b: 255 },
+        sunset: { brightness: 106, r: 255, g: 122, b: 95 },
+        neon: { brightness: 98, r: 72, g: 255, b: 88 }
+      };
+      return map[theme] || { brightness: 100, r: 30, g: 79, b: 163 };
+    }
+
+    function applyThemeTuning() {
+      const brightness = Number(localStorage.getItem("themeBrightness") || 100);
+      const r = Number(localStorage.getItem("themeTintR") || 30);
+      const g = Number(localStorage.getItem("themeTintG") || 79);
+      const b = Number(localStorage.getItem("themeTintB") || 163);
+
+      document.body.style.setProperty("--theme-brightness", (brightness / 100).toFixed(2));
+      document.body.style.setProperty("--theme-r", r);
+      document.body.style.setProperty("--theme-g", g);
+      document.body.style.setProperty("--theme-b", b);
+
+      const map = {
+        brightnessSlider: brightness,
+        rSlider: r,
+        gSlider: g,
+        bSlider: b,
+        brightnessValue: `${brightness}%`,
+        rValue: `${r}`,
+        gValue: `${g}`,
+        bValue: `${b}`
+      };
+
+      Object.entries(map).forEach(([id, value]) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (el.tagName === "INPUT") el.value = value;
+        else el.textContent = value;
+      });
+
+      updateSliderVisual(document.getElementById("brightnessSlider"), "#f8f8f8", "#ffe08a");
+      updateSliderVisual(document.getElementById("rSlider"), "#ff5a5a", "#ff1a1a");
+      updateSliderVisual(document.getElementById("gSlider"), "#6fff8e", "#22cf55");
+      updateSliderVisual(document.getElementById("bSlider"), "#72a5ff", "#2b6bff");
+    }
+
+    function setThemeBrightness(v) {
+      const value = Math.max(70, Math.min(130, Number(v) || 100));
+      localStorage.setItem("themeBrightness", String(value));
+      applyThemeTuning();
+    }
+
+    function applyThemeClass(t) {
       document.body.className = t;
-      document.documentElement.classList.remove("theme-blue","theme-red","theme-green","theme-yellow","theme-orange","theme-gray","theme-purple","theme-pink");
+      document.documentElement.classList.remove("theme-blue","theme-red","theme-green","theme-yellow","theme-orange","theme-gray","theme-purple","theme-pink","theme-cyan","theme-sunset","theme-neon");
       document.documentElement.classList.add(`theme-${t}`);
       localStorage.setItem("theme", t);
+    }
+
+    function deriveThemeFromRGB(r, g, b) {
+      if (r >= g && r >= b) return "red";
+      if (g >= r && g >= b) return "green";
+      return "blue";
+    }
+
+    function setThemeRGB(ch, v) {
+      const value = Math.max(0, Math.min(255, Number(v) || 0));
+      if (ch === "r") localStorage.setItem("themeTintR", String(value));
+      if (ch === "g") localStorage.setItem("themeTintG", String(value));
+      if (ch === "b") localStorage.setItem("themeTintB", String(value));
+
+      const r = Number(localStorage.getItem("themeTintR") || 0);
+      const g = Number(localStorage.getItem("themeTintG") || 0);
+      const b = Number(localStorage.getItem("themeTintB") || 0);
+      const autoTheme = deriveThemeFromRGB(r, g, b);
+      applyThemeClass(autoTheme);
+
+      applyThemeTuning();
+    }
+
+    function setTheme(t) {
+      applyThemeClass(t);
+
+      const defaults = getThemeDefaultTuning(t);
+      localStorage.setItem("themeBrightness", String(defaults.brightness));
+      localStorage.setItem("themeTintR", String(defaults.r));
+      localStorage.setItem("themeTintG", String(defaults.g));
+      localStorage.setItem("themeTintB", String(defaults.b));
+
       document.getElementById("themePopup").style.display = "none";
+      applyThemeTuning();
     }
 
     function openThemePopup() {
+      applyThemeTuning();
       document.getElementById("themePopup").style.display = "flex";
     }
 
@@ -2178,11 +2451,13 @@ function showInventory() {
       const saved = localStorage.getItem("theme");
       if (saved) {
         document.body.className = saved;
-        document.documentElement.classList.remove("theme-blue","theme-red","theme-green","theme-yellow","theme-orange","theme-gray","theme-purple","theme-pink");
+        document.documentElement.classList.remove("theme-blue","theme-red","theme-green","theme-yellow","theme-orange","theme-gray","theme-purple","theme-pink","theme-cyan","theme-sunset","theme-neon");
         document.documentElement.classList.add(`theme-${saved}`);
       }
+      applyThemeTuning();
       renderRecommended();
       renderGames(files);
+      searchMeta.textContent = "Visar alla spel";
       startIntroLoader();
       refreshChatStatus();
 
