@@ -1741,7 +1741,7 @@ function showInventory() {
       picks.forEach((file) => {
         const btn = document.createElement("button");
         btn.className = "game-btn recommended-btn";
-        btn.append(createGameThumb(file), document.createTextNode(displayName(file)));
+        btn.append(createGameThumb(file));
         btn.onclick = () => openGame(file);
         recommendedRow.appendChild(btn);
       });
@@ -1784,7 +1784,7 @@ function showInventory() {
 
           const b = document.createElement("button");
           b.className = "game-btn";
-          b.append(createGameThumb(file), document.createTextNode(displayName(file)));
+          b.append(createGameThumb(file));
           b.onclick = () => openGame(file);
 
           const f = document.createElement("button");
