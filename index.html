@@ -16,21 +16,33 @@
   </script>
 
   <style>
+    @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap");
+
     * { box-sizing: border-box; }
 
     html, body {
       width: 100%;
       height: 100%;
       margin: 0;
-      font-family: Arial, sans-serif;
+      font-family: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
       color: white;
       transition: background .6s ease;
     }
 
     body {
-      background-size: 400% 400%;
-      animation: bgMove 25s ease infinite;
+      --theme-r: 30;
+      --theme-g: 79;
+      --theme-b: 163;
+      background-size: 280% 280%;
+      animation: bgMove 34s ease infinite;
+      transition: background .3s ease;
     }
+
+    button, .chat-send, .sidebar-btn, .game-btn, .theme-btn {
+      font-family: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
+      letter-spacing: .2px;
+    }
+
 
     @keyframes bgMove {
       0% { background-position: 0% 50%; }
@@ -93,9 +105,10 @@
     body::after {
       background:
         radial-gradient(circle at 60% 30%, var(--accent-dark), transparent 60%),
-        radial-gradient(circle at 20% 60%, var(--accent), transparent 65%);
+        radial-gradient(circle at 20% 60%, var(--accent), transparent 65%),
+        radial-gradient(circle at 50% 50%, rgba(var(--theme-r), var(--theme-g), var(--theme-b), .22), transparent 62%);
       animation-duration: 60s;
-      opacity: .4;
+      opacity: .45;
     }
 
     @keyframes auroraMove {
@@ -364,12 +377,14 @@
     #embedContainer {
       display: none;
       margin: 20px auto;
-      width: 100%;
+      width: min(100%, 1080px);
       aspect-ratio: 16/9;
       background: #000;
       border-radius: 18px;
       overflow: hidden;
       position: relative;
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow: 0 20px 46px rgba(0,0,0,.45);
     }
 
     #embedContainer iframe { width: 100%; height: 100%; border: none; }
@@ -499,52 +514,76 @@
 
     .game-card { position: relative; }
 
-    .game-thumb {
+    .game-preview {
       width: 100%;
       aspect-ratio: 16 / 9;
-      border-radius: 12px;
-      margin-bottom: 10px;
-      background: linear-gradient(135deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
-      border: 1px solid rgba(255,255,255,.16);
-      object-fit: cover;
-      display: block;
+      margin-bottom: 12px;
+      border-radius: 16px;
+      position: relative;
+      border: 1px solid rgba(255,255,255,.2);
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.2), rgba(255,255,255,.02) 45%),
+        linear-gradient(225deg, rgba(0,0,0,.35), rgba(255,255,255,.02)),
+        linear-gradient(120deg, color-mix(in oklab, var(--accent) 58%, #fff 10%), color-mix(in oklab, var(--accent-dark) 86%, #000 18%));
+      overflow: hidden;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.26), 0 12px 28px rgba(0,0,0,.32);
     }
 
-    .game-thumb.fallback {
-      display: grid;
-      place-items: center;
-      font-size: 28px;
-      font-weight: 900;
-      color: rgba(255,255,255,.9);
-      letter-spacing: 1px;
-      text-shadow: 0 4px 12px rgba(0,0,0,.45);
+    .game-preview::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        repeating-linear-gradient(115deg, rgba(255,255,255,.12) 0 6px, transparent 6px 18px),
+        linear-gradient(180deg, transparent 0 68%, rgba(0,0,0,.36) 100%);
+      opacity: .45;
+      pointer-events: none;
+    }
+
+    .game-name-chip {
+      position: absolute;
+      left: 10px;
+      right: 10px;
+      bottom: 10px;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      text-align: center;
+      padding: 7px 10px;
+      border-radius: 10px;
+      background: rgba(0,0,0,.44);
+      border: 1px solid rgba(255,255,255,.18);
+      backdrop-filter: blur(7px);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .game-btn {
       width: 100%;
-      padding: 22px;
-      border-radius: 16px;
-      border: none;
-      background: linear-gradient(135deg, var(--accent-dark), var(--accent));
+      padding: 14px;
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,.26);
+      background:
+        linear-gradient(160deg, rgba(255,255,255,.2), rgba(255,255,255,.04)),
+        linear-gradient(120deg, color-mix(in oklab, var(--accent) 80%, #fff 10%), color-mix(in oklab, var(--accent-dark) 92%, #000 24%));
       color: white;
       font-size: 16px;
+      font-weight: 900;
       cursor: pointer;
       position: relative;
-      box-shadow:
-        0 6px 14px rgba(0, 0, 0, 0.4),
-        inset 0 2px 4px rgba(255, 255, 255, 0.15);
-      transition:
-        transform .15s ease,
-        box-shadow .15s ease,
-        filter .2s ease;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 20px 44px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.3);
+      transition: transform .16s ease, box-shadow .2s ease, filter .2s ease, border-color .2s ease;
     }
 
     .game-btn:hover {
-      transform: translateY(-4px) scale(1.03);
-      box-shadow:
-        0 12px 22px rgba(0, 0, 0, 0.55),
-        inset 0 2px 6px rgba(255, 255, 255, 0.25);
-      filter: brightness(1.1);
+      transform: translateY(-4px) scale(1.018);
+      box-shadow: 0 24px 46px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.34);
+      border-color: rgba(255,255,255,.45);
+      filter: brightness(1.12) saturate(1.08);
     }
 
     .game-btn:active {
@@ -560,21 +599,60 @@
       inset: 0;
       border-radius: 16px;
       pointer-events: none;
-      box-shadow: 0 0 12px var(--accent);
-      opacity: .5;
+      box-shadow: 0 0 20px color-mix(in oklab, var(--accent) 80%, #fff 20%);
+      opacity: .75;
+    }
+
+    .sidebar-btn, .chat-send, .theme-btn, .fullscreen-btn, .profile-btn {
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.24);
+      box-shadow: 0 10px 26px rgba(0,0,0,.36), inset 0 1px 0 rgba(255,255,255,.2);
+      transition: transform .14s ease, filter .18s ease, box-shadow .18s ease;
+    }
+
+    .sidebar-btn:hover, .chat-send:hover, .theme-btn:hover, .fullscreen-btn:hover, .profile-btn:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.08);
+      box-shadow: 0 14px 32px rgba(0,0,0,.44), inset 0 1px 0 rgba(255,255,255,.26);
     }
 
     .favorite {
       position: absolute;
       top: 10px;
       right: 12px;
-      font-size: 20px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.28);
+      background: rgba(0,0,0,.42);
+      color: rgba(255,255,255,.75);
+      display: grid;
+      place-items: center;
+      font-size: 16px;
       cursor: pointer;
-      opacity: .5;
-      user-select: none;
+      transition: transform .14s ease, background .16s ease, color .16s ease, box-shadow .16s ease;
+      z-index: 2;
     }
 
-    .favorite.active { opacity: 1; color: gold; }
+    .favorite:hover { transform: scale(1.08); background: rgba(255,255,255,.16); color: #fff; }
+    .favorite.active { color: #ffd54a; background: rgba(255,205,64,.22); box-shadow: 0 0 16px rgba(255,205,64,.45); }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,.75);
+      border: 1px solid rgba(255,255,255,.22);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: 13px;
+      z-index: 2600;
+      backdrop-filter: blur(8px);
+      opacity: 0;
+      transition: opacity .18s ease, transform .18s ease;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(-6px); }
 
     #themePopup {
       position: fixed;
@@ -586,22 +664,36 @@
     }
 
     .theme-box {
-      background: #111;
-      padding: 25px;
-      border-radius: 18px;
+      width: min(760px, 94vw);
+      background: rgba(8,8,12,.92);
+      padding: 24px;
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,.18);
+      backdrop-filter: blur(14px);
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 15px;
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+
+    .theme-presets {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      align-content: start;
     }
 
     .theme-btn {
-      padding: 18px;
+      padding: 14px 10px;
       border-radius: 12px;
-      border: none;
+      border: 1px solid rgba(255,255,255,.16);
       cursor: pointer;
-      font-size: 22px;
-      background: linear-gradient(135deg, var(--accent-dark), var(--accent));
+      font-size: 12px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: .5px;
+      background: linear-gradient(135deg, color-mix(in oklab, var(--accent-dark) 80%, #000), var(--accent));
     }
+
 
     .recommended-section { margin: 20px 0 42px; }
     .recommended-title {
@@ -618,7 +710,29 @@
     }
     .recommended-row .recommended-btn { min-width: 180px; }
 
-    
+    #searchInput {
+      width: 100%;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(0,0,0,.38);
+      color: #fff;
+      padding: 12px 14px;
+      outline: none;
+      transition: border-color .15s ease, box-shadow .15s ease;
+    }
+
+    #searchInput:focus {
+      border-color: rgba(255,255,255,.42);
+      box-shadow: 0 0 0 3px rgba(255,255,255,.12);
+    }
+
+    .search-meta {
+      margin-top: 6px;
+      font-size: 12px;
+      opacity: .82;
+      min-height: 16px;
+    }
+
 
     .profile-btn {
       position: fixed;
@@ -643,7 +757,7 @@
     .chat-msg { animation: popIn .25s ease; }
     @keyframes popIn { from { transform: translateY(8px); opacity: 0;} to { transform: translateY(0); opacity: 1; } }
     .modal { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,.62); z-index: 1500; }
-    .modal-box { width: min(520px, 90vw); max-height: 85vh; overflow: auto; background: rgba(10,10,10,.95); border: 1px solid rgba(255,255,255,.18); border-radius: 14px; padding: 16px; }
+    .modal-box { width: min(520px, 90vw); max-height: 85vh; overflow: auto; background: linear-gradient(165deg, rgba(255,255,255,.08), rgba(0,0,0,.7)); border: 1px solid rgba(255,255,255,.22); border-radius: 18px; padding: 18px; box-shadow: 0 24px 60px rgba(0,0,0,.5); backdrop-filter: blur(14px); }
     .modal-box.wide { width: min(760px, 94vw); }
     .auth-input { width: 100%; margin-bottom: 8px; border: none; border-radius: 8px; padding: 9px; }
     .info-card { margin-top: 10px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.12); border-radius: 10px; padding: 10px; }
@@ -655,6 +769,9 @@
     html.theme-gray body { --accent: #aaaaaa; --accent-dark: #666666; background-image: linear-gradient(180deg, #2b2b2b, #000, #2b2b2b); }
     html.theme-purple body { --accent: #8a2be2; --accent-dark: #4b0082; background-image: linear-gradient(180deg, #2b0040, #000, #2b0040); }
     html.theme-pink body { --accent: #ff69b4; --accent-dark: #c71585; background-image: linear-gradient(180deg, #4a0028, #000, #4a0028); }
+    html.theme-cyan body { --accent: #00d4ff; --accent-dark: #005f7a; background-image: linear-gradient(180deg, #002c36, #000, #003d4d); }
+    html.theme-sunset body { --accent: #ff6b6b; --accent-dark: #7a1b4d; background-image: linear-gradient(180deg, #4a1736, #14010a, #6a2e25); }
+    html.theme-neon body { --accent: #39ff14; --accent-dark: #0f5a19; background-image: linear-gradient(180deg, #05210b, #000, #0a2d0f); }
 
     .intro-overlay { position: fixed; inset: 0; z-index: 2200; display:flex; align-items:center; justify-content:center; background-image: inherit; background-size: 400% 400%; animation: bgMove 25s ease infinite; overflow:hidden; }
     .intro-overlay::before,
@@ -818,7 +935,7 @@
 
     <div class="sidebar" id="sidebar">
       <button class="sidebar-btn" onclick="goHome()"><span class="icon">🏠</span><span class="label">Hem</span></button>
-      <button class="sidebar-btn" onclick="showFavorites()"><span class="icon">⭐</span><span class="label">Favoriter</span></button>
+      <button id="favoritesBtn" class="sidebar-btn" onclick="showFavorites()"><span class="icon">⭐</span><span id="favoritesLabel" class="label">Favoriter (0)</span></button>
       <button class="sidebar-btn" onclick="showRecent()"><span class="icon">⏱</span><span class="label">Senaste</span></button>
       <button class="sidebar-btn" onclick="openIframe('https://alv3333.github.io/Coola-Mattespel-Soundboard.github.io/')"><span class="icon">🔊</span><span class="label">Soundboard</span></button>
       <button class="sidebar-btn" onclick="openIframe('https://studio.pickaxe.co/STUDIOGX4LHRY55GYHQ15/295XP68K97')"><span class="icon">🤖</span><span class="label">AI</span></button>
@@ -868,7 +985,8 @@
         <p class="subtitle">Cool sida med coola mattespel!</p>
         <p id="activePlayers" class="active-players">Aktiva spelare: ...</p> <!-- NYTT -->
         <div class="search-box">
-         <input id="searchInput" placeholder="Sök spel..." oninput="filterGames()" />
+         <input id="searchInput" placeholder="Sök spel snabbt..." oninput="filterGames()" />
+         <div id="searchMeta" class="search-meta"></div>
         </div>
       </div>
 
@@ -921,14 +1039,19 @@
 
   <div id="themePopup" onclick="if(event.target===this)this.style.display='none'">
     <div class="theme-box">
-      <button class="theme-btn" onclick="setTheme('blue')">🔵</button>
-      <button class="theme-btn" onclick="setTheme('red')">🔴</button>
-      <button class="theme-btn" onclick="setTheme('green')">🟢</button>
-      <button class="theme-btn" onclick="setTheme('yellow')">🟡</button>
-      <button class="theme-btn" onclick="setTheme('orange')">🟠</button>
-      <button class="theme-btn" onclick="setTheme('gray')">⚪</button>
-      <button class="theme-btn" onclick="setTheme('purple')">🟣</button>
-      <button class="theme-btn" onclick="setTheme('pink')">🌸</button>
+      <div class="theme-presets">
+        <button class="theme-btn" onclick="setTheme('blue')">BLUE</button>
+        <button class="theme-btn" onclick="setTheme('red')">RED</button>
+        <button class="theme-btn" onclick="setTheme('green')">GREEN</button>
+        <button class="theme-btn" onclick="setTheme('yellow')">YELLOW</button>
+        <button class="theme-btn" onclick="setTheme('orange')">ORANGE</button>
+        <button class="theme-btn" onclick="setTheme('gray')">GRAY</button>
+        <button class="theme-btn" onclick="setTheme('purple')">PURPLE</button>
+        <button class="theme-btn" onclick="setTheme('pink')">PINK</button>
+        <button class="theme-btn" onclick="setTheme('cyan')">CYAN</button>
+        <button class="theme-btn" onclick="setTheme('sunset')">SUNSET</button>
+        <button class="theme-btn" onclick="setTheme('neon')">NEON</button>
+      </div>
     </div>
   </div>
 
@@ -1017,7 +1140,7 @@
     files.sort((a, b) => a.localeCompare(b, "sv", { sensitivity: "base" }));
 
     let recentGames = JSON.parse(localStorage.getItem("recentGames") || "[]");
-    let favoriteGames = JSON.parse(localStorage.getItem("favoriteGames") || "[]");
+    let favoriteGames = [...new Set(JSON.parse(localStorage.getItem("favoriteGames") || "[]"))];
 
     const gamesGrid = document.getElementById("gamesGrid");
     const embedContainer = document.getElementById("embedContainer");
@@ -1169,43 +1292,51 @@
       });
     };
 
-    function getGameThumbCandidates(file) {
-      return [
-        `UGS-Files/thumbnails/${file}.webp`,
-        `UGS-Files/thumbnails/${file}.png`,
-        `UGS-Files/${file}.webp`,
-        `UGS-Files/${file}.png`,
-        `UGS-Files/${file}.jpg`,
-        `UGS-Files/${file}.jpeg`
-      ];
+    function createGameThumb(file) {
+      const preview = document.createElement("div");
+      preview.className = "game-preview";
+
+      const chip = document.createElement("div");
+      chip.className = "game-name-chip";
+      chip.textContent = displayName(file);
+
+      preview.append(chip);
+      return preview;
     }
 
-    function createGameThumb(file) {
-      const candidates = getGameThumbCandidates(file);
-      const img = document.createElement("img");
-      img.className = "game-thumb";
-      img.alt = `Förhandsbild för ${displayName(file)}`;
-      img.loading = "lazy";
+    function saveFavorites() {
+      localStorage.setItem("favoriteGames", JSON.stringify(favoriteGames));
+      if (favoritesLabel) favoritesLabel.textContent = `Favoriter (${favoriteGames.length})`;
+    }
 
-      let i = 0;
-      const tryNext = () => {
-        if (i >= candidates.length) {
-          const fallback = document.createElement("div");
-          fallback.className = "game-thumb fallback";
-          const initials = displayName(file).split(/\s+/).map((p) => p[0] || "").join("").slice(0, 2).toUpperCase();
-          fallback.textContent = initials || "🎮";
-          return fallback;
-        }
-        img.src = candidates[i++];
-        return img;
-      };
+    function isFavorite(file) {
+      return favoriteGames.includes(file);
+    }
 
-      img.onerror = () => {
-        const next = tryNext();
-        if (next !== img && img.parentElement) img.replaceWith(next);
-      };
+    function showToast(message) {
+      let toast = document.getElementById("uiToast");
+      if (!toast) {
+        toast = document.createElement("div");
+        toast.id = "uiToast";
+        toast.className = "toast";
+        document.body.appendChild(toast);
+      }
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => toast.classList.remove("show"), 1500);
+    }
 
-      return tryNext();
+    function toggleFavorite(file, { quiet = false } = {}) {
+      if (isFavorite(file)) {
+        favoriteGames = favoriteGames.filter((g) => g !== file);
+        if (!quiet) showToast(`Tog bort ${displayName(file)} från favoriter`);
+      } else {
+        favoriteGames.unshift(file);
+        favoriteGames = [...new Set(favoriteGames)].slice(0, 300);
+        if (!quiet) showToast(`La till ${displayName(file)} i favoriter`);
+      }
+      saveFavorites();
     }
 
     function openSidebar() {
@@ -1582,25 +1713,20 @@ function showInventory() {
       gamesGrid.style.display = "grid";
       recommendedSection.style.display = "block";
 
-      const groups = { "#": [] };
-      alphabet.forEach((letter) => (groups[letter] = []));
-
-      list.forEach((file) => {
-        groups[getGroupLabel(file)].push(file);
+      const sortedList = [...list].sort((a, b) => {
+        const favDelta = Number(isFavorite(b)) - Number(isFavorite(a));
+        if (favDelta !== 0) return favDelta;
+        return displayName(a).localeCompare(displayName(b), "sv", { sensitivity: "base", numeric: true });
       });
 
-      const order = ["#", ...alphabet];
+      const groups = { "#": [] };
+      alphabet.forEach((letter) => (groups[letter] = []));
+      sortedList.forEach((file) => groups[getGroupLabel(file)].push(file));
 
+      const order = ["#", ...alphabet];
       order.forEach((groupKey) => {
         const groupItems = groups[groupKey];
         if (!groupItems.length) return;
-
-        groupItems.sort((a, b) =>
-          displayName(a).localeCompare(displayName(b), "sv", {
-            sensitivity: "base",
-            numeric: true
-          })
-        );
 
         const header = document.createElement("div");
         header.className = "group-header";
@@ -1616,20 +1742,21 @@ function showInventory() {
           b.append(createGameThumb(file), document.createTextNode(displayName(file)));
           b.onclick = () => openGame(file);
 
-          const f = document.createElement("span");
-          f.className = "favorite";
+          const f = document.createElement("button");
+          f.type = "button";
+          f.className = `favorite${isFavorite(file) ? " active" : ""}`;
           f.textContent = "★";
-          if (favoriteGames.includes(file)) f.classList.add("active");
+          f.title = isFavorite(file) ? "Ta bort favorit" : "Lägg till favorit";
+          f.setAttribute("aria-label", f.title);
+          f.setAttribute("aria-pressed", String(isFavorite(file)));
 
           f.onclick = (e) => {
             e.stopPropagation();
-            if (favoriteGames.includes(file)) {
-              favoriteGames = favoriteGames.filter((g) => g !== file);
-            } else {
-              favoriteGames.push(file);
-            }
-            localStorage.setItem("favoriteGames", JSON.stringify(favoriteGames));
-            renderGames(list);
+            toggleFavorite(file);
+            f.classList.toggle("active", isFavorite(file));
+            f.title = isFavorite(file) ? "Ta bort favorit" : "Lägg till favorit";
+            f.setAttribute("aria-label", f.title);
+            f.setAttribute("aria-pressed", String(isFavorite(file)));
           };
 
           c.append(b, f);
@@ -1658,16 +1785,64 @@ function showInventory() {
       }
     }
 
- function filterGames() {
-  const q = document.getElementById("searchInput").value.toLowerCase();
-  renderGames(files.filter((f) => displayName(f).toLowerCase().includes(q)));
-}
+    let searchDebounce = null;
+
+    function normalizeSearchText(value) {
+      return (value || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[̀-ͯ]/g, "")
+        .replace(/[^a-z0-9]/g, "");
+    }
+
+    function scoreGameMatch(file, query) {
+      const raw = displayName(file);
+      const name = normalizeSearchText(raw);
+      if (!query) return { score: 1, ok: true };
+      if (name.startsWith(query)) return { score: 1000 - name.length, ok: true };
+      const idx = name.indexOf(query);
+      if (idx !== -1) return { score: 700 - idx, ok: true };
+
+      let qi = 0;
+      for (let i = 0; i < name.length && qi < query.length; i++) {
+        if (name[i] === query[qi]) qi++;
+      }
+      if (qi === query.length) return { score: 300 - Math.max(0, name.length - query.length), ok: true };
+      return { score: -1, ok: false };
+    }
+
+    function runGameSearch() {
+      const q = normalizeSearchText(searchInput.value);
+      if (!q) {
+        searchMeta.textContent = "Visar alla spel";
+        renderGames(files);
+        return;
+      }
+
+      const ranked = files
+        .map((file) => ({ file, ...scoreGameMatch(file, q) }))
+        .filter((r) => r.ok)
+        .sort((a, b) => b.score - a.score || displayName(a.file).localeCompare(displayName(b.file), "sv", { sensitivity: "base" }));
+
+      searchMeta.textContent = `${ranked.length} träffar för "${searchInput.value.trim()}"`;
+      renderGames(ranked.map((r) => r.file));
+    }
+
+    function filterGames() {
+      if (searchDebounce) clearTimeout(searchDebounce);
+      searchDebounce = setTimeout(runGameSearch, 90);
+    }
 
     function goHome() {
       location.reload();
     }
 
     function showFavorites() {
+      if (!favoriteGames.length) {
+        searchMeta.textContent = "Inga favoriter än. Klicka på ★ för att lägga till.";
+      } else {
+        searchMeta.textContent = `Visar ${favoriteGames.length} favoriter`;
+      }
       renderGames(favoriteGames);
     }
 
@@ -1702,7 +1877,7 @@ function showInventory() {
 
     function setTheme(t) {
       document.body.className = t;
-      document.documentElement.classList.remove("theme-blue","theme-red","theme-green","theme-yellow","theme-orange","theme-gray","theme-purple","theme-pink");
+      document.documentElement.classList.remove("theme-blue","theme-red","theme-green","theme-yellow","theme-orange","theme-gray","theme-purple","theme-pink","theme-cyan","theme-sunset","theme-neon");
       document.documentElement.classList.add(`theme-${t}`);
       localStorage.setItem("theme", t);
       document.getElementById("themePopup").style.display = "none";
@@ -2178,11 +2353,13 @@ function showInventory() {
       const saved = localStorage.getItem("theme");
       if (saved) {
         document.body.className = saved;
-        document.documentElement.classList.remove("theme-blue","theme-red","theme-green","theme-yellow","theme-orange","theme-gray","theme-purple","theme-pink");
+        document.documentElement.classList.remove("theme-blue","theme-red","theme-green","theme-yellow","theme-orange","theme-gray","theme-purple","theme-pink","theme-cyan","theme-sunset","theme-neon");
         document.documentElement.classList.add(`theme-${saved}`);
       }
+      saveFavorites();
       renderRecommended();
       renderGames(files);
+      searchMeta.textContent = "Visar alla spel";
       startIntroLoader();
       refreshChatStatus();
 
