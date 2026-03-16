@@ -1169,6 +1169,27 @@
       });
     };
 
+    function nameVariantsForThumbLookup(file) {
+      const base = file.replace(/^cl/i, "").trim();
+      const splitCamel = base.replace(/([a-zåäö])([A-ZÅÄÖ])/g, "$1 $2");
+      const cleaned = splitCamel.replace(/[_-]+/g, " ").replace(/\s+/g, " ").trim();
+      const shown = displayName(file);
+      return [...new Set([shown, cleaned, base].filter(Boolean))];
+    }
+
+    function getRemoteGameThumbCandidates(file) {
+      const variants = nameVariantsForThumbLookup(file);
+      const urls = [];
+
+      variants.forEach((variant) => {
+        urls.push(`https://thumbnails.gamenora.com/${encodeURIComponent(variant)}.webp`);
+        urls.push(`https://source.unsplash.com/640x360/?${encodeURIComponent(`${variant} gameplay screenshot`)}`);
+      });
+
+      urls.push(`https://picsum.photos/seed/${encodeURIComponent(file)}/640/360`);
+      return urls;
+    }
+
     function getGameThumbCandidates(file) {
       return [
         `UGS-Files/thumbnails/${file}.webp`,
@@ -1176,7 +1197,8 @@
         `UGS-Files/${file}.webp`,
         `UGS-Files/${file}.png`,
         `UGS-Files/${file}.jpg`,
-        `UGS-Files/${file}.jpeg`
+        `UGS-Files/${file}.jpeg`,
+        ...getRemoteGameThumbCandidates(file)
       ];
     }
 
