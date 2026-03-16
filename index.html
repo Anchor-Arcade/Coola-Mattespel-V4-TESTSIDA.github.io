@@ -16,13 +16,15 @@
   </script>
 
   <style>
+    @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap");
+
     * { box-sizing: border-box; }
 
     html, body {
       width: 100%;
       height: 100%;
       margin: 0;
-      font-family: Arial, sans-serif;
+      font-family: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
       color: white;
       transition: background .6s ease;
     }
@@ -37,6 +39,12 @@
       transition: filter .25s ease;
       filter: brightness(var(--theme-brightness));
     }
+
+    button, .chat-send, .sidebar-btn, .game-btn, .theme-btn {
+      font-family: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
+      letter-spacing: .2px;
+    }
+
 
     @keyframes bgMove {
       0% { background-position: 0% 50%; }
@@ -664,7 +672,39 @@
       align-items: center;
     }
 
-    .theme-controls input[type="range"] { width: 100%; }
+    .theme-controls input[type="range"] {
+      width: 100%;
+      appearance: none;
+      -webkit-appearance: none;
+      height: 8px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(255,255,255,.5), rgba(255,255,255,.14));
+      outline: none;
+      border: 1px solid rgba(255,255,255,.2);
+    }
+
+    .theme-controls input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #fff;
+      border: 2px solid rgba(0,0,0,.35);
+      box-shadow: 0 2px 8px rgba(0,0,0,.45);
+      cursor: pointer;
+    }
+
+    .theme-controls input[type="range"]::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #fff;
+      border: 2px solid rgba(0,0,0,.35);
+      box-shadow: 0 2px 8px rgba(0,0,0,.45);
+      cursor: pointer;
+    }
+
 
     .recommended-section { margin: 20px 0 42px; }
     .recommended-title {
@@ -728,7 +768,7 @@
     .chat-msg { animation: popIn .25s ease; }
     @keyframes popIn { from { transform: translateY(8px); opacity: 0;} to { transform: translateY(0); opacity: 1; } }
     .modal { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,.62); z-index: 1500; }
-    .modal-box { width: min(520px, 90vw); max-height: 85vh; overflow: auto; background: rgba(10,10,10,.95); border: 1px solid rgba(255,255,255,.18); border-radius: 14px; padding: 16px; }
+    .modal-box { width: min(520px, 90vw); max-height: 85vh; overflow: auto; background: linear-gradient(165deg, rgba(255,255,255,.08), rgba(0,0,0,.7)); border: 1px solid rgba(255,255,255,.22); border-radius: 18px; padding: 18px; box-shadow: 0 24px 60px rgba(0,0,0,.5); backdrop-filter: blur(14px); }
     .modal-box.wide { width: min(760px, 94vw); }
     .auth-input { width: 100%; margin-bottom: 8px; border: none; border-radius: 8px; padding: 9px; }
     .info-card { margin-top: 10px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.12); border-radius: 10px; padding: 10px; }
@@ -1816,6 +1856,32 @@ function showInventory() {
       }
     }
 
+    function updateSliderVisual(input, colorStart, colorEnd) {
+      if (!input) return;
+      const min = Number(input.min || 0);
+      const max = Number(input.max || 100);
+      const value = Number(input.value || min);
+      const pct = ((value - min) / (max - min || 1)) * 100;
+      input.style.background = `linear-gradient(90deg, ${colorStart} 0%, ${colorEnd} ${pct}%, rgba(255,255,255,.14) ${pct}%, rgba(255,255,255,.08) 100%)`;
+    }
+
+    function getThemeDefaultTuning(theme) {
+      const map = {
+        blue: { brightness: 100, r: 25, g: 95, b: 255 },
+        red: { brightness: 100, r: 255, g: 70, b: 70 },
+        green: { brightness: 100, r: 60, g: 230, b: 90 },
+        yellow: { brightness: 108, r: 255, g: 220, b: 65 },
+        orange: { brightness: 104, r: 255, g: 150, b: 50 },
+        gray: { brightness: 95, r: 170, g: 170, b: 185 },
+        purple: { brightness: 100, r: 150, g: 90, b: 255 },
+        pink: { brightness: 102, r: 255, g: 125, b: 210 },
+        cyan: { brightness: 98, r: 0, g: 215, b: 255 },
+        sunset: { brightness: 106, r: 255, g: 122, b: 95 },
+        neon: { brightness: 98, r: 72, g: 255, b: 88 }
+      };
+      return map[theme] || { brightness: 100, r: 30, g: 79, b: 163 };
+    }
+
     function applyThemeTuning() {
       const brightness = Number(localStorage.getItem("themeBrightness") || 100);
       const r = Number(localStorage.getItem("themeTintR") || 30);
@@ -1844,6 +1910,11 @@ function showInventory() {
         if (el.tagName === "INPUT") el.value = value;
         else el.textContent = value;
       });
+
+      updateSliderVisual(document.getElementById("brightnessSlider"), "#f8f8f8", "#ffe08a");
+      updateSliderVisual(document.getElementById("rSlider"), "#ff5a5a", "#ff1a1a");
+      updateSliderVisual(document.getElementById("gSlider"), "#6fff8e", "#22cf55");
+      updateSliderVisual(document.getElementById("bSlider"), "#72a5ff", "#2b6bff");
     }
 
     function setThemeBrightness(v) {
@@ -1865,6 +1936,13 @@ function showInventory() {
       document.documentElement.classList.remove("theme-blue","theme-red","theme-green","theme-yellow","theme-orange","theme-gray","theme-purple","theme-pink","theme-cyan","theme-sunset","theme-neon");
       document.documentElement.classList.add(`theme-${t}`);
       localStorage.setItem("theme", t);
+
+      const defaults = getThemeDefaultTuning(t);
+      localStorage.setItem("themeBrightness", String(defaults.brightness));
+      localStorage.setItem("themeTintR", String(defaults.r));
+      localStorage.setItem("themeTintG", String(defaults.g));
+      localStorage.setItem("themeTintB", String(defaults.b));
+
       document.getElementById("themePopup").style.display = "none";
       applyThemeTuning();
     }
