@@ -390,6 +390,25 @@
 
     #embedContainer iframe { width: 100%; height: 100%; border: none; }
 
+    #playArea {
+      display: none;
+      margin: 20px auto;
+      width: min(100%, 1320px);
+      grid-template-columns: minmax(0, 1fr) 320px;
+      gap: 14px;
+      align-items: start;
+    }
+
+    #questTrackerPanel {
+      background: linear-gradient(165deg, rgba(8,10,20,.9), rgba(15,23,42,.82));
+      border: 1px solid rgba(148,163,184,.34);
+      border-radius: 16px;
+      padding: 12px;
+      min-height: 120px;
+    }
+    .tracker-title { font-weight: 900; margin-bottom: 8px; }
+    .tracker-empty { opacity: .8; font-size: 13px; }
+
     #iframeLoader {
       position: absolute;
       inset: 0;
@@ -818,6 +837,12 @@
     html.theme-cyan body { --accent: #00d4ff; --accent-dark: #005f7a; background-image: linear-gradient(180deg, #002c36, #000, #003d4d); }
     html.theme-sunset body { --accent: #ff6b6b; --accent-dark: #7a1b4d; background-image: linear-gradient(180deg, #4a1736, #14010a, #6a2e25); }
     html.theme-neon body { --accent: #39ff14; --accent-dark: #0f5a19; background-image: linear-gradient(180deg, #05210b, #000, #0a2d0f); }
+    html.theme-ocean body { --accent: #38bdf8; --accent-dark: #075985; background-image: linear-gradient(180deg, #03283e, #000, #063755); }
+    html.theme-lava body { --accent: #fb923c; --accent-dark: #7c2d12; background-image: linear-gradient(180deg, #431407, #000, #7c2d12); }
+    html.theme-forest body { --accent: #4ade80; --accent-dark: #14532d; background-image: linear-gradient(180deg, #052e16, #000, #14532d); }
+    html.theme-midnight body { --accent: #a78bfa; --accent-dark: #312e81; background-image: linear-gradient(180deg, #1e1b4b, #000, #312e81); }
+    html.theme-candy body { --accent: #f472b6; --accent-dark: #9d174d; background-image: linear-gradient(180deg, #4a044e, #000, #831843); }
+    html.theme-gold body { --accent: #facc15; --accent-dark: #92400e; background-image: linear-gradient(180deg, #3f2a00, #000, #713f12); }
 
     .intro-overlay { position: fixed; inset: 0; z-index: 2200; display:flex; align-items:center; justify-content:center; background-image: inherit; background-size: 400% 400%; animation: bgMove 25s ease infinite; overflow:hidden; }
     .intro-overlay::before,
@@ -982,6 +1007,8 @@
       .profile-grid { grid-template-columns: 1fr; }
       .profile-actions .chat-send { min-width: 100%; }
 
+      #playArea { grid-template-columns: 1fr; }
+      #embedContainer { width: 100%; }
       .chat-panel {
         left: 10px;
         right: 10px;
@@ -1054,18 +1081,21 @@
         </div>
       </div>
 
-      <div id="embedContainer">
-        <div id="iframeLoader">
-          <div class="loader-box">
-            <div class="loader-title">Laddar</div>
-            <div class="loader-track">
-              <div id="loaderFill" class="loader-fill"></div>
+      <div id="playArea">
+        <div id="embedContainer">
+          <div id="iframeLoader">
+            <div class="loader-box">
+              <div class="loader-title">Laddar</div>
+              <div class="loader-track">
+                <div id="loaderFill" class="loader-fill"></div>
+              </div>
+              <div id="loaderMessage" class="loader-message"></div>
             </div>
-            <div id="loaderMessage" class="loader-message"></div>
           </div>
+          <iframe id="gameFrame"></iframe>
+          <button class="fullscreen-btn" onclick="toggleFullscreen()">Fullscreen</button>
         </div>
-        <iframe id="gameFrame"></iframe>
-        <button class="fullscreen-btn" onclick="toggleFullscreen()">Fullscreen</button>
+        <div id="questTrackerPanel"><div class="tracker-title">🎯 Quest progression</div><div class="tracker-empty">Starta ett spel med quest för att se progress här.</div></div>
       </div>
 
       <div id="recommendedSection" class="recommended-section">
@@ -1120,6 +1150,12 @@
         <button class="theme-btn" data-theme="cyan" onclick="setTheme('cyan')">CYAN</button>
         <button class="theme-btn" data-theme="sunset" onclick="setTheme('sunset')">SUNSET</button>
         <button class="theme-btn" data-theme="neon" onclick="setTheme('neon')">NEON</button>
+        <button class="theme-btn" data-theme="ocean" onclick="setTheme('ocean')">OCEAN</button>
+        <button class="theme-btn" data-theme="lava" onclick="setTheme('lava')">LAVA</button>
+        <button class="theme-btn" data-theme="forest" onclick="setTheme('forest')">FOREST</button>
+        <button class="theme-btn" data-theme="midnight" onclick="setTheme('midnight')">MIDNIGHT</button>
+        <button class="theme-btn" data-theme="candy" onclick="setTheme('candy')">CANDY</button>
+        <button class="theme-btn" data-theme="gold" onclick="setTheme('gold')">GOLD</button>
       </div>
     </div>
   </div>
@@ -1168,6 +1204,9 @@
             <button class="chat-send" onclick="viewPublicProfile()">Visa profil</button>
           </div>
           <div id="publicProfileView" class="info-card"></div>
+          <h4 style="margin-top:12px;">🔎 Browsa profiler</h4>
+          <div class="chat-row"><input id="profileBrowseInput" class="chat-input" placeholder="Sök username..." oninput="renderProfileBrowser()" /></div>
+          <div id="profileBrowseList" class="info-card"></div>
         </div>
       </div>
       <div class="profile-actions" style="margin-top:10px;">
@@ -1188,6 +1227,7 @@
         <input id="adminPassword" class="auth-input" type="password" placeholder="Admin-lösenord" />
         <input id="adminTarget" class="auth-input" placeholder="Mål (username)" />
         <input id="adminCoins" class="auth-input" type="number" placeholder="Coins att ge" />
+        <input id="adminXp" class="auth-input" type="number" placeholder="XP att ge" />
       </div>
       <div class="admin-actions">
         <button class="chat-send" onclick="adminAction('kick')">Kick</button>
@@ -1195,7 +1235,7 @@
         <button class="chat-send" onclick="adminAction('ban')">Ban</button>
         <button class="chat-send" onclick="adminAction('coins')">Ge coins</button>
         <button class="chat-send" onclick="adminAction('verify')">Verifera ✔️</button>
-        <button class="chat-send" onclick="adminAction('clearChat')">Clear chatt</button>
+        <button class="chat-send" onclick="adminAction('xp')">Ge XP</button>
         <button class="chat-send" onclick="adminAction('clearInventory')">Clear inventory</button>
         <button class="chat-send" onclick="adminAction('clearAccounts')">Clear accounts</button>
         <button class="chat-send" onclick="adminAction('resetQuests')">Reset quests</button>
@@ -1227,7 +1267,8 @@
     let favoriteGames = [...new Set(JSON.parse(localStorage.getItem("favoriteGames") || "[]"))];
 
     const gamesGrid = document.getElementById("gamesGrid");
-    const embedContainer = document.getElementById("embedContainer");
+    const playArea = document.getElementById("playArea");
+const embedContainer = document.getElementById("embedContainer");
     const gameFrame = document.getElementById("gameFrame");
     const recommendedSection = document.getElementById("recommendedSection");
     const recommendedRow = document.getElementById("recommendedRow");
@@ -1402,6 +1443,24 @@
         level++;
       }
       return { level, progressXp: remaining, neededXp: xpForLevel(level) };
+    }
+
+
+    function getCoinsForLevel(level) {
+      return 10 + (level % 21);
+    }
+
+    async function ensureLevelCoinRewards() {
+      if (!currentUser || !db) return;
+      const levelNow = getLevelFromXp(currentUser.xp || 0).level;
+      const rewardedLevel = Number(currentUser.rewardedLevel || 1);
+      if (levelNow <= rewardedLevel) return;
+      let bonus = 0;
+      for (let l = rewardedLevel + 1; l <= levelNow; l++) bonus += getCoinsForLevel(l);
+      await db.ref(`accounts/${currentUser.id}`).update({
+        coins: (currentUser.coins || 0) + bonus,
+        rewardedLevel: levelNow
+      });
     }
 
     function getTodayKey() {
@@ -1808,7 +1867,9 @@ function sendChatMessage() {
 function hidePages() {
   gamesGrid.style.display = "none";
   recommendedSection.style.display = "none";
+  playArea.style.display = "none";
   embedContainer.style.display = "none";
+  gameFrame.src = "about:blank";
   activeGame = null;
   activeGameLastTick = null;
   document.getElementById("updatesPage").style.display = "none";
@@ -1917,6 +1978,7 @@ function showInventory() {
       activeGame = game;
       activeGameLastTick = Date.now();
 
+      playArea.style.display = "grid";
       embedContainer.style.display = "block";
       gameFrame.onload = null;
       gameFrame.src = `UGS-Files/${game}.html`;
@@ -1981,7 +2043,11 @@ function showInventory() {
     }
 
     function goHome() {
-      location.reload();
+      hidePages();
+      gamesGrid.style.display = "grid";
+      recommendedSection.style.display = "block";
+      searchMeta.textContent = "Visar alla spel";
+      renderGames(files);
     }
 
     function showFavorites() {
@@ -2002,6 +2068,7 @@ function showInventory() {
       activeGame = null;
       activeGameLastTick = null;
 
+      playArea.style.display = "grid";
       embedContainer.style.display = "block";
       gameFrame.onload = null;
       gameFrame.src = url;
@@ -2024,26 +2091,16 @@ function showInventory() {
     }
 
 
-    const themeUnlockLevels = { blue: 1, red: 1, green: 1, yellow: 2, orange: 3, gray: 4, purple: 5, pink: 6, cyan: 7, sunset: 9, neon: 11 };
-    const roadmapRewards = [
-      { level: 2, label: "Lås upp tema: YELLOW", type: "theme", key: "yellow" },
-      { level: 3, label: "Lås upp tema: ORANGE", type: "theme", key: "orange" },
-      { level: 4, label: "Lås upp tema: GRAY", type: "theme", key: "gray" },
-      { level: 5, label: "Lås upp tema: PURPLE", type: "theme", key: "purple" },
-      { level: 6, label: "Lås upp tema: PINK", type: "theme", key: "pink" },
-      { level: 7, label: "Lås upp tema: CYAN", type: "theme", key: "cyan" },
-      { level: 8, label: "+200 coins" },
-      { level: 9, label: "Lås upp tema: SUNSET", type: "theme", key: "sunset" },
-      { level: 10, label: "Lås upp item: Holo-shine" },
-      { level: 11, label: "Lås upp tema: NEON", type: "theme", key: "neon" },
-      { level: 12, label: "+350 coins" },
-      { level: 13, label: "Lås upp item: Champion crown" },
-      { level: 14, label: "VIP profil-banner" },
-      { level: 15, label: "Mystery reward x3" },
-      { level: 16, label: "+500 coins" },
-      { level: 18, label: "Legend rank-badge" },
-      { level: 20, label: "Ultra glow pack" }
-    ];
+    const themeUnlockLevels = { blue: 1, red: 1, green: 1, yellow: 2, orange: 3, gray: 4, purple: 5, pink: 6, cyan: 7, sunset: 9, neon: 11, ocean: 14, lava: 18, forest: 22, midnight: 30, candy: 40, gold: 55 };
+    const roadmapRewards = Array.from({ length: 100 }, (_, i) => {
+      const level = i + 1;
+      const coins = 10 + (level % 21);
+      const base = { level, label: `+${coins} coins` };
+      const themeByLevel = { 2:"yellow",3:"orange",4:"gray",5:"purple",6:"pink",7:"cyan",9:"sunset",11:"neon",14:"ocean",18:"lava",22:"forest",30:"midnight",40:"candy",55:"gold" };
+      if (themeByLevel[level]) base.label = `Lås upp tema: ${themeByLevel[level].toUpperCase()} + ${coins} coins`;
+      if ([10,20,35,50,65,80,100].includes(level)) base.label += " • Bonus reward";
+      return base;
+    });
 
     function getThemeRequiredLevel(theme) {
       return themeUnlockLevels[theme] || 999;
@@ -2074,7 +2131,7 @@ function showInventory() {
         return alert(`Det temat är låst. Nå level ${req} i roadmapen först.`);
       }
       document.body.className = t;
-      document.documentElement.classList.remove("theme-blue","theme-red","theme-green","theme-yellow","theme-orange","theme-gray","theme-purple","theme-pink","theme-cyan","theme-sunset","theme-neon");
+      document.documentElement.classList.remove("theme-blue","theme-red","theme-green","theme-yellow","theme-orange","theme-gray","theme-purple","theme-pink","theme-cyan","theme-sunset","theme-neon","theme-ocean","theme-lava","theme-forest","theme-midnight","theme-candy","theme-gold");
       document.documentElement.classList.add(`theme-${t}`);
       localStorage.setItem("theme", t);
       closeThemePopup();
@@ -2163,7 +2220,7 @@ function showInventory() {
       const ref = db.ref("accounts").push();
       const quests = {};
       questsConfig.forEach((q) => { quests[q.id] = { progressMs: 0, claimed: false }; });
-      await ref.set({ email, username, usernameLower: username.toLowerCase(), password, coins: 0, xp: 0, verified: false, banned: false, timeoutUntil: 0, sessionActive: false, createdAt: Date.now(), lastQuestReset: getTodayKey(), quests, inventory: {}, equipped: {} });
+      await ref.set({ email, username, usernameLower: username.toLowerCase(), password, coins: 0, xp: 0, verified: false, banned: false, timeoutUntil: 0, sessionActive: false, createdAt: Date.now(), lastQuestReset: getTodayKey(), quests, inventory: {}, equipped: {}, rewardedLevel: 1 });
       alert("Konto skapat! Logga in nu.");
     }
 
@@ -2351,6 +2408,8 @@ function showInventory() {
         friendRequestsEl.innerHTML = "";
         friendsListEl.innerHTML = "";
         privateChatEl.style.display = "none";
+        const browseList = document.getElementById("profileBrowseList");
+        if (browseList) browseList.innerHTML = "";
         return;
       }
       const ownedEffects = getOwnedShopEffects(currentUser.inventory || {}, currentUser.equipped || {});
@@ -2375,6 +2434,35 @@ function showInventory() {
           friendsListEl.innerHTML += `${f.username} <button onclick="openPrivateChat('${fid}','${f.username}')">Öppna privat chat</button><br>`;
         }
       });
+      renderProfileBrowser();
+    }
+
+    async function sendFriendRequestToUsername(name) {
+      const input = document.getElementById("friendInput");
+      if (input) input.value = name || "";
+      await sendFriendRequest();
+    }
+
+    async function renderProfileBrowser() {
+      const list = document.getElementById("profileBrowseList");
+      const query = (document.getElementById("profileBrowseInput")?.value || "").toLowerCase();
+      if (!list || !db || !currentUser) return;
+      const snap = await db.ref("accounts").limitToLast(120).once("value");
+      if (!snap.exists()) { list.textContent = "Inga profiler hittades."; return; }
+      const users = [];
+      snap.forEach((c) => users.push({ id: c.key, ...(c.val() || {}) }));
+      const rows = users
+        .filter((u) => u.id !== currentUser.id)
+        .filter((u) => !query || String(u.username || "").toLowerCase().includes(query))
+        .sort((a, b) => (b.xp || 0) - (a.xp || 0))
+        .slice(0, 40)
+        .map((u) => {
+          const rawName = String(u.username || "Okänd");
+          const safeName = rawName.replace(/["'<>]/g, "");
+          const lvl = getLevelFromXp(u.xp || 0).level;
+          return `<div style="margin-bottom:8px;"><b>${safeName}</b> • LVL ${lvl} <button onclick="document.getElementById('viewProfileInput').value='${safeName}'; viewPublicProfile();">Visa</button> <button onclick="sendFriendRequestToUsername('${safeName}')">Lägg till vän</button></div>`;
+        }).join("");
+      list.innerHTML = rows || "Inga profiler matchar sökningen.";
     }
 
     async function maybeResetDailyQuests() {
@@ -2482,9 +2570,37 @@ function showInventory() {
           <div class="quest-progress">${(st.progressMs/60000).toFixed(1)} / ${(q.targetMs/60000).toFixed(0)} min</div>
           <div class="quest-progress-track"><div class="quest-progress-fill" style="width:${pct.toFixed(1)}%"></div></div>
           <div>${st.claimed ? "✅ Claimad" : done ? `<button class="chat-send" onclick="claimQuest('${q.id}')">Claim ${q.rewardXp}</button>` : "Spela mer för att låsa upp reward."}</div>
+          <div><button class="chat-send" onclick="openQuestGame('${q.game}')">▶ Spela detta quest-spel</button></div>
         `;
         card.appendChild(row);
       });
+      renderQuestTrackerPanel();
+    }
+
+    function openQuestGame(game) {
+      hidePages();
+      openGame(game);
+      renderQuestTrackerPanel();
+    }
+
+    function renderQuestTrackerPanel() {
+      const panel = document.getElementById("questTrackerPanel");
+      if (!panel) return;
+      if (!activeGame) {
+        panel.innerHTML = `<div class="tracker-title">🎯 Quest progression</div><div class="tracker-empty">Starta ett spel med quest för att se progress här.</div>`;
+        return;
+      }
+      const matching = questsConfig.filter((q) => q.game === activeGame);
+      if (!matching.length || !currentUser) {
+        panel.innerHTML = `<div class="tracker-title">🎯 Quest progression</div><div class="tracker-empty">Inga quests för ${displayName(activeGame)} just nu.</div>`;
+        return;
+      }
+      const rows = matching.map((q) => {
+        const st = currentUser.quests?.[q.id] || { progressMs: 0, claimed: false };
+        const pct = Math.max(0, Math.min(100, (st.progressMs / q.targetMs) * 100));
+        return `<div class="quest-item"><div class="quest-title">${q.label}</div><div class="quest-progress">${(st.progressMs/60000).toFixed(1)} / ${(q.targetMs/60000).toFixed(0)} min</div><div class="quest-progress-track"><div class="quest-progress-fill" style="width:${pct.toFixed(1)}%"></div></div></div>`;
+      }).join("");
+      panel.innerHTML = `<div class="tracker-title">🎯 Quest progression: ${displayName(activeGame)}</div>${rows}`;
     }
 
     function isActivelyPlayingGame() {
@@ -2504,6 +2620,7 @@ function showInventory() {
       if (state.claimed || state.progressMs < q.targetMs) return;
       await db.ref(`accounts/${currentUser.id}/xp`).set((currentUser.xp || 0) + q.rewardXp);
       await db.ref(`accounts/${currentUser.id}/quests/${questId}/claimed`).set(true);
+      setTimeout(ensureLevelCoinRewards, 200);
     }
 
     function renderShop() {
@@ -2576,7 +2693,7 @@ function showInventory() {
       if (!adminUnlocked) return alert("Adminpanelen är låst.");
       if ((document.getElementById("adminPassword").value || "") !== ADMIN_PASSWORD) return alert("Skriv admin-lösenord igen för att bekräfta åtgärden.");
 
-      const globalActions = new Set(["clearChat", "clearAccounts"]);
+      const globalActions = new Set(["clearAccounts"]);
       let target = null;
 
       if (!globalActions.has(action)) {
@@ -2593,15 +2710,15 @@ function showInventory() {
         const amount = Number(document.getElementById("adminCoins").value || 0);
         await db.ref(`accounts/${target.id}/coins`).set((target.coins || 0) + amount);
       }
-      if (action === "clearInventory") await db.ref(`accounts/${target.id}`).update({ inventory: {}, equipped: {} });
+      if (action === "xp") {
+        const amount = Number(document.getElementById("adminXp").value || 0);
+        await db.ref(`accounts/${target.id}/xp`).set((target.xp || 0) + amount);
+      }
+      if (action === "clearInventory") await db.ref(`accounts/${target.id}`).update({ inventory: {}, equipped: {}, rewardedLevel: 1 });
       if (action === "resetQuests") {
         const reset = {};
         questsConfig.forEach((q) => { reset[q.id] = { progressMs: 0, claimed: false }; });
         await db.ref(`accounts/${target.id}`).update({ quests: reset, lastQuestReset: getTodayKey() });
-      }
-      if (action === "clearChat") {
-        await db.ref("global-chat").remove();
-        await db.ref("private-chats").remove();
       }
       if (action === "clearAccounts") {
         const ok = confirm("Är du säker? Detta raderar ALLA konton.");
@@ -2628,6 +2745,7 @@ function showInventory() {
           const next = Math.min(current.progressMs + delta, q.targetMs);
           if (next === current.progressMs) continue;
           await db.ref(`accounts/${currentUser.id}/quests/${q.id}`).update({ progressMs: next, claimed: !!current.claimed });
+          renderQuestTrackerPanel();
         }
       }, 1000);
     }
@@ -2722,7 +2840,7 @@ function showInventory() {
       const saved = localStorage.getItem("theme");
       if (saved) {
         document.body.className = saved;
-        document.documentElement.classList.remove("theme-blue","theme-red","theme-green","theme-yellow","theme-orange","theme-gray","theme-purple","theme-pink","theme-cyan","theme-sunset","theme-neon");
+        document.documentElement.classList.remove("theme-blue","theme-red","theme-green","theme-yellow","theme-orange","theme-gray","theme-purple","theme-pink","theme-cyan","theme-sunset","theme-neon","theme-ocean","theme-lava","theme-forest","theme-midnight","theme-candy","theme-gold");
         document.documentElement.classList.add(`theme-${saved}`);
       }
       saveFavorites();
