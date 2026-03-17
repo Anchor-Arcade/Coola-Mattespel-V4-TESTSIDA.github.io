@@ -206,6 +206,7 @@
     }
 
        .chat-panel {
+      display: none !important;
       position: fixed;
       top: 72px;
       left: 224px;
@@ -538,6 +539,16 @@
         linear-gradient(180deg, transparent 0 68%, rgba(0,0,0,.36) 100%);
       opacity: .45;
       pointer-events: none;
+    }
+
+    .game-title {
+      margin-top: 10px;
+      display: block;
+      font-size: 14px;
+      font-weight: 800;
+      text-align: center;
+      color: rgba(255,255,255,.96);
+      text-shadow: 0 2px 8px rgba(0,0,0,.35);
     }
 
     .game-name-chip {
@@ -962,7 +973,7 @@
       <button class="sidebar-btn" onclick="showQuests()"><span class="icon">🎯</span><span class="label">Quests</span></button>
       <button class="sidebar-btn" onclick="showShop()"><span class="icon">🛒</span><span class="label">Shop</span></button>
       <button class="sidebar-btn" onclick="showInventory()"><span class="icon">🎒</span><span class="label">Inventory</span></button>
-      <button class="sidebar-btn" onclick="openAdminGate()"><span class="icon">🛡️</span><span class="label">Admin</span></button>
+      <button class="sidebar-btn" onclick="showRoadmap()"><span class="icon">🧭</span><span class="label">Roadmap</span></button>
       <button class="sidebar-btn" onclick="openThemePopup()"><span class="icon">🎨</span><span class="label">Tema</span></button>
     </div>
 
@@ -1040,7 +1051,8 @@
   </div>
 </div>
       <div id="questsPage" style="display:none;margin-top:30px;">
-  <h2 style="font-size:28px;margin-bottom:15px;">🎯 Quests</h2>
+  <h2 style="font-size:28px;margin-bottom:6px;">🎯 Quests</h2>
+  <div id="questResetTimer" class="search-meta">Quests nollställs om --:--:--</div>
   <div id="questCard" class="info-card quest-list"></div>
 </div>
 <div id="shopPage" style="display:none;margin-top:30px;">
@@ -1050,6 +1062,10 @@
 <div id="inventoryPage" style="display:none;margin-top:30px;">
   <h2 style="font-size:28px;margin-bottom:15px;">🎒 Inventory</h2>
   <div id="inventoryList" class="shop-shell"></div>
+</div>
+<div id="roadmapPage" style="display:none;margin-top:30px;">
+  <h2 style="font-size:28px;margin-bottom:15px;">🧭 Roadmap</h2>
+  <div id="roadmapCard" class="info-card quest-list"></div>
 </div>
       <div class="games-grid" id="gamesGrid"></div>
     </div>
@@ -1101,6 +1117,7 @@
             <button class="chat-send" onclick="logoutAccount()">Logga ut</button>
           </div>
           <div id="profileInfo" class="info-card"></div>
+          <div id="profileStylePreview" class="info-card"></div>
         </div>
         <div class="profile-section">
           <h4>🤝 Kompisar</h4>
@@ -1111,6 +1128,11 @@
           <div id="friendRequests" class="info-card"></div>
           <div id="friendsList" class="info-card"></div>
           <div id="privateChat" class="info-card" style="display:none;"></div>
+          <div class="chat-row" style="margin-top:8px;">
+            <input id="viewProfileInput" class="chat-input" placeholder="Visa profil via username" />
+            <button class="chat-send" onclick="viewPublicProfile()">Visa profil</button>
+          </div>
+          <div id="publicProfileView" class="info-card"></div>
         </div>
       </div>
       <div class="profile-actions" style="margin-top:10px;">
@@ -1138,7 +1160,10 @@
         <button class="chat-send" onclick="adminAction('ban')">Ban</button>
         <button class="chat-send" onclick="adminAction('coins')">Ge coins</button>
         <button class="chat-send" onclick="adminAction('verify')">Verifera ✔️</button>
-        <button class="chat-send" onclick="toggleChatState()">Start/Stop chatt</button>
+        <button class="chat-send" onclick="adminAction('clearChat')">Clear chatt</button>
+        <button class="chat-send" onclick="adminAction('clearInventory')">Clear inventory</button>
+        <button class="chat-send" onclick="adminAction('clearAccounts')">Clear accounts</button>
+        <button class="chat-send" onclick="adminAction('resetQuests')">Reset quests</button>
       </div>
       <button class="chat-send" onclick="closeAdminPanel()">Stäng</button>
     </div>
@@ -1263,29 +1288,31 @@
 
       return selectedGames.slice(0, 40).map((game, idx) => {
         const minutes = 6 + (idx % 10);
-        const reward = Math.max(5, Math.round(minutes * 0.9));
+        const rewardXp = Math.max(8, Math.round(minutes * 1.8));
         return {
           id: `quest_${idx + 1}_${game.replace(/[^a-z0-9]/gi, "").toLowerCase().slice(0, 18)}`,
           game,
           label: `Spela ${questDisplayName(game)} i ${minutes} min`,
           targetMs: minutes * 60 * 1000,
-          reward
+          rewardXp
         };
       });
     }
 
     const questsConfig = buildQuestsFromFiles();
     const shopItems = [
-      { id: "sparkle", title: "✨ Namn-effekt", price: 15, desc: "Lägger till extra sparkle i ditt namn." },
-      { id: "vip", title: "👑 VIP-tag", price: 25, desc: "Ger dig VIP-prefix i chatten." },
-      { id: "rainbow", title: "🌈 Rainbow-tag", price: 30, desc: "Gör namnet neon/rainbow i chatten." },
-      { id: "glow", title: "💡 Glow-namn", price: 22, desc: "Ger lysande namn-effekt." },
-      { id: "avatarFrame", title: "🖼️ Profilram", price: 20, desc: "Visar en ram runt ditt chattnamn." },
-      { id: "chatBubble", title: "💬 Chat-bubbla", price: 18, desc: "Snygg rundad bubbla runt dina meddelanden." },
-      { id: "titleLegend", title: "🏆 Titel: Legend", price: 35, desc: "Lägger till [Legend] efter namnet." },
-      { id: "nameFire", title: "🔥 Fire-namn", price: 28, desc: "Lägger till fire-badge vid ditt namn." },
-      { id: "iconStar", title: "⭐ Stjärnikon", price: 12, desc: "Visar en stjärna efter ditt namn." },
-      { id: "bgNebula", title: "🌌 Nebula-bakgrund", price: 40, desc: "Nebula-bakgrund på dina meddelanden." }
+      { id: "profileFrame", title: "🖼️ Profilram", price: 20, desc: "Visar en glödande ram i din profil.", effect: "frame" },
+      { id: "profileNeon", title: "🌈 Neon-namn", price: 28, desc: "Ger neon-effekt på namnet i profilen.", effect: "neon" },
+      { id: "profileVip", title: "👑 VIP-tag", price: 24, desc: "Visar VIP-tag i din profil.", effect: "vip" },
+      { id: "profileFire", title: "🔥 Fire-badge", price: 22, desc: "Visar fire-badge i din profil.", effect: "fire" },
+      { id: "profileGalaxy", title: "🌌 Galaxy-kort", price: 34, desc: "Galaxybakgrund på profilkortet.", effect: "galaxy" },
+      { id: "profileGold", title: "🥇 Guld-namn", price: 26, desc: "Guldig namntext i profil.", effect: "gold" },
+      { id: "profileShadow", title: "🕶️ Shadow-kort", price: 18, desc: "Mörk kontrast-stil i profil.", effect: "shadow" },
+      { id: "profilePulse", title: "💓 Pulse-effekt", price: 30, desc: "Pulserande accent runt profilkort.", effect: "pulse" },
+      { id: "profileCrystal", title: "💎 Crystal-tag", price: 27, desc: "Kristall-badge i profil.", effect: "crystal" },
+      { id: "profileRetro", title: "🕹️ Retro-tema", price: 21, desc: "Retro-färgtema i profil.", effect: "retro" },
+      { id: "profileWave", title: "🌊 Wave-overlay", price: 19, desc: "Våg-mönster i profilkort.", effect: "wave" },
+      { id: "profileAura", title: "✨ Aura-glow", price: 25, desc: "Auralys runt profilkort.", effect: "aura" }
     ];
 
     const loadingMessages = [
@@ -1311,6 +1338,24 @@
     let fakeLoadRaf = null;
     let currentLoadId = 0;
 
+    const xpForLevel = (lvl) => Math.floor(120 + (lvl - 1) * 45);
+    function getLevelFromXp(xp = 0) {
+      let level = 1;
+      let remaining = xp;
+      while (remaining >= xpForLevel(level) && level < 200) {
+        remaining -= xpForLevel(level);
+        level++;
+      }
+      return { level, progressXp: remaining, neededXp: xpForLevel(level) };
+    }
+
+    function getTodayKey() {
+      const d = new Date();
+      const mm = String(d.getMonth() + 1).padStart(2, "0");
+      const dd = String(d.getDate()).padStart(2, "0");
+      return `${d.getFullYear()}-${mm}-${dd}`;
+    }
+
     const displayName = (f) => {
       const raw = f.replace(/^cl/i, "").trim();
       return raw.replace(/^([^A-Za-zÅÄÖåäö]*)([a-zåäö])/, (_, prefix, letter) => {
@@ -1319,15 +1364,17 @@
     };
 
     function createGameThumb(file) {
+      const wrap = document.createElement("div");
+
       const preview = document.createElement("div");
       preview.className = "game-preview";
 
-      const chip = document.createElement("div");
-      chip.className = "game-name-chip";
-      chip.textContent = displayName(file);
+      const title = document.createElement("div");
+      title.className = "game-title";
+      title.textContent = displayName(file);
 
-      preview.append(chip);
-      return preview;
+      wrap.append(preview, title);
+      return wrap;
     }
 
     function saveFavorites() {
@@ -1371,7 +1418,6 @@
       menuToggle.textContent = "✕";
       menuToggle.setAttribute("aria-expanded", "true");
       menuToggle.setAttribute("aria-label", "Stäng meny");
-      addSystemChatMessage("Välkommen till chatten, om det finns någon som säger att de är Coola Mattespel och de inte har \"✔️\" i sitt namn så är den personen oftast inte Coola Mattespel så lita EJ på vad de säger.");
     }
 
     function closeSidebar() {
@@ -1714,6 +1760,7 @@ function hidePages() {
   document.getElementById("questsPage").style.display = "none";
   document.getElementById("shopPage").style.display = "none";
   document.getElementById("inventoryPage").style.display = "none";
+  document.getElementById("roadmapPage").style.display = "none";
 }
 
 function showQuests() {
@@ -1910,6 +1957,7 @@ function showInventory() {
       document.getElementById("questsPage").style.display = "none";
       document.getElementById("shopPage").style.display = "none";
       document.getElementById("inventoryPage").style.display = "none";
+  document.getElementById("roadmapPage").style.display = "none";
     }
 
     function toggleFullscreen() {
@@ -2010,7 +2058,7 @@ function showInventory() {
       const ref = db.ref("accounts").push();
       const quests = {};
       questsConfig.forEach((q) => { quests[q.id] = { progressMs: 0, claimed: false }; });
-      await ref.set({ email, username, usernameLower: username.toLowerCase(), password, coins: 0, verified: false, banned: false, timeoutUntil: 0, sessionActive: false, createdAt: Date.now(), quests, inventory: {}, equipped: {} });
+      await ref.set({ email, username, usernameLower: username.toLowerCase(), password, coins: 0, xp: 0, verified: false, banned: false, timeoutUntil: 0, sessionActive: false, createdAt: Date.now(), lastQuestReset: getTodayKey(), quests, inventory: {}, equipped: {} });
       alert("Konto skapat! Logga in nu.");
     }
 
@@ -2027,7 +2075,23 @@ function showInventory() {
       const existingSessionRaw = localStorage.getItem(SESSION_KEY);
       let existingSession = null;
       try { existingSession = existingSessionRaw ? JSON.parse(existingSessionRaw) : null; } catch (e) {}
-      const sessionId = found.sessionId || `sess_${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
+
+      const sameBrowserSession = !!(
+        existingSession &&
+        existingSession.accountId === found.id &&
+        existingSession.sessionId &&
+        found.sessionId &&
+        existingSession.sessionId === found.sessionId
+      );
+
+      if (found.sessionActive && found.sessionId && !sameBrowserSession) {
+        return alert("Kontot är redan inloggat på en annan enhet.");
+      }
+
+      const sessionId = (found.sessionActive && found.sessionId && sameBrowserSession)
+        ? found.sessionId
+        : `sess_${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
+
       await db.ref(`accounts/${found.id}`).update({ sessionActive: true, sessionId, lastSeen: Date.now(), forcedLogout: false });
       localStorage.setItem(SESSION_KEY, JSON.stringify({ accountId: found.id, sessionId }));
       currentUser = { ...found, sessionId };
@@ -2175,15 +2239,19 @@ function showInventory() {
     }
 
     function renderProfile() {
+      const profileStylePreview = document.getElementById("profileStylePreview");
       if (!currentUser) {
         profileInfoEl.innerHTML = "Inte inloggad.";
+        if (profileStylePreview) profileStylePreview.textContent = "Ingen profil att visa.";
         friendRequestsEl.innerHTML = "";
         friendsListEl.innerHTML = "";
         privateChatEl.style.display = "none";
         return;
       }
       const ownedEffects = getOwnedShopEffects(currentUser.inventory || {}, currentUser.equipped || {});
-      profileInfoEl.innerHTML = `Inloggad som <b>${getDisplayUsername()}</b><br>Mail: ${currentUser.email}<br>Coins: ${currentUser.coins || 0}<br>Shop-effekter i chatten/profilen: ${ownedEffects.length ? ownedEffects.join(", ") : "Inga köpta ännu."}`;
+      const lv = getLevelFromXp(currentUser.xp || 0);
+      profileInfoEl.innerHTML = `Inloggad som <b>${getDisplayUsername()}</b><br>Mail: ${currentUser.email}<br>Coins: ${currentUser.coins || 0}<br>XP: ${currentUser.xp || 0}<br>Level: ${lv.level}<br>Shop-effekter i profil: ${ownedEffects.length ? ownedEffects.join(", ") : "Inga köpta ännu."}`;
+      if (profileStylePreview) profileStylePreview.innerHTML = buildProfileVisual(currentUser);
       db.ref(`friend-requests/${currentUser.id}`).on("value", (snap) => {
         friendRequestsEl.innerHTML = "<b>Vänförfrågningar (måste accepteras)</b><br>";
         if (!snap.exists()) { friendRequestsEl.innerHTML += "Inga."; return; }
@@ -2204,9 +2272,86 @@ function showInventory() {
       });
     }
 
-    function renderQuest() {
+    async function maybeResetDailyQuests() {
+      if (!currentUser || !db) return;
+      const today = getTodayKey();
+      if ((currentUser.lastQuestReset || "") === today) return;
+      const reset = {};
+      questsConfig.forEach((q) => { reset[q.id] = { progressMs: 0, claimed: false }; });
+      await db.ref(`accounts/${currentUser.id}`).update({ quests: reset, lastQuestReset: today });
+    }
+
+    function updateQuestResetTimer() {
+      const el = document.getElementById("questResetTimer");
+      if (!el) return;
+      const now = new Date();
+      const next = new Date(now);
+      next.setHours(24, 0, 0, 0);
+      const diff = Math.max(0, next - now);
+      const h = Math.floor(diff / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      el.textContent = `Quests nollställs om ${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+    }
+
+    function renderRoadmap() {
+      const card = document.getElementById("roadmapCard");
+      if (!card) return;
+      if (!currentUser) { card.textContent = "Logga in för att se roadmap."; return; }
+
+      const xp = currentUser.xp || 0;
+      const lv = getLevelFromXp(xp);
+      const milestones = [
+        { level: 2, label: "Lås upp tema: CYAN" },
+        { level: 3, label: "+100 coins" },
+        { level: 4, label: "Lås upp item: VIP-tag" },
+        { level: 5, label: "Lås upp tema: SUNSET" },
+        { level: 6, label: "+150 coins" },
+        { level: 7, label: "Lås upp item: Galaxy-kort" },
+        { level: 8, label: "Lås upp tema: NEON" },
+        { level: 10, label: "+250 coins" }
+      ];
+
+      card.innerHTML = `<div class="shop-balance">Level ${lv.level} • XP ${xp} • ${lv.progressXp}/${lv.neededXp} till nästa level</div>` +
+        milestones.map((m) => {
+          const unlocked = lv.level >= m.level;
+          return `<div class="quest-item"><div class="quest-head"><div class="quest-title">Level ${m.level}</div><div class="quest-status ${unlocked ? "done" : "progress"}">${unlocked ? "Unlockad" : "Låst"}</div></div><div>${m.label}</div></div>`;
+        }).join("");
+    }
+
+    function showRoadmap() {
+      hidePages();
+      document.getElementById("roadmapPage").style.display = "block";
+      renderRoadmap();
+    }
+
+    function buildProfileVisual(user) {
+      const inv = user?.inventory || {};
+      const equipped = user?.equipped || {};
+      const owned = shopItems.filter((it) => inv[it.id]);
+      const active = owned.filter((it) => equipped[it.id]);
+      const lv = getLevelFromXp(user?.xp || 0);
+      const badges = active.map((it) => `<span class="tag owned">${it.title}</span>`).join(" ") || "Inga aktiva effekter";
+      return `<div><b>${user?.username || "Gäst"}${user?.verified ? " ✔️" : ""}</b> • Level ${lv.level}</div><div style="margin-top:8px">${badges}</div>`;
+    }
+
+    async function viewPublicProfile() {
+      if (!db) return;
+      const name = sanitizeName(document.getElementById("viewProfileInput").value || "");
+      const box = document.getElementById("publicProfileView");
+      if (!name) { box.textContent = "Skriv ett username."; return; }
+      const snap = await db.ref("accounts").orderByChild("usernameLower").equalTo(name.toLowerCase()).once("value");
+      if (!snap.exists()) { box.textContent = "Profil hittades inte."; return; }
+      let acc = null;
+      snap.forEach((c) => { if (!acc) acc = c.val(); });
+      box.innerHTML = buildProfileVisual(acc);
+    }
+
+    async function renderQuest() {
       const card = document.getElementById("questCard");
+      updateQuestResetTimer();
       if (!currentUser) { card.textContent = "Logga in för quests."; return; }
+      await maybeResetDailyQuests();
       const questState = currentUser.quests || {};
       card.innerHTML = "";
       questsConfig.forEach((q) => {
@@ -2222,10 +2367,10 @@ function showInventory() {
             <div class="quest-title">${q.label}</div>
             <div class="quest-status ${statusClass}">${statusText}</div>
           </div>
-          <div class="quest-reward">Reward: <b>${q.reward} coins</b></div>
+          <div class="quest-reward">Reward: <b>${q.rewardXp} XP</b></div>
           <div class="quest-progress">${(st.progressMs/60000).toFixed(1)} / ${(q.targetMs/60000).toFixed(0)} min</div>
           <div class="quest-progress-track"><div class="quest-progress-fill" style="width:${pct.toFixed(1)}%"></div></div>
-          <div>${st.claimed ? "✅ Claimad" : done ? `<button class="chat-send" onclick="claimQuest('${q.id}')">Claim ${q.reward}</button>` : "Spela mer för att låsa upp reward."}</div>
+          <div>${st.claimed ? "✅ Claimad" : done ? `<button class="chat-send" onclick="claimQuest('${q.id}')">Claim ${q.rewardXp}</button>` : "Spela mer för att låsa upp reward."}</div>
         `;
         card.appendChild(row);
       });
@@ -2246,7 +2391,7 @@ function showInventory() {
       if (!q) return;
       const state = currentUser.quests?.[questId] || { progressMs: 0, claimed: false };
       if (state.claimed || state.progressMs < q.targetMs) return;
-      await db.ref(`accounts/${currentUser.id}/coins`).set((currentUser.coins || 0) + q.reward);
+      await db.ref(`accounts/${currentUser.id}/xp`).set((currentUser.xp || 0) + q.rewardXp);
       await db.ref(`accounts/${currentUser.id}/quests/${questId}/claimed`).set(true);
     }
 
@@ -2319,11 +2464,16 @@ function showInventory() {
     async function adminAction(action) {
       if (!adminUnlocked) return alert("Adminpanelen är låst.");
       if ((document.getElementById("adminPassword").value || "") !== ADMIN_PASSWORD) return alert("Skriv admin-lösenord igen för att bekräfta åtgärden.");
-      const username = sanitizeName(document.getElementById("adminTarget").value);
-      const snap = await db.ref("accounts").orderByChild("usernameLower").equalTo(username.toLowerCase()).once("value");
-      if (!snap.exists()) return alert("Mål hittades inte.");
+
+      const globalActions = new Set(["clearChat", "clearAccounts"]);
       let target = null;
-      snap.forEach((c) => { if (!target) target = { id: c.key, ...c.val() }; });
+
+      if (!globalActions.has(action)) {
+        const username = sanitizeName(document.getElementById("adminTarget").value);
+        const snap = await db.ref("accounts").orderByChild("usernameLower").equalTo(username.toLowerCase()).once("value");
+        if (!snap.exists()) return alert("Mål hittades inte.");
+        snap.forEach((c) => { if (!target) target = { id: c.key, ...c.val() }; });
+      }
       if (action === "kick") await db.ref(`accounts/${target.id}`).update({ forcedLogout: true, sessionActive: false });
       if (action === "timeout") await db.ref(`accounts/${target.id}`).update({ timeoutUntil: Date.now() + 5 * 60 * 1000 });
       if (action === "ban") await db.ref(`accounts/${target.id}`).update({ banned: true, sessionActive: false, forcedLogout: true });
@@ -2331,6 +2481,20 @@ function showInventory() {
       if (action === "coins") {
         const amount = Number(document.getElementById("adminCoins").value || 0);
         await db.ref(`accounts/${target.id}/coins`).set((target.coins || 0) + amount);
+      }
+      if (action === "clearInventory") await db.ref(`accounts/${target.id}`).update({ inventory: {}, equipped: {} });
+      if (action === "resetQuests") {
+        const reset = {};
+        questsConfig.forEach((q) => { reset[q.id] = { progressMs: 0, claimed: false }; });
+        await db.ref(`accounts/${target.id}`).update({ quests: reset, lastQuestReset: getTodayKey() });
+      }
+      if (action === "clearChat") {
+        await db.ref("global-chat").remove();
+        await db.ref("private-chats").remove();
+      }
+      if (action === "clearAccounts") {
+        const ok = confirm("Är du säker? Detta raderar ALLA konton.");
+        if (ok) await db.ref("accounts").remove();
       }
       alert("Admin-åtgärd utförd.");
     }
@@ -2395,16 +2559,46 @@ function showInventory() {
       if (!db) return;
       const raw = localStorage.getItem(SESSION_KEY);
       if (!raw) return;
+
       let sess = null;
-      try { sess = JSON.parse(raw); } catch (e) { localStorage.removeItem(SESSION_KEY); return; }
-      if (!sess || !sess.accountId || !sess.sessionId) { localStorage.removeItem(SESSION_KEY); return; }
+      try {
+        sess = JSON.parse(raw);
+      } catch (e) {
+        addSystemChatMessage("Kunde inte läsa sparad session.");
+        return;
+      }
+
+      if (!sess || !sess.accountId || !sess.sessionId) {
+        addSystemChatMessage("Sparad session är ogiltig.");
+        return;
+      }
 
       const snap = await db.ref(`accounts/${sess.accountId}`).once("value");
-      if (!snap.exists()) { localStorage.removeItem(SESSION_KEY); return; }
-      const acc = snap.val() || {};
-      if (acc.banned) { localStorage.removeItem(SESSION_KEY); return; }
+      if (!snap.exists()) {
+        addSystemChatMessage("Konto för sparad session hittades inte.");
+        return;
+      }
 
-      await db.ref(`accounts/${sess.accountId}`).update({ sessionActive: true, sessionId: sess.sessionId, lastSeen: Date.now(), forcedLogout: false });
+      const acc = snap.val() || {};
+      if (acc.banned) {
+        addSystemChatMessage("Kontot är bannat.");
+        return;
+      }
+
+      // En enhet åt gången: återställ bara om sessionen matchar servern.
+      if (acc.sessionActive && acc.sessionId && acc.sessionId !== sess.sessionId) {
+        addSystemChatMessage("Kontot är aktivt på en annan enhet. Logga in igen när den sessionen är avslutad.");
+        refreshChatStatus();
+        return;
+      }
+
+      await db.ref(`accounts/${sess.accountId}`).update({
+        sessionActive: true,
+        sessionId: sess.sessionId,
+        lastSeen: Date.now(),
+        forcedLogout: false
+      });
+
       currentUser = { id: sess.accountId, ...acc, sessionId: sess.sessionId };
       userRef = db.ref(`accounts/${sess.accountId}`);
       watchCurrentUser();
@@ -2431,16 +2625,15 @@ function showInventory() {
         btn.addEventListener("click", closeSidebar);
       });
 
-      chatSendEl.addEventListener("click", sendChatMessage);
-      chatInputEl.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") sendChatMessage();
+      updateQuestResetTimer();
+      setInterval(updateQuestResetTimer, 1000);
+
+      document.addEventListener("keydown", (e) => {
+        if (e.ctrlKey && e.shiftKey && (e.key === "A" || e.key === "a")) {
+          e.preventDefault();
+          openAdminGate();
+        }
       });
-      privateSendEl.addEventListener("click", sendPrivateMessage);
-      privateInputEl.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") sendPrivateMessage();
-      });
-      updateChatToggleUI();
-      setChatTab("global");
 
       const notConfigured = (
         !firebaseConfig.apiKey || firebaseConfig.apiKey.includes("DIN_") ||
@@ -2449,7 +2642,6 @@ function showInventory() {
 
       if (notConfigured) {
         activePlayersEl.textContent = "Aktiva spelare: --";
-        addSystemChatMessage("Chatten är inte kopplad ännu. Fyll i firebaseConfig i koden.");
         return;
       }
 
@@ -2483,13 +2675,10 @@ function showInventory() {
         }, () => {
           activePlayersEl.textContent = "Aktiva spelare: --";
         });
-      chatRef = db.ref("global-chat");
-        chatRef.limitToLast(120).on("child_added", (snap) => { addChatMessage(snap.val() || {}); });
         startGameTracker();
         restoreSessionFromStorage();
       } catch (err) {
         activePlayersEl.textContent = "Aktiva spelare: --";
-        addSystemChatMessage("Kunde inte ansluta chatten.");
       }
 
     })();
