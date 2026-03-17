@@ -542,9 +542,9 @@
     }
 
     .game-title {
-      margin-top: 10px;
+      margin-top: 8px;
       display: block;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 800;
       text-align: center;
       color: rgba(255,255,255,.96);
@@ -573,8 +573,8 @@
 
     .game-btn {
       width: 100%;
-      padding: 14px;
-      border-radius: 22px;
+      padding: 10px;
+      border-radius: 18px;
       border: 1px solid rgba(255,255,255,.26);
       background:
         linear-gradient(160deg, rgba(255,255,255,.2), rgba(255,255,255,.04)),
@@ -705,6 +705,41 @@
       background: linear-gradient(135deg, color-mix(in oklab, var(--accent-dark) 80%, #000), var(--accent));
     }
 
+
+    .theme-btn.locked {
+      opacity: .6;
+      filter: grayscale(.4);
+      cursor: not-allowed;
+      border-color: rgba(250,204,21,.45);
+    }
+    .theme-btn .req { display:block; font-size:10px; opacity:.85; margin-top:4px; }
+
+    .roadmap-shell {
+      background: radial-gradient(circle at top, rgba(56,189,248,.16), transparent 52%), linear-gradient(165deg, rgba(8,10,20,.92), rgba(15,23,42,.88));
+      border: 1px solid rgba(148, 163, 184, .32);
+      border-radius: 20px;
+      padding: 18px;
+    }
+    .roadmap-progress-wrap { margin-bottom: 18px; }
+    .roadmap-progress-title { font-weight: 800; margin-bottom: 8px; }
+    .roadmap-progress-track { height: 14px; border-radius: 999px; background: rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.2); overflow:hidden; }
+    .roadmap-progress-fill { height:100%; width:0; background: linear-gradient(90deg, #22d3ee, #818cf8, #f472b6); border-radius:inherit; }
+    .roadmap-progress-text { margin-top: 8px; font-size: 13px; opacity:.9; }
+    .roadmap-rewards { display:grid; grid-template-columns: repeat(auto-fit,minmax(190px,1fr)); gap:10px; }
+    .roadmap-reward { background: linear-gradient(165deg, rgba(255,255,255,.08), rgba(255,255,255,.03)); border:1px solid rgba(255,255,255,.2); border-radius:12px; padding:10px; }
+    .roadmap-reward.unlocked { border-color: rgba(34,197,94,.55); box-shadow: 0 0 0 1px rgba(34,197,94,.2) inset; }
+
+    .profile-visual-card {
+      border-radius: 16px;
+      padding: 14px;
+      background: radial-gradient(circle at 20% 10%, rgba(56,189,248,.22), transparent 45%), radial-gradient(circle at 80% 0%, rgba(236,72,153,.16), transparent 40%), linear-gradient(165deg, rgba(15,23,42,.95), rgba(30,41,59,.88));
+      border: 1px solid rgba(255,255,255,.25);
+      box-shadow: 0 14px 24px rgba(0,0,0,.35);
+    }
+    .profile-visual-name { font-size: 20px; font-weight: 900; letter-spacing: .2px; }
+    .profile-visual-stats { margin-top: 8px; display:grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap:8px; }
+    .profile-stat { background: rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.16); border-radius:10px; padding:8px; font-size:12px; }
+    .profile-badges { margin-top:10px; display:flex; flex-wrap:wrap; gap:6px; }
 
     .recommended-section { margin: 20px 0 42px; }
     .recommended-title {
@@ -1065,7 +1100,7 @@
 </div>
 <div id="roadmapPage" style="display:none;margin-top:30px;">
   <h2 style="font-size:28px;margin-bottom:15px;">🧭 Roadmap</h2>
-  <div id="roadmapCard" class="info-card quest-list"></div>
+  <div id="roadmapCard" class="roadmap-shell"></div>
 </div>
       <div class="games-grid" id="gamesGrid"></div>
     </div>
@@ -1074,17 +1109,17 @@
   <div id="themePopup" onclick="if(event.target===this)closeThemePopup()">
     <div class="theme-box">
       <div class="theme-presets">
-        <button class="theme-btn" onclick="setTheme('blue')">BLUE</button>
-        <button class="theme-btn" onclick="setTheme('red')">RED</button>
-        <button class="theme-btn" onclick="setTheme('green')">GREEN</button>
-        <button class="theme-btn" onclick="setTheme('yellow')">YELLOW</button>
-        <button class="theme-btn" onclick="setTheme('orange')">ORANGE</button>
-        <button class="theme-btn" onclick="setTheme('gray')">GRAY</button>
-        <button class="theme-btn" onclick="setTheme('purple')">PURPLE</button>
-        <button class="theme-btn" onclick="setTheme('pink')">PINK</button>
-        <button class="theme-btn" onclick="setTheme('cyan')">CYAN</button>
-        <button class="theme-btn" onclick="setTheme('sunset')">SUNSET</button>
-        <button class="theme-btn" onclick="setTheme('neon')">NEON</button>
+        <button class="theme-btn" data-theme="blue" onclick="setTheme('blue')">BLUE</button>
+        <button class="theme-btn" data-theme="red" onclick="setTheme('red')">RED</button>
+        <button class="theme-btn" data-theme="green" onclick="setTheme('green')">GREEN</button>
+        <button class="theme-btn" data-theme="yellow" onclick="setTheme('yellow')">YELLOW</button>
+        <button class="theme-btn" data-theme="orange" onclick="setTheme('orange')">ORANGE</button>
+        <button class="theme-btn" data-theme="gray" onclick="setTheme('gray')">GRAY</button>
+        <button class="theme-btn" data-theme="purple" onclick="setTheme('purple')">PURPLE</button>
+        <button class="theme-btn" data-theme="pink" onclick="setTheme('pink')">PINK</button>
+        <button class="theme-btn" data-theme="cyan" onclick="setTheme('cyan')">CYAN</button>
+        <button class="theme-btn" data-theme="sunset" onclick="setTheme('sunset')">SUNSET</button>
+        <button class="theme-btn" data-theme="neon" onclick="setTheme('neon')">NEON</button>
       </div>
     </div>
   </div>
@@ -1312,7 +1347,27 @@
       { id: "profileCrystal", title: "💎 Crystal-tag", price: 27, desc: "Kristall-badge i profil.", effect: "crystal" },
       { id: "profileRetro", title: "🕹️ Retro-tema", price: 21, desc: "Retro-färgtema i profil.", effect: "retro" },
       { id: "profileWave", title: "🌊 Wave-overlay", price: 19, desc: "Våg-mönster i profilkort.", effect: "wave" },
-      { id: "profileAura", title: "✨ Aura-glow", price: 25, desc: "Auralys runt profilkort.", effect: "aura" }
+      { id: "profileAura", title: "✨ Aura-glow", price: 25, desc: "Auralys runt profilkort.", effect: "aura" },
+      { id: "profileFrost", title: "❄️ Frostram", price: 23, desc: "Isblå frostkant runt profilkortet.", effect: "frost" },
+      { id: "profileVolt", title: "⚡ Volttext", price: 29, desc: "Elektrisk glow runt namnet.", effect: "volt" },
+      { id: "profileMeteor", title: "☄️ Meteorstänk", price: 31, desc: "Meteor-partiklar i profilkort.", effect: "meteor" },
+      { id: "profileRuby", title: "🔴 Ruby-badge", price: 24, desc: "Röd premium-badge.", effect: "ruby" },
+      { id: "profileEmerald", title: "🟢 Emerald-badge", price: 24, desc: "Grön premium-badge.", effect: "emerald" },
+      { id: "profileSapphire", title: "🔵 Sapphire-badge", price: 24, desc: "Blå premium-badge.", effect: "sapphire" },
+      { id: "profileVortex", title: "🌀 Vortex-kort", price: 33, desc: "Virvel-bakgrund med djup.", effect: "vortex" },
+      { id: "profileCarbon", title: "🧩 Carbon-mönster", price: 20, desc: "Mörkt mönster i kortet.", effect: "carbon" },
+      { id: "profileHolo", title: "🪩 Holo-shine", price: 34, desc: "Holografisk reflex i kortet.", effect: "holo" },
+      { id: "profileComet", title: "🌠 Comet trail", price: 32, desc: "Rörlig ljussvans över profilkortet.", effect: "comet" },
+      { id: "profilePixel", title: "🧱 Pixelstil", price: 19, desc: "8-bit profilkänsla.", effect: "pixel" },
+      { id: "profileRose", title: "🌹 Rose glow", price: 21, desc: "Mjuk rosafärgad glöd.", effect: "rose" },
+      { id: "profileLime", title: "🍀 Lime boost", price: 21, desc: "Fräsch limefärgad accent.", effect: "lime" },
+      { id: "profileSun", title: "☀️ Sun flare", price: 27, desc: "Varmt solljus över kortet.", effect: "sun" },
+      { id: "profileMoon", title: "🌙 Moon aura", price: 27, desc: "Nattlig glow med stjärnton.", effect: "moon" },
+      { id: "profileGlitch", title: "👾 Glitch-overlay", price: 30, desc: "Digital glitch-effekt i profil.", effect: "glitch" },
+      { id: "profileInk", title: "🖋️ Ink fade", price: 18, desc: "Tusch-liknande skuggövergång.", effect: "ink" },
+      { id: "profilePlasma", title: "🔮 Plasma-ring", price: 35, desc: "Högenergi-ring runt namnet.", effect: "plasma" },
+      { id: "profileCrown", title: "🏆 Champion crown", price: 38, desc: "Champion-markering i profilen.", effect: "crown" },
+      { id: "profileGoldBorder", title: "💠 Premium kant", price: 26, desc: "Tjock premium-kant i guld.", effect: "goldborder" }
     ];
 
     const loadingMessages = [
@@ -1968,7 +2023,56 @@ function showInventory() {
       }
     }
 
+
+    const themeUnlockLevels = { blue: 1, red: 1, green: 1, yellow: 2, orange: 3, gray: 4, purple: 5, pink: 6, cyan: 7, sunset: 9, neon: 11 };
+    const roadmapRewards = [
+      { level: 2, label: "Lås upp tema: YELLOW", type: "theme", key: "yellow" },
+      { level: 3, label: "Lås upp tema: ORANGE", type: "theme", key: "orange" },
+      { level: 4, label: "Lås upp tema: GRAY", type: "theme", key: "gray" },
+      { level: 5, label: "Lås upp tema: PURPLE", type: "theme", key: "purple" },
+      { level: 6, label: "Lås upp tema: PINK", type: "theme", key: "pink" },
+      { level: 7, label: "Lås upp tema: CYAN", type: "theme", key: "cyan" },
+      { level: 8, label: "+200 coins" },
+      { level: 9, label: "Lås upp tema: SUNSET", type: "theme", key: "sunset" },
+      { level: 10, label: "Lås upp item: Holo-shine" },
+      { level: 11, label: "Lås upp tema: NEON", type: "theme", key: "neon" },
+      { level: 12, label: "+350 coins" },
+      { level: 13, label: "Lås upp item: Champion crown" },
+      { level: 14, label: "VIP profil-banner" },
+      { level: 15, label: "Mystery reward x3" },
+      { level: 16, label: "+500 coins" },
+      { level: 18, label: "Legend rank-badge" },
+      { level: 20, label: "Ultra glow pack" }
+    ];
+
+    function getThemeRequiredLevel(theme) {
+      return themeUnlockLevels[theme] || 999;
+    }
+
+    function isThemeUnlocked(theme, user = currentUser) {
+      const req = getThemeRequiredLevel(theme);
+      if (req <= 1) return true;
+      const level = getLevelFromXp(user?.xp || 0).level;
+      return level >= req;
+    }
+
+    function refreshThemeButtons() {
+      const level = getLevelFromXp(currentUser?.xp || 0).level;
+      document.querySelectorAll('.theme-btn[data-theme]').forEach((btn) => {
+        const theme = btn.dataset.theme;
+        const req = getThemeRequiredLevel(theme);
+        const unlocked = req <= level;
+        btn.classList.toggle('locked', !unlocked);
+        const base = theme.toUpperCase();
+        btn.innerHTML = unlocked || req <= 1 ? base : `${base}<span class="req">LÅST • LVL ${req}</span>`;
+      });
+    }
+
     function setTheme(t) {
+      if (!isThemeUnlocked(t)) {
+        const req = getThemeRequiredLevel(t);
+        return alert(`Det temat är låst. Nå level ${req} i roadmapen först.`);
+      }
       document.body.className = t;
       document.documentElement.classList.remove("theme-blue","theme-red","theme-green","theme-yellow","theme-orange","theme-gray","theme-purple","theme-pink","theme-cyan","theme-sunset","theme-neon");
       document.documentElement.classList.add(`theme-${t}`);
@@ -1977,6 +2081,7 @@ function showInventory() {
     }
 
     function openThemePopup() {
+      refreshThemeButtons();
       document.getElementById("themePopup").style.display = "flex";
       setPopupOpen(true);
     }
@@ -2301,22 +2406,19 @@ function showInventory() {
 
       const xp = currentUser.xp || 0;
       const lv = getLevelFromXp(xp);
-      const milestones = [
-        { level: 2, label: "Lås upp tema: CYAN" },
-        { level: 3, label: "+100 coins" },
-        { level: 4, label: "Lås upp item: VIP-tag" },
-        { level: 5, label: "Lås upp tema: SUNSET" },
-        { level: 6, label: "+150 coins" },
-        { level: 7, label: "Lås upp item: Galaxy-kort" },
-        { level: 8, label: "Lås upp tema: NEON" },
-        { level: 10, label: "+250 coins" }
-      ];
+      const pct = Math.max(0, Math.min(100, (lv.progressXp / lv.neededXp) * 100));
 
-      card.innerHTML = `<div class="shop-balance">Level ${lv.level} • XP ${xp} • ${lv.progressXp}/${lv.neededXp} till nästa level</div>` +
-        milestones.map((m) => {
-          const unlocked = lv.level >= m.level;
-          return `<div class="quest-item"><div class="quest-head"><div class="quest-title">Level ${m.level}</div><div class="quest-status ${unlocked ? "done" : "progress"}">${unlocked ? "Unlockad" : "Låst"}</div></div><div>${m.label}</div></div>`;
-        }).join("");
+      const rewardsHtml = roadmapRewards.map((m) => {
+        const unlocked = lv.level >= m.level;
+        return `<div class="roadmap-reward ${unlocked ? "unlocked" : ""}"><div class="quest-head"><div class="quest-title">Level ${m.level}</div><div class="quest-status ${unlocked ? "done" : "progress"}">${unlocked ? "Unlockad" : "Låst"}</div></div><div>${m.label}</div></div>`;
+      }).join("");
+
+      card.innerHTML = `<div class="roadmap-progress-wrap">
+          <div class="roadmap-progress-title">🚀 Din roadmap-progress</div>
+          <div class="roadmap-progress-track"><div class="roadmap-progress-fill" style="width:${pct}%"></div></div>
+          <div class="roadmap-progress-text">Level ${lv.level} • XP ${xp} • ${lv.progressXp}/${lv.neededXp} till nästa level</div>
+        </div>
+        <div class="roadmap-rewards">${rewardsHtml}</div>`;
     }
 
     function showRoadmap() {
@@ -2331,8 +2433,17 @@ function showInventory() {
       const owned = shopItems.filter((it) => inv[it.id]);
       const active = owned.filter((it) => equipped[it.id]);
       const lv = getLevelFromXp(user?.xp || 0);
-      const badges = active.map((it) => `<span class="tag owned">${it.title}</span>`).join(" ") || "Inga aktiva effekter";
-      return `<div><b>${user?.username || "Gäst"}${user?.verified ? " ✔️" : ""}</b> • Level ${lv.level}</div><div style="margin-top:8px">${badges}</div>`;
+      const badges = active.map((it) => `<span class="tag owned">${it.title}</span>`).join("");
+      return `<div class="profile-visual-card">
+        <div class="profile-visual-name">${user?.username || "Gäst"}${user?.verified ? " ✔️" : ""}</div>
+        <div class="profile-visual-stats">
+          <div class="profile-stat">🏅 Level <b>${lv.level}</b></div>
+          <div class="profile-stat">✨ XP <b>${user?.xp || 0}</b></div>
+          <div class="profile-stat">🪙 Coins <b>${user?.coins || 0}</b></div>
+          <div class="profile-stat">🎒 Items <b>${owned.length}</b></div>
+        </div>
+        <div class="profile-badges">${badges || '<span class="tag missing">Inga aktiva effekter</span>'}</div>
+      </div>`;
     }
 
     async function viewPublicProfile() {
@@ -2618,6 +2729,7 @@ function showInventory() {
       renderRecommended();
       renderGames(files);
       searchMeta.textContent = "Visar alla spel";
+      refreshThemeButtons();
       startIntroLoader();
       refreshChatStatus();
 
