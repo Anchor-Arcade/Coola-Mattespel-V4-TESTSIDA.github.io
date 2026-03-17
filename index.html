@@ -353,6 +353,27 @@
     }
 
     /* NYTT: Aktiva spelare */
+
+    .discord-banner {
+      margin: 12px auto 8px;
+      max-width: 760px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.3);
+      background: linear-gradient(135deg, rgba(88,101,242,.34), rgba(0,0,0,.35));
+      box-shadow: 0 10px 24px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.2);
+      text-align: center;
+      font-weight: 800;
+      font-size: 14px;
+      letter-spacing: .4px;
+    }
+    .discord-banner a {
+      color: #dbeafe;
+      text-decoration: none;
+      border-bottom: 1px dashed rgba(219,234,254,.7);
+    }
+    .discord-banner a:hover { color: #fff; border-bottom-color: #fff; }
+
     .active-players {
       margin-top: 8px;
       font-size: 15px;
@@ -1020,7 +1041,28 @@
     @media (max-width: 768px) {
       .header h1 { font-size: 34px; }
       .subtitle { font-size: 14px; letter-spacing: 1px; }
-      .active-players { font-size: 12px; } /* NYTT */
+  
+    .discord-banner {
+      margin: 12px auto 8px;
+      max-width: 760px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.3);
+      background: linear-gradient(135deg, rgba(88,101,242,.34), rgba(0,0,0,.35));
+      box-shadow: 0 10px 24px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.2);
+      text-align: center;
+      font-weight: 800;
+      font-size: 14px;
+      letter-spacing: .4px;
+    }
+    .discord-banner a {
+      color: #dbeafe;
+      text-decoration: none;
+      border-bottom: 1px dashed rgba(219,234,254,.7);
+    }
+    .discord-banner a:hover { color: #fff; border-bottom-color: #fff; }
+
+    .active-players { font-size: 12px; } /* NYTT */
       .menu-toggle { top: 12px; left: 12px; width: 42px; height: 42px; font-size: 24px; }
       .sidebar { width: 190px; padding-top: 66px; }
       .sidebar-btn { font-size: 15px; padding: 10px; }
@@ -1100,6 +1142,7 @@
       <div class="header">
         <h1>Coola Mattespel V4</h1>
         <p class="subtitle">Cool sida med coola mattespel!</p>
+        <div class="discord-banner">Joina discorden: <a href="https://discord.gg/eB23Wwy57j" target="_blank" rel="noopener noreferrer">https://discord.gg/eB23Wwy57j</a></div>
         <p id="activePlayers" class="active-players">Aktiva spelare: ...</p> <!-- NYTT -->
         <div class="search-box">
          <input id="searchInput" placeholder="Sök spel snabbt..." oninput="filterGames()" />
@@ -1330,12 +1373,8 @@ const embedContainer = document.getElementById("embedContainer");
     const privateChatEl = document.getElementById("privateChat");
     const updates = [
       "Här kommer uppdateringar synas, varje uppdatering kommer ungefär varje söndag. 👍",
-      "Nästa uppdatering (SÖN 14/3) --> V4.1 ⬆",
-      "KANSKE en discord server (om fler vill ha en)",
-      "Quest och shop system där man kan göra quests ex: spela snowrider 3d 15 min. Så får man ex 10 coins som man kan spendera i shoppen på ex nåt till sin profil",
-      "Profil/kompis system där man kan logga in och göra sin egna profil. Man ska även kunna lägga till kompisar och ha privata chattar med de",
-      "Chatt-förbättringar jag ska lägga till bättre filter och göra chatten snyggare, man måste även vara inloggad för att kunna chatta",
-      "Admin-panel där JAG kan timeouta, banna och kicka folk från chatten. Kanske nåt mer????",
+      "Nästa uppdatering --> SÖN 22/3",
+      "vene"
       "SKICKA FÖRSLAG!!!"
 
 ];
