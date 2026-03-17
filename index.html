@@ -410,6 +410,25 @@
     .tracker-title { font-weight: 900; margin-bottom: 8px; }
     .tracker-empty { opacity: .8; font-size: 13px; }
 
+    html.theme-cyber #embedContainer,
+    html.theme-cyber #questTrackerPanel,
+    html.theme-cyber .shop-shell,
+    html.theme-cyber .roadmap-shell {
+      border-color: rgba(34,211,238,.7);
+      box-shadow:
+        0 0 0 1px rgba(34,211,238,.35) inset,
+        0 0 18px rgba(34,211,238,.45),
+        0 0 36px rgba(34,211,238,.2);
+    }
+    html.theme-cyber #embedContainer::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      border-radius: 18px;
+      box-shadow: 0 0 20px rgba(34,211,238,.55) inset;
+    }
+
     #iframeLoader {
       position: absolute;
       inset: 0;
@@ -1125,7 +1144,7 @@
       <div id="questsPage" style="display:none;margin-top:30px;">
   <h2 style="font-size:28px;margin-bottom:6px;">🎯 Quests</h2>
   <div id="questResetTimer" class="search-meta">Quests nollställs om --:--:--</div>
-  <div id="questCard" class="info-card quest-list"></div>
+  <div id="questCard" class="shop-shell quest-list"></div>
 </div>
 <div id="shopPage" style="display:none;margin-top:30px;">
   <h2 style="font-size:28px;margin-bottom:15px;">🛒 Shop</h2>
@@ -1447,7 +1466,7 @@ const embedContainer = document.getElementById("embedContainer");
     let fakeLoadRaf = null;
     let currentLoadId = 0;
 
-    const xpForLevel = (lvl) => Math.floor(120 + (lvl - 1) * 45);
+    const xpForLevel = (lvl) => Math.floor(120 + (lvl - 1) * 32 + Math.pow(lvl - 1, 1.55) * 6);
     function getLevelFromXp(xp = 0) {
       let level = 1;
       let remaining = xp;
@@ -2233,7 +2252,7 @@ function showInventory() {
       const ref = db.ref("accounts").push();
       const quests = {};
       questsConfig.forEach((q) => { quests[q.id] = { progressMs: 0, claimed: false }; });
-      await ref.set({ email, username, usernameLower: username.toLowerCase(), password, coins: 0, xp: 0, verified: false, banned: false, timeoutUntil: 0, sessionActive: false, createdAt: Date.now(), lastQuestReset: getTodayKey(), quests, inventory: {}, equipped: {}, rewardedLevel: 1 });
+      await ref.set({ email, username, usernameLower: username.toLowerCase(), password, coins: 0, xp: 0, verified: false, banned: false, timeoutUntil: 0, createdAt: Date.now(), lastQuestReset: getTodayKey(), quests, inventory: {}, equipped: {}, rewardedLevel: 1 });
       alert("Konto skapat! Logga in nu.");
     }
 
@@ -2247,29 +2266,12 @@ function showInventory() {
       snap.forEach((c) => { if (!found) found = { id: c.key, ...c.val() }; });
       if (!found || found.password !== password) return alert("Fel lösenord.");
       if (found.banned) return alert("Detta konto är bannat.");
-      const existingSessionRaw = localStorage.getItem(SESSION_KEY);
-      let existingSession = null;
-      try { existingSession = existingSessionRaw ? JSON.parse(existingSessionRaw) : null; } catch (e) {}
 
-      const sameBrowserSession = !!(
-        existingSession &&
-        existingSession.accountId === found.id &&
-        existingSession.sessionId &&
-        found.sessionId &&
-        existingSession.sessionId === found.sessionId
-      );
+      // Tillåt flera enheter och håll session permanent.
+      await db.ref(`accounts/${found.id}`).update({ lastSeen: Date.now(), forcedLogout: false });
+      localStorage.setItem(SESSION_KEY, JSON.stringify({ accountId: found.id }));
 
-      if (found.sessionActive && found.sessionId && !sameBrowserSession) {
-        return alert("Kontot är redan inloggat på en annan enhet.");
-      }
-
-      const sessionId = (found.sessionActive && found.sessionId && sameBrowserSession)
-        ? found.sessionId
-        : `sess_${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
-
-      await db.ref(`accounts/${found.id}`).update({ sessionActive: true, sessionId, lastSeen: Date.now(), forcedLogout: false });
-      localStorage.setItem(SESSION_KEY, JSON.stringify({ accountId: found.id, sessionId }));
-      currentUser = { ...found, sessionId };
+      currentUser = { ...found };
       userRef = db.ref(`accounts/${found.id}`);
       watchCurrentUser();
       renderProfile();
@@ -2279,8 +2281,7 @@ function showInventory() {
     }
 
     async function logoutAccount() {
-      if (!currentUser || !db) return;
-      await db.ref(`accounts/${currentUser.id}`).update({ sessionActive: false, sessionId: null });
+      if (!currentUser) return;
       localStorage.removeItem(SESSION_KEY);
       if (userRef) userRef.off();
       if (privateListenerRef) privateListenerRef.off();
@@ -2717,7 +2718,7 @@ function showInventory() {
       }
       if (action === "kick") await db.ref(`accounts/${target.id}`).update({ forcedLogout: true, sessionActive: false });
       if (action === "timeout") await db.ref(`accounts/${target.id}`).update({ timeoutUntil: Date.now() + 5 * 60 * 1000 });
-      if (action === "ban") await db.ref(`accounts/${target.id}`).update({ banned: true, sessionActive: false, forcedLogout: true });
+      if (action === "ban") await db.ref(`accounts/${target.id}`).update({ banned: true, forcedLogout: true });
       if (action === "verify") await db.ref(`accounts/${target.id}`).update({ verified: true });
       if (action === "coins") {
         const amount = Number(document.getElementById("adminCoins").value || 0);
@@ -2810,12 +2811,13 @@ function showInventory() {
         return;
       }
 
-      if (!sess || !sess.accountId || !sess.sessionId) {
+      const accountId = sess?.accountId;
+      if (!accountId) {
         addSystemChatMessage("Sparad session är ogiltig.");
         return;
       }
 
-      const snap = await db.ref(`accounts/${sess.accountId}`).once("value");
+      const snap = await db.ref(`accounts/${accountId}`).once("value");
       if (!snap.exists()) {
         addSystemChatMessage("Konto för sparad session hittades inte.");
         return;
@@ -2827,22 +2829,10 @@ function showInventory() {
         return;
       }
 
-      // En enhet åt gången: återställ bara om sessionen matchar servern.
-      if (acc.sessionActive && acc.sessionId && acc.sessionId !== sess.sessionId) {
-        addSystemChatMessage("Kontot är aktivt på en annan enhet. Logga in igen när den sessionen är avslutad.");
-        refreshChatStatus();
-        return;
-      }
+      await db.ref(`accounts/${accountId}`).update({ lastSeen: Date.now(), forcedLogout: false });
 
-      await db.ref(`accounts/${sess.accountId}`).update({
-        sessionActive: true,
-        sessionId: sess.sessionId,
-        lastSeen: Date.now(),
-        forcedLogout: false
-      });
-
-      currentUser = { id: sess.accountId, ...acc, sessionId: sess.sessionId };
-      userRef = db.ref(`accounts/${sess.accountId}`);
+      currentUser = { id: accountId, ...acc };
+      userRef = db.ref(`accounts/${accountId}`);
       watchCurrentUser();
       renderProfile();
       refreshChatStatus();
