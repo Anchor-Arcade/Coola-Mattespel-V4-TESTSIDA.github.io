@@ -377,8 +377,8 @@
 
     #embedContainer {
       display: none;
-      margin: 20px auto;
-      width: min(100%, 1080px);
+      margin: 0 auto;
+      width: 100%;
       aspect-ratio: 16/9;
       background: #000;
       border-radius: 18px;
@@ -393,8 +393,9 @@
     #playArea {
       display: none;
       margin: 20px auto;
-      width: min(100%, 1320px);
-      grid-template-columns: minmax(0, 1fr) 320px;
+      width: min(100%, 1420px);
+      grid-template-columns: minmax(760px, 1080px) 320px;
+      justify-content: center;
       gap: 14px;
       align-items: start;
     }
@@ -843,6 +844,12 @@
     html.theme-midnight body { --accent: #a78bfa; --accent-dark: #312e81; background-image: linear-gradient(180deg, #1e1b4b, #000, #312e81); }
     html.theme-candy body { --accent: #f472b6; --accent-dark: #9d174d; background-image: linear-gradient(180deg, #4a044e, #000, #831843); }
     html.theme-gold body { --accent: #facc15; --accent-dark: #92400e; background-image: linear-gradient(180deg, #3f2a00, #000, #713f12); }
+    html.theme-arctic body { --accent: #93c5fd; --accent-dark: #1e3a8a; background-image: linear-gradient(180deg, #0b1b44, #000, #1d4ed8); }
+    html.theme-emerald body { --accent: #34d399; --accent-dark: #065f46; background-image: linear-gradient(180deg, #022c22, #000, #065f46); }
+    html.theme-rose body { --accent: #fb7185; --accent-dark: #9f1239; background-image: linear-gradient(180deg, #4c0519, #000, #9f1239); }
+    html.theme-storm body { --accent: #94a3b8; --accent-dark: #334155; background-image: linear-gradient(180deg, #0f172a, #000, #1e293b); }
+    html.theme-cyber body { --accent: #22d3ee; --accent-dark: #155e75; background-image: linear-gradient(180deg, #083344, #000, #164e63); }
+    html.theme-dusk body { --accent: #c084fc; --accent-dark: #6b21a8; background-image: linear-gradient(180deg, #2e1065, #000, #581c87); }
 
     .intro-overlay { position: fixed; inset: 0; z-index: 2200; display:flex; align-items:center; justify-content:center; background-image: inherit; background-size: 400% 400%; animation: bgMove 25s ease infinite; overflow:hidden; }
     .intro-overlay::before,
@@ -1156,6 +1163,12 @@
         <button class="theme-btn" data-theme="midnight" onclick="setTheme('midnight')">MIDNIGHT</button>
         <button class="theme-btn" data-theme="candy" onclick="setTheme('candy')">CANDY</button>
         <button class="theme-btn" data-theme="gold" onclick="setTheme('gold')">GOLD</button>
+        <button class="theme-btn" data-theme="arctic" onclick="setTheme('arctic')">ARCTIC</button>
+        <button class="theme-btn" data-theme="emerald" onclick="setTheme('emerald')">EMERALD</button>
+        <button class="theme-btn" data-theme="rose" onclick="setTheme('rose')">ROSE</button>
+        <button class="theme-btn" data-theme="storm" onclick="setTheme('storm')">STORM</button>
+        <button class="theme-btn" data-theme="cyber" onclick="setTheme('cyber')">CYBER</button>
+        <button class="theme-btn" data-theme="dusk" onclick="setTheme('dusk')">DUSK</button>
       </div>
     </div>
   </div>
@@ -2091,12 +2104,12 @@ function showInventory() {
     }
 
 
-    const themeUnlockLevels = { blue: 1, red: 1, green: 1, yellow: 2, orange: 3, gray: 4, purple: 5, pink: 6, cyan: 7, sunset: 9, neon: 11, ocean: 14, lava: 18, forest: 22, midnight: 30, candy: 40, gold: 55 };
+    const themeUnlockLevels = { blue: 1, red: 1, green: 1, yellow: 2, orange: 3, gray: 4, purple: 5, pink: 6, cyan: 7, sunset: 9, neon: 11, ocean: 14, lava: 18, forest: 22, midnight: 30, candy: 40, gold: 55, arctic: 62, emerald: 70, rose: 78, storm: 86, cyber: 92, dusk: 98 };
     const roadmapRewards = Array.from({ length: 100 }, (_, i) => {
       const level = i + 1;
       const coins = 10 + (level % 21);
       const base = { level, label: `+${coins} coins` };
-      const themeByLevel = { 2:"yellow",3:"orange",4:"gray",5:"purple",6:"pink",7:"cyan",9:"sunset",11:"neon",14:"ocean",18:"lava",22:"forest",30:"midnight",40:"candy",55:"gold" };
+      const themeByLevel = { 2:"yellow",3:"orange",4:"gray",5:"purple",6:"pink",7:"cyan",9:"sunset",11:"neon",14:"ocean",18:"lava",22:"forest",30:"midnight",40:"candy",55:"gold",62:"arctic",70:"emerald",78:"rose",86:"storm",92:"cyber",98:"dusk" };
       if (themeByLevel[level]) base.label = `Lås upp tema: ${themeByLevel[level].toUpperCase()} + ${coins} coins`;
       if ([10,20,35,50,65,80,100].includes(level)) base.label += " • Bonus reward";
       return base;
@@ -2131,7 +2144,7 @@ function showInventory() {
         return alert(`Det temat är låst. Nå level ${req} i roadmapen först.`);
       }
       document.body.className = t;
-      document.documentElement.classList.remove("theme-blue","theme-red","theme-green","theme-yellow","theme-orange","theme-gray","theme-purple","theme-pink","theme-cyan","theme-sunset","theme-neon","theme-ocean","theme-lava","theme-forest","theme-midnight","theme-candy","theme-gold");
+      document.documentElement.classList.remove("theme-blue","theme-red","theme-green","theme-yellow","theme-orange","theme-gray","theme-purple","theme-pink","theme-cyan","theme-sunset","theme-neon","theme-ocean","theme-lava","theme-forest","theme-midnight","theme-candy","theme-gold","theme-arctic","theme-emerald","theme-rose","theme-storm","theme-cyber","theme-dusk");
       document.documentElement.classList.add(`theme-${t}`);
       localStorage.setItem("theme", t);
       closeThemePopup();
@@ -2840,7 +2853,7 @@ function showInventory() {
       const saved = localStorage.getItem("theme");
       if (saved) {
         document.body.className = saved;
-        document.documentElement.classList.remove("theme-blue","theme-red","theme-green","theme-yellow","theme-orange","theme-gray","theme-purple","theme-pink","theme-cyan","theme-sunset","theme-neon","theme-ocean","theme-lava","theme-forest","theme-midnight","theme-candy","theme-gold");
+        document.documentElement.classList.remove("theme-blue","theme-red","theme-green","theme-yellow","theme-orange","theme-gray","theme-purple","theme-pink","theme-cyan","theme-sunset","theme-neon","theme-ocean","theme-lava","theme-forest","theme-midnight","theme-candy","theme-gold","theme-arctic","theme-emerald","theme-rose","theme-storm","theme-cyber","theme-dusk");
         document.documentElement.classList.add(`theme-${saved}`);
       }
       saveFavorites();
