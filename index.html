@@ -165,9 +165,23 @@
       top: 0;
       left: 0;
       height: 100%;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
       transform: translateX(-110%);
       transition: transform .25s ease;
       z-index: 1100;
+    }
+
+    .sidebar::-webkit-scrollbar {
+      width: 9px;
+    }
+
+    .sidebar::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,.24);
+      border-radius: 999px;
+      border: 2px solid transparent;
+      background-clip: padding-box;
     }
 
     .sidebar.open {
@@ -943,6 +957,44 @@
     .chat-tab { border:none; border-radius:999px; padding:6px 10px; background:rgba(255,255,255,.12); color:#fff; font-weight:700; cursor:pointer; }
     .chat-tab.active { background: linear-gradient(135deg, var(--accent-dark), var(--accent)); }
     .chat-view { display:flex; flex-direction:column; min-height:0; flex:1; }
+    .news-view { padding: 10px; gap: 10px; }
+    .news-card {
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 14px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 0;
+      flex: 1;
+    }
+    .news-info { font-size: 12px; opacity: .82; line-height: 1.45; }
+    .news-input {
+      width: 100%;
+      min-height: 180px;
+      resize: vertical;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 12px;
+      background: rgba(0,0,0,.32);
+      color: #fff;
+      font: inherit;
+      outline: none;
+    }
+    .news-preview {
+      min-height: 120px;
+      max-height: 220px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      background: rgba(0,0,0,.24);
+      border-radius: 10px;
+      padding: 10px 12px;
+      border: 1px solid rgba(255,255,255,.08);
+      font-size: 13px;
+      line-height: 1.45;
+    }
     .private-friends { display:flex; gap:6px; overflow-x:auto; padding:8px; border-bottom:1px solid rgba(255,255,255,.12); }
     .private-friend-btn { border:none; border-radius:999px; padding:6px 12px; cursor:pointer; color:#fff; background:rgba(255,255,255,.14); white-space:nowrap; }
     .private-friend-btn.active { background: linear-gradient(135deg, var(--accent-dark), var(--accent)); }
@@ -1093,6 +1145,7 @@
         <div class="chat-tabs">
           <button id="globalTabBtn" class="chat-tab active" onclick="setChatTab('global')">Global</button>
           <button id="privateTabBtn" class="chat-tab" onclick="setChatTab('private')">Privat</button>
+          <button id="newsTabBtn" class="chat-tab" onclick="setChatTab('news')">Nyheter</button>
         </div>
       </div>
       <div id="globalChatView" class="chat-view">
@@ -1114,6 +1167,18 @@
             <input id="privateInput" class="chat-input" maxlength="200" placeholder="Privat meddelande..." />
             <button id="privateSend" class="chat-send">Skicka</button>
           </div>
+        </div>
+      </div>
+      <div id="newsChatView" class="chat-view news-view" style="display:none;">
+        <div class="news-card">
+          <div class="news-info">Här kan du skriva egna nyheter eller uppdateringar som sparas i webbläsaren på den här enheten.</div>
+          <textarea id="newsInput" class="news-input" maxlength="1500" placeholder="Skriv nyheter, uppdateringar eller meddelanden här..."></textarea>
+          <div class="chat-row">
+            <button id="newsSaveBtn" class="chat-send">Spara nyhet</button>
+            <button id="newsClearBtn" class="chat-send" type="button">Rensa</button>
+          </div>
+          <div id="newsStatus" class="chat-status">Inga sparade nyheter ännu.</div>
+          <div id="newsPreview" class="news-preview">Här visas dina sparade nyheter.</div>
         </div>
       </div>
     </div>
@@ -1346,6 +1411,11 @@ const embedContainer = document.getElementById("embedContainer");
     const privateSendEl = document.getElementById("privateSend");
     const privateMessagesEl = document.getElementById("privateMessages");
     const privateFriendsListEl = document.getElementById("privateFriendsList");
+    const newsInputEl = document.getElementById("newsInput");
+    const newsSaveBtnEl = document.getElementById("newsSaveBtn");
+    const newsClearBtnEl = document.getElementById("newsClearBtn");
+    const newsStatusEl = document.getElementById("newsStatus");
+    const newsPreviewEl = document.getElementById("newsPreview");
     const activePlayersEl = document.getElementById("activePlayers");
     const profileInfoEl = document.getElementById("profileInfo");
     const friendRequestsEl = document.getElementById("friendRequests");
@@ -1388,6 +1458,7 @@ const embedContainer = document.getElementById("embedContainer");
     let privateListenerRef = null;
     const SESSION_KEY = "v4AuthSession";
     const CHAT_ENABLED_KEY = "v4ChatEnabled";
+    const NEWS_STORAGE_KEY = "v4SidebarNews";
     let chatEnabled = localStorage.getItem(CHAT_ENABLED_KEY) !== "0";
     const preferredQuestGames = [
       "clsummerRider3D", "climposter", "clworldguessr", "clslopeplus", "clretrobowl", "cltemplerun2",
@@ -2105,6 +2176,11 @@ function showInventory() {
       renderGames(files);
     }
 
+    newsSaveBtnEl.addEventListener("click", saveNewsDraft);
+    newsClearBtnEl.addEventListener("click", clearNewsDraft);
+    newsInputEl.addEventListener("input", () => updateNewsPreview(newsInputEl.value));
+    loadNewsDraft();
+
     function showFavorites() {
       if (!favoriteGames.length) {
         searchMeta.textContent = "Inga favoriter än. Klicka på ★ för att lägga till.";
@@ -2224,6 +2300,39 @@ function showInventory() {
       else addSystemChatMessage("Chatten är startad igen.");
     }
 
+
+    function getSavedNews() {
+      return localStorage.getItem(NEWS_STORAGE_KEY) || "";
+    }
+
+    function updateNewsPreview(text) {
+      const trimmed = (text || "").trim();
+      newsPreviewEl.textContent = trimmed || "Här visas dina sparade nyheter.";
+      newsStatusEl.textContent = trimmed
+        ? `Senast sparat lokalt • ${trimmed.length}/1500 tecken`
+        : "Inga sparade nyheter ännu.";
+    }
+
+    function loadNewsDraft() {
+      const saved = getSavedNews();
+      newsInputEl.value = saved;
+      updateNewsPreview(saved);
+    }
+
+    function saveNewsDraft() {
+      const value = (newsInputEl.value || "").trim();
+      localStorage.setItem(NEWS_STORAGE_KEY, value);
+      updateNewsPreview(value);
+      showToast(value ? "Nyheterna sparades" : "Nyheterna rensades");
+    }
+
+    function clearNewsDraft() {
+      newsInputEl.value = "";
+      localStorage.removeItem(NEWS_STORAGE_KEY);
+      updateNewsPreview("");
+      showToast("Nyheterna rensades");
+    }
+
     function closeModalOnBackdrop(event, id) {
       if (event.target.id === id) {
         document.getElementById(id).style.display = "none";
@@ -2234,11 +2343,16 @@ function showInventory() {
     function setChatTab(tab) {
       activeChatTab = tab;
       const isGlobal = tab === "global";
+      const isPrivate = tab === "private";
+      const isNews = tab === "news";
       document.getElementById("globalChatView").style.display = isGlobal ? "flex" : "none";
-      document.getElementById("privateChatView").style.display = isGlobal ? "none" : "flex";
+      document.getElementById("privateChatView").style.display = isPrivate ? "flex" : "none";
+      document.getElementById("newsChatView").style.display = isNews ? "flex" : "none";
       document.getElementById("globalTabBtn").classList.toggle("active", isGlobal);
-      document.getElementById("privateTabBtn").classList.toggle("active", !isGlobal);
-      renderPrivateFriendsBar();
+      document.getElementById("privateTabBtn").classList.toggle("active", isPrivate);
+      document.getElementById("newsTabBtn").classList.toggle("active", isNews);
+      if (isPrivate) renderPrivateFriendsBar();
+      if (isNews) loadNewsDraft();
     }
 
     function openProfileModal() { document.getElementById("profileModal").style.display = "flex"; setPopupOpen(true); renderProfile(); }
