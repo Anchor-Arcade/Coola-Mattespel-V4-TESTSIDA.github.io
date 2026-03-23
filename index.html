@@ -168,6 +168,13 @@
     .hintRow{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;}
     .hintPill{background:rgba(123,44,255,.15);border:1px solid var(--line);border-radius:20px;padding:5px 13px;font-size:11px;color:var(--m);}
     .onlineCount{margin-top:10px;font-size:12px;color:var(--p1);font-weight:700;}
+    .discordJoin{
+      margin-top:12px;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+      padding:9px 14px;border-radius:999px;border:1px solid var(--line);text-decoration:none;
+      background:linear-gradient(135deg,rgba(88,101,242,.25),rgba(123,44,255,.25));
+      color:var(--w);font-size:12px;font-weight:800;transition:all .2s;
+    }
+    .discordJoin:hover{transform:translateY(-1px);border-color:rgba(181,108,255,.5);}
 
     .recommendedWrap{padding:0 24px 8px;}
     .recommendedTitle{font-size:13px;font-weight:700;color:var(--d);margin-bottom:8px;text-align:center;}
@@ -517,6 +524,9 @@
         <span class="hintPill">👤 Profilsystem</span>
         <span class="hintPill">🌗 Ljus/Mörkt</span>
       </div>
+      <a class="discordJoin" href="https://discord.gg/fwk4ZmS9" target="_blank" rel="noopener noreferrer">
+        Joina discorden: https://discord.gg/fwk4ZmS9
+      </a>
       <div class="onlineCount" id="onlineCount">...</div>
     </section>
 
@@ -805,6 +815,16 @@
         });
       });
       return clean;
+    }
+
+    function mergeCurrentFilesListWithExtra() {
+      const fromWindow = window.CM_FILES_LIST || window.filesList || window.CM_FILES_LIST_TEXT || [];
+      const rawExtra = Array.isArray(fromWindow)
+        ? fromWindow
+        : String(fromWindow).split(",");
+      const fallbackIds = DEFAULT_GAMES.map(g => g.id);
+      const merged = sanitizeFilesList([...fallbackIds, ...rawExtra]);
+      if (merged.length) GAMES = merged;
     }
 
     async function loadGamesFromFirebase() {
@@ -1228,13 +1248,6 @@
       }
     }
 
-    function scrollToGamePanel() {
-      const panel = document.getElementById("inlineGamePanel");
-      if (!panel) return;
-      const y = panel.getBoundingClientRect().top + window.scrollY - 70;
-      window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
-    }
-
     function openGame(gameId) {
       const game = GAMES.find(g => g.id === gameId);
       if (!game) return;
@@ -1265,7 +1278,7 @@
         renderProfileWindow();
       }
 
-      scrollToGamePanel();
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
     function openExternal(url, title) {
@@ -1287,7 +1300,7 @@
 
       refreshGameFavButton();
       closeSidebar();
-      scrollToGamePanel();
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
     function closeGame(scrollTop = true) {
@@ -1820,6 +1833,9 @@
       if (hasFirebase) {
         await loadGamesFromFirebase();
         connectPresence();
+      }
+      if (!gamesLoadedFromFirebase) {
+        mergeCurrentFilesListWithExtra();
       }
 
       renderRecommended();
