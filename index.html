@@ -487,6 +487,9 @@
       <button class="sideNavBtn" onclick="openExternal('https://app.supersigmamatteeducation.xo.je','Browser')">
         <span class="sideNavIcon">🌐</span><span>Browser</span>
       </button>
+      <button class="sideNavBtn" onclick="openExternal('UGS-Files/ai.html','AI')">
+        <span class="sideNavIcon">🤖</span><span>AI</span>
+      </button>
       <button class="sideNavBtn" onclick="openExternal('https://alv3333.github.io/Coola-Mattespel-Soundboard.github.io/','Soundboard')">
         <span class="sideNavIcon">🔊</span><span>Soundboard</span>
       </button>
@@ -733,7 +736,6 @@
       currentIsExternal: false
     };
 
-    // -------------------- STORAGE --------------------
     function getAccounts() {
       try { return JSON.parse(localStorage.getItem(ACCOUNTS_KEY) || "{}"); }
       catch { return {}; }
@@ -787,7 +789,6 @@
       saveUserData(state.user, state.data);
     }
 
-    // -------------------- UTILS --------------------
     function toast(msg, ms = 2200) {
       const t = document.createElement("div");
       t.className = "toast";
@@ -856,7 +857,6 @@
       return false;
     }
 
-    // -------------------- LOADER --------------------
     let loaderInterval = null;
 
     function showPageLoader(title = "Laddar sidan...") {
@@ -896,7 +896,6 @@
       document.getElementById("igpLoader").classList.add("hidden");
     }
 
-    // -------------------- THEME --------------------
     function applyDarkMode(isDark) {
       document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
       const tg = document.getElementById("darkToggle");
@@ -915,7 +914,6 @@
       applyDarkMode(!current);
     }
 
-    // -------------------- HUD --------------------
     function updateHUD() {
       const coins = state.data ? state.data.coins : 0;
       const xp = state.data ? state.data.xp : 0;
@@ -944,7 +942,6 @@
       updateHUD();
     }
 
-    // -------------------- SIDEBAR --------------------
     function openSidebar() {
       document.getElementById("sidebar").classList.add("open");
       document.getElementById("sideOverlay").classList.add("open");
@@ -960,7 +957,6 @@
       if (open) closeSidebar(); else openSidebar();
     }
 
-    // -------------------- RECOMMENDED --------------------
     function renderRecommended() {
       const wrap = document.getElementById("recommendedSection");
       wrap.innerHTML = "";
@@ -978,7 +974,6 @@
       });
     }
 
-    // -------------------- GAMES GRID --------------------
     function setFilter(filter, btn) {
       state.filter = filter;
       state.page = 0;
@@ -1109,7 +1104,6 @@
       }
     }
 
-    // -------------------- GAME PANEL --------------------
     function openGame(gameId) {
       const game = GAMES.find(g => g.id === gameId);
       if (!game) return;
@@ -1201,7 +1195,6 @@
       window.location.reload();
     }
 
-    // -------------------- LOGIN --------------------
     function openLoginModal(registerMode) {
       const ov = document.getElementById("loginOverlay");
       ov.classList.add("open");
@@ -1308,7 +1301,6 @@
       toast(message);
     }
 
-    // -------------------- PROFILE --------------------
     function openProfileWindow() {
       if (!requireLogin()) return;
       const ov = document.getElementById("profileOverlay");
@@ -1567,7 +1559,6 @@
       renderUsersBrowser(document.getElementById("profileSearchInput")?.value || "");
     }
 
-    // -------------------- PUBLIC PROFILE VIEW --------------------
     function viewProfile(username) {
       const clean = sanitizeUsername(username);
       if (!clean) return;
@@ -1633,7 +1624,6 @@
       document.getElementById("viewProfileOverlay").classList.remove("open");
     }
 
-    // -------------------- UPDATES --------------------
     function showUpdates() {
       closeSidebar();
       closeGame(false);
@@ -1667,7 +1657,6 @@
       document.body.appendChild(panel);
     }
 
-    // -------------------- EVENTS --------------------
     document.getElementById("searchInput").addEventListener("input", (e) => {
       state.search = e.target.value.trim();
       state.page = 0;
@@ -1686,7 +1675,6 @@
       }
     });
 
-    // -------------------- INIT --------------------
     (function init() {
       showPageLoader("Laddar Coola Mattespel...");
 
@@ -1708,7 +1696,6 @@
         : (localStorage.getItem("cm_dark_pref_v4") !== "0");
       applyDarkMode(prefDark);
 
-      // fake online count
       const onlineEl = document.getElementById("onlineCount");
       let online = 80 + Math.floor(Math.random() * 50);
       onlineEl.textContent = `${online} online nu`;
@@ -1719,7 +1706,6 @@
         onlineEl.textContent = `${online} online nu`;
       }, 3500);
 
-      // startup loader animation
       let msgi = 0;
       const msgEl = document.getElementById("loaderMsg");
       const fill = document.getElementById("loaderFill");
