@@ -2,773 +2,422 @@
 <html lang="sv">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <link rel="icon" href="UGS-Files/icon.png" type="image/png" />
   <title>Coola Mattespel V4</title>
-  <link rel="icon" type="image/png" href="UGS-Files/icon.png" />
-
-  <script>
-    (function () {
-      try {
-        const savedTheme = localStorage.getItem("theme") || "purple";
-        document.documentElement.dataset.theme = savedTheme;
-      } catch (e) {}
-    })();
-  </script>
 
   <style>
-    :root {
-      --bg0: #050008;
-      --bg1: #0b0014;
-      --bg2: #120022;
-      --p0: #7b2cff;
-      --p1: #b56cff;
-      --p2: #3a00b7;
-      --w: #f5f0ff;
-      --m: #c9b9ff;
-      --d: #8a7bc2;
-      --line: rgba(181, 108, 255, 0.18);
-      --glass: rgba(12, 6, 24, 0.55);
-      --glass-2: rgba(12, 6, 24, 0.35);
-      --shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
-      --shadow2: 0 10px 30px rgba(123, 44, 255, 0.18);
-      --r: 18px;
+    :root{
+      --bg0:#050008;--bg1:#0b0014;--bg2:#120022;
+      --p0:#7b2cff;--p1:#b56cff;--p2:#3a00b7;
+      --w:#f5f0ff;--m:#c9b9ff;--d:#8a7bc2;
+      --line:rgba(181,108,255,.18);
+      --glass:rgba(12,6,24,.55);--glass2:rgba(12,6,24,.35);
+      --shadow:0 12px 40px rgba(0,0,0,.55);
+      --shadow2:0 10px 30px rgba(123,44,255,.18);
+      --r:18px;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+    *{margin:0;padding:0;box-sizing:border-box;}
+    html,body{
+      height:100%;
+      font-family:'Segoe UI',system-ui,sans-serif;
+      background:var(--bg0);
+      color:var(--w);
+      overflow-x:hidden;
+      cursor:url('cursor.png') 0 0,auto !important;
+    }
+    *,*::before,*::after,button,a,[onclick],[role='button']{
+      cursor:url('cursor.png') 0 0,auto !important;
     }
 
-    html,
-    body {
-      min-height: 100%;
-      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
-      color: var(--w);
-      background: var(--bg0);
-      overflow-x: hidden;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    .bg {
-      position: fixed;
-      inset: 0;
-      z-index: -4;
-      pointer-events: none;
-    }
-
-    .bg-grid {
-      position: absolute;
-      inset: 0;
+    .bg{position:fixed;inset:0;z-index:-1;}
+    .bg-grid{
+      position:absolute;inset:0;
       background-image:
-        linear-gradient(rgba(123, 44, 255, 0.07) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(123, 44, 255, 0.07) 1px, transparent 1px);
-      background-size: 40px 40px;
-    }
-
-    .bg-noise {
-      position: absolute;
-      inset: 0;
-      opacity: 0.03;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    }
-
-    .bg-orb {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(80px);
-      animation: drift 18s ease-in-out infinite alternate;
-    }
-
-    .bg-orb.o1 {
-      width: 620px;
-      height: 620px;
-      top: -200px;
-      left: -200px;
-      background: radial-gradient(circle, rgba(123, 44, 255, 0.25), transparent 70%);
-    }
-
-    .bg-orb.o2 {
-      width: 460px;
-      height: 460px;
-      bottom: -140px;
-      right: -120px;
-      background: radial-gradient(circle, rgba(58, 0, 183, 0.32), transparent 70%);
-      animation-delay: -9s;
-    }
-
-    .bg-orb.o3 {
-      width: 320px;
-      height: 320px;
-      top: 40%;
-      left: 60%;
-      background: radial-gradient(circle, rgba(181, 108, 255, 0.18), transparent 70%);
-      animation-delay: -4s;
-    }
-
-    @keyframes drift {
-      0% {
-        transform: translate(0, 0) scale(1);
-      }
-      100% {
-        transform: translate(40px, 30px) scale(1.1);
-      }
-    }
-
-    .topbar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 1000;
-      height: 64px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 0 16px;
-      background: rgba(5, 0, 8, 0.88);
-      border-bottom: 1px solid var(--line);
-      backdrop-filter: blur(20px);
-    }
-
-    .menuBtn {
-      width: 44px;
-      height: 44px;
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      background: none;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 6px;
-      padding: 0 11px;
-      flex-shrink: 0;
-    }
-
-    .menuBtn span {
-      display: block;
-      height: 2px;
-      background: var(--p1);
-      border-radius: 2px;
-    }
-
-    .menuBtn:hover {
-      background: rgba(123, 44, 255, 0.2);
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      min-width: 0;
-    }
-
-    .logo {
-      width: 40px;
-      height: 40px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, var(--p2), var(--p0));
-      display: grid;
-      place-items: center;
-      font-size: 22px;
-      flex-shrink: 0;
-    }
-
-    .brandText {
-      min-width: 0;
-      line-height: 1.1;
-    }
-
-    .brandText .title {
-      font-size: 16px;
-      font-weight: 800;
-      color: var(--w);
-    }
-
-    .brandText .sub {
-      font-size: 11px;
-      color: var(--d);
-    }
-
-    .topRight {
-      margin-left: auto;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .coinBadge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      border-radius: 20px;
-      padding: 6px 12px;
-      border: 1px solid var(--line);
-      background: rgba(123, 44, 255, 0.2);
-      color: var(--m);
-      font-size: 13px;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-
-    .pill {
-      border: 1px solid var(--line);
-      background: var(--glass);
-      color: var(--m);
-      border-radius: 40px;
-      padding: 8px 14px;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    .pill:hover {
-      background: rgba(123, 44, 255, 0.2);
-      color: var(--w);
-    }
-
-    .main {
-      padding-top: 64px;
-    }
-
-    .hero {
-      padding: 36px 24px 20px;
-      text-align: center;
-    }
-
-    .hero h1 {
-      font-size: clamp(32px, 6vw, 64px);
-      font-weight: 900;
-      letter-spacing: -0.02em;
-      line-height: 1.1;
-      margin-bottom: 10px;
-      background: linear-gradient(135deg, var(--w) 0%, var(--p1) 60%, var(--p0) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .hero .subtitle {
-      color: var(--m);
-      font-size: 14px;
-      margin-bottom: 10px;
-    }
-
-    .hintRow {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      justify-content: center;
-      margin-bottom: 8px;
-    }
-
-    .hintPill {
-      background: rgba(123, 44, 255, 0.15);
-      border: 1px solid var(--line);
-      border-radius: 20px;
-      padding: 5px 13px;
-      font-size: 11px;
-      color: var(--m);
-    }
-
-    .activePlayers {
-      font-size: 12px;
-      color: var(--d);
-      margin-bottom: 8px;
-    }
-
-    .filterBar {
-      display: flex;
-      gap: 8px;
-      padding: 0 24px 14px;
-      overflow-x: auto;
-      scrollbar-width: none;
-    }
-
-    .filterBar::-webkit-scrollbar {
-      display: none;
-    }
-
-    .filterBtn {
-      flex-shrink: 0;
-      padding: 7px 16px;
-      border-radius: 20px;
-      border: 1px solid var(--line);
-      background: none;
-      color: var(--m);
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    .filterBtn:hover {
-      background: rgba(123, 44, 255, 0.15);
-      color: var(--w);
-    }
-
-    .filterBtn.active {
-      background: linear-gradient(135deg, var(--p0), var(--p2));
-      border-color: transparent;
-      color: white;
-    }
-
-    .searchWrap {
-      padding: 0 24px 14px;
-      position: relative;
-    }
-
-    .searchWrap::before {
-      content: "🔍";
-      position: absolute;
-      left: 36px;
-      top: 11px;
-      font-size: 14px;
-      pointer-events: none;
-    }
-
-    .searchWrap input {
-      width: 100%;
-      background: rgba(255, 255, 255, 0.07);
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 11px 16px 11px 42px;
-      color: var(--w);
-      font-size: 14px;
-      font-family: inherit;
-    }
-
-    .searchWrap input::placeholder {
-      color: var(--d);
-    }
-
-    .searchWrap input:focus {
-      outline: none;
-      border-color: var(--p0);
-    }
-
-    .searchMeta {
-      padding: 0 24px 14px;
-      color: var(--d);
-      font-size: 12px;
-    }
-
-    .sectionWrap {
-      padding: 0 24px 24px;
-    }
-
-    .sectionTitle {
-      font-size: 18px;
-      color: var(--m);
-      margin-bottom: 10px;
-    }
-
-    .recommended-row {
-      display: flex;
-      gap: 10px;
-      overflow-x: auto;
-      padding-bottom: 8px;
-      scrollbar-width: thin;
-      margin-bottom: 14px;
-    }
-
-    .recommended-row .gameCard {
-      min-width: 170px;
-    }
-
-    .gamesGrid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 14px;
-    }
-
-    .gameCard {
-      border-radius: 14px;
-      background: var(--glass);
-      border: 1px solid var(--line);
-      overflow: hidden;
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
-      position: relative;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .gameCard:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--shadow2);
-      border-color: rgba(181, 108, 255, 0.4);
-    }
-
-    .gameThumb {
-      height: 90px;
-      position: relative;
-      overflow: hidden;
-      display: grid;
-      place-items: center;
-    }
-
-    .gameThumbLetter {
-      position: relative;
-      z-index: 2;
-      font-size: 32px;
-      font-weight: 900;
-      color: rgba(255, 255, 255, 0.92);
-      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-    }
-
-    .gameInfo {
-      padding: 9px 10px 8px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .gameName {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--w);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      flex: 1;
-    }
-
-    .favBtn {
-      border: 1px solid var(--line);
-      border-radius: 7px;
-      background: none;
-      color: var(--d);
-      font-size: 13px;
-      padding: 3px 7px;
-      cursor: pointer;
-      transition: 0.2s;
-      flex-shrink: 0;
-    }
-
-    .favBtn:hover {
-      border-color: var(--p1);
-      color: var(--p1);
-    }
-
-    .favBtn.active {
-      background: rgba(123, 44, 255, 0.2);
-      border-color: var(--p1);
-      color: #ffd700;
-    }
-
-    #playArea {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 260px;
-      gap: 12px;
-      padding: 0 24px 16px;
-      margin-top: 4px;
-    }
-
-    #embedContainer {
-      background: var(--glass);
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      overflow: hidden;
-      min-height: 420px;
-      position: relative;
-      box-shadow: var(--shadow);
-    }
-
-    #gameFrame {
-      width: 100%;
-      height: 100%;
-      min-height: 420px;
-      border: none;
-      background: #000;
-    }
-
-    .iframeLoader {
-      position: absolute;
-      inset: 0;
-      display: grid;
-      place-items: center;
-      background: rgba(0, 0, 0, 0.65);
-      color: var(--m);
-      font-weight: 700;
-      letter-spacing: 0.03em;
-      z-index: 2;
-    }
-
-    .fullscreen-btn {
-      position: absolute;
-      right: 10px;
-      bottom: 10px;
-      border: none;
-      border-radius: 30px;
-      padding: 9px 14px;
-      color: white;
-      background: linear-gradient(135deg, var(--p0), var(--p2));
-      cursor: pointer;
-      font-weight: 700;
-      box-shadow: var(--shadow2);
-      z-index: 3;
-    }
-
-    #questTrackerPanel {
-      border-radius: 14px;
-      border: 1px solid var(--line);
-      background: var(--glass);
-      padding: 12px;
-      box-shadow: var(--shadow);
-      color: var(--m);
-      font-size: 13px;
-      line-height: 1.45;
-    }
-
-    .panel {
-      margin: 0 24px 24px;
-      border-radius: 14px;
-      border: 1px solid var(--line);
-      background: var(--glass);
-      box-shadow: var(--shadow);
-      padding: 16px;
-    }
-
-    .panel h2 {
-      font-size: 22px;
-      margin-bottom: 8px;
-    }
-
-    .panel ul {
-      margin-left: 18px;
-      color: var(--m);
-      display: grid;
-      gap: 6px;
-    }
-
-    .sidebar-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 1050;
-      background: rgba(0, 0, 0, 0.5);
-      opacity: 0;
-      pointer-events: none;
-      transition: 0.25s;
-    }
-
-    .sidebar-overlay.show {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .sidebar {
-      position: fixed;
-      top: 0;
-      left: -360px;
-      bottom: 0;
-      width: 300px;
-      background: var(--bg1);
-      border-right: 1px solid var(--line);
-      z-index: 1100;
-      display: flex;
-      flex-direction: column;
-      transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      backdrop-filter: blur(30px);
-    }
-
-    .sidebar.open {
-      left: 0;
-    }
-
-    .sideHead {
-      height: 64px;
-      padding: 0 16px;
-      border-bottom: 1px solid var(--line);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-shrink: 0;
-    }
-
-    .sideHead h3 {
-      font-size: 15px;
-      color: var(--w);
-    }
-
-    .closeBtn {
-      width: 30px;
-      height: 30px;
-      border-radius: 8px;
-      border: 1px solid var(--line);
-      background: none;
-      color: var(--m);
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    .sideNavList {
-      padding: 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      overflow-y: auto;
-    }
-
-    .sideNavBtn {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      width: 100%;
-      padding: 13px 14px;
-      border-radius: 12px;
-      border: none;
-      background: none;
-      color: var(--m);
-      cursor: pointer;
-      text-align: left;
-      font-size: 15px;
-      font-weight: 600;
-      transition: 0.2s;
-    }
-
-    .sideNavBtn:hover {
-      background: rgba(123, 44, 255, 0.15);
-      color: var(--w);
-    }
-
-    .sideNavIcon {
-      width: 24px;
-      text-align: center;
-      font-size: 17px;
-      flex-shrink: 0;
-    }
-
-    #themePopup {
-      position: fixed;
-      inset: 0;
-      z-index: 1300;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0, 0, 0, 0.62);
-      padding: 12px;
-    }
-
-    .theme-box {
-      width: min(760px, 96vw);
-      border-radius: 14px;
-      border: 1px solid var(--line);
-      background: var(--bg1);
-      padding: 14px;
-      box-shadow: var(--shadow);
-    }
-
-    .theme-presets {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
-    }
-
-    .theme-btn {
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 0.04);
-      color: var(--w);
-      cursor: pointer;
-      padding: 12px 10px;
-      font-weight: 800;
-      letter-spacing: 0.04em;
-      transition: 0.2s;
-    }
-
-    .theme-btn:hover {
-      border-color: var(--p1);
-      background: rgba(123, 44, 255, 0.2);
-    }
-
-    .theme-btn.active {
-      border-color: transparent;
-      background: linear-gradient(135deg, var(--p0), var(--p2));
-      color: #fff;
-    }
-
-    .toast {
-      position: fixed;
-      right: 20px;
-      bottom: 20px;
-      z-index: 2000;
-      background: var(--glass);
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 10px 14px;
-      color: var(--w);
-      font-size: 13px;
-      box-shadow: var(--shadow);
-      opacity: 0;
-      transform: translateY(6px);
-      transition: 0.2s;
-      pointer-events: none;
-    }
-
-    .toast.show {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    @media (max-width: 900px) {
-      .coinBadge {
-        display: none;
-      }
-
-      #playArea {
-        grid-template-columns: 1fr;
-      }
-
-      #questTrackerPanel {
-        margin-top: 8px;
-      }
-
-      .theme-presets {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-
-    @media (max-width: 600px) {
-      .topbar {
-        padding: 0 10px;
-        gap: 8px;
-      }
-
-      .brandText .sub {
-        display: none;
-      }
-
-      .hero {
-        padding: 26px 12px 14px;
-      }
-
-      .filterBar,
-      .searchWrap,
-      .searchMeta,
-      .sectionWrap,
-      #playArea {
-        padding-left: 12px;
-        padding-right: 12px;
-      }
-
-      .panel {
-        margin-left: 12px;
-        margin-right: 12px;
-      }
-
-      .gamesGrid {
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-        gap: 10px;
-      }
-
-      .sidebar {
-        width: 260px;
-      }
+        linear-gradient(rgba(123,44,255,.07) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(123,44,255,.07) 1px,transparent 1px);
+      background-size:40px 40px;
+    }
+    .bg-noise{
+      position:absolute;inset:0;opacity:.03;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+    .bg-orb{position:absolute;border-radius:50%;filter:blur(80px);animation:drift 18s ease-in-out infinite alternate;}
+    .bg-orb.o1{width:600px;height:600px;top:-200px;left:-200px;background:radial-gradient(circle,rgba(123,44,255,.25),transparent 70%);}
+    .bg-orb.o2{width:430px;height:430px;bottom:-120px;right:-100px;background:radial-gradient(circle,rgba(58,0,183,.3),transparent 70%);animation-delay:-9s;}
+    .bg-orb.o3{width:300px;height:300px;top:40%;left:60%;background:radial-gradient(circle,rgba(181,108,255,.15),transparent 70%);animation-delay:-4s;}
+    @keyframes drift{0%{transform:translate(0,0) scale(1)}100%{transform:translate(40px,30px) scale(1.1)}}
+
+    .loader-overlay{
+      position:fixed;inset:0;z-index:9999;background:var(--bg0);
+      display:flex;align-items:center;justify-content:center;
+      opacity:0;pointer-events:none;transition:opacity .25s ease;
+    }
+    .loader-overlay.visible{opacity:1;pointer-events:auto;}
+    .loader-box{
+      width:min(460px,90vw);padding:28px 30px;text-align:center;
+      border-radius:14px;background:var(--bg1);border:1px solid var(--line);box-shadow:var(--shadow);
+    }
+    .loader-title{font-size:21px;font-weight:900;margin-bottom:14px;}
+    .loader-track{height:6px;border-radius:999px;background:var(--line);overflow:hidden;margin-bottom:10px;}
+    .loader-fill{height:100%;width:0;background:linear-gradient(90deg,var(--p2),var(--p1),var(--p0));transition:width .3s ease;}
+    .loader-msg{font-size:12px;color:var(--d);min-height:16px;}
+
+    .toastContainer{position:fixed;bottom:24px;right:24px;z-index:99999;display:flex;flex-direction:column;gap:8px;pointer-events:none;}
+    .toast{
+      background:var(--glass);border:1px solid var(--line);border-radius:12px;
+      padding:12px 16px;color:var(--w);font-size:13px;backdrop-filter:blur(20px);box-shadow:var(--shadow);
+      animation:toastIn .25s ease;
+    }
+    @keyframes toastIn{from{transform:translateX(60px);opacity:0}to{transform:none;opacity:1}}
+
+    .topbar{
+      position:fixed;top:0;left:0;right:0;z-index:500;height:64px;
+      display:flex;align-items:center;padding:0 16px;gap:12px;
+      background:rgba(5,0,8,.88);border-bottom:1px solid var(--line);backdrop-filter:blur(20px);
+    }
+    .menuBtn{
+      width:44px;height:44px;background:none;border:1px solid var(--line);border-radius:10px;
+      display:flex;flex-direction:column;justify-content:center;gap:6px;padding:0 11px;flex-shrink:0;
+      transition:background .2s;
+    }
+    .menuBtn:hover{background:rgba(123,44,255,.2);}
+    .menuBtn span{display:block;height:2px;background:var(--p1);border-radius:2px;}
+
+    .brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
+    .logo{
+      width:40px;height:40px;border-radius:12px;overflow:hidden;
+      background:linear-gradient(135deg,var(--p2),var(--p0));
+      display:flex;align-items:center;justify-content:center;flex-shrink:0;
+      border:1px solid rgba(255,255,255,.16);
+    }
+    .logo img{width:100%;height:100%;object-fit:cover;}
+    .brandText{display:flex;flex-direction:column;line-height:1.1;}
+    .brandText .title{font-size:16px;font-weight:800;color:var(--w);}
+    .brandText .sub{font-size:11px;color:var(--d);}
+
+    .topRight{display:flex;align-items:center;gap:8px;margin-left:auto;}
+    .coinBadge{
+      display:flex;align-items:center;gap:6px;background:rgba(123,44,255,.2);border:1px solid var(--line);
+      border-radius:20px;padding:6px 12px;font-size:13px;font-weight:700;
+    }
+    .levelBadge{font-size:11px;color:var(--d);white-space:nowrap;}
+    .xpBar{height:3px;background:rgba(255,255,255,.1);border-radius:2px;width:64px;}
+    .xpBarFill{height:100%;background:linear-gradient(90deg,var(--p0),var(--p1));border-radius:2px;transition:width .35s ease;}
+    .pill{
+      display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:40px;
+      font-size:13px;font-weight:700;transition:all .2s;border:none;
+    }
+    .pill.ghost{background:none;border:1px solid var(--line);color:var(--m);}
+    .pill.ghost:hover{background:rgba(123,44,255,.15);border-color:var(--p0);}
+    .pill.primary{background:linear-gradient(135deg,var(--p0),var(--p2));color:#fff;box-shadow:var(--shadow2);}
+    .pill.primary:hover{opacity:.92;transform:translateY(-1px);}
+
+    .sideOverlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:600;opacity:0;pointer-events:none;transition:opacity .25s;}
+    .sideOverlay.open{opacity:1;pointer-events:auto;}
+    .sidebar{
+      position:fixed;top:0;left:-360px;bottom:0;width:300px;background:var(--bg1);border-right:1px solid var(--line);
+      z-index:700;display:flex;flex-direction:column;transition:left .25s cubic-bezier(.4,0,.2,1);backdrop-filter:blur(30px);
+    }
+    .sidebar.open{left:0;}
+    .sideHead{
+      padding:16px 16px 10px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);flex-shrink:0;
+    }
+    .sideHead h3{font-size:15px;font-weight:700;color:var(--w);}
+    .closeBtn{
+      width:30px;height:30px;border-radius:8px;background:none;border:1px solid var(--line);color:var(--m);
+      font-size:14px;display:flex;align-items:center;justify-content:center;transition:background .2s;
+    }
+    .closeBtn:hover{background:rgba(123,44,255,.2);}
+    .sideNavList{display:flex;flex-direction:column;padding:8px;gap:2px;overflow-y:auto;}
+    .sideNavList::-webkit-scrollbar{width:3px;}
+    .sideNavList::-webkit-scrollbar-thumb{background:var(--p2);border-radius:2px;}
+    .sideNavBtn{
+      display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:12px;background:none;border:none;color:var(--m);
+      font-size:15px;font-weight:600;text-align:left;transition:all .2s;width:100%;
+    }
+    .sideNavBtn:hover{background:rgba(123,44,255,.15);color:var(--w);}
+    .sideNavIcon{font-size:18px;width:24px;text-align:center;flex-shrink:0;}
+
+    .sideToggleRow{
+      margin:10px 8px 0;padding:10px 12px;border:1px solid var(--line);border-radius:12px;
+      background:rgba(255,255,255,.03);display:flex;align-items:center;justify-content:space-between;gap:8px;
+    }
+    .sideToggleRow span{font-size:12px;color:var(--m);font-weight:700;}
+    .toggle{
+      width:44px;height:24px;border-radius:14px;border:none;background:rgba(255,255,255,.16);position:relative;transition:.25s;
+    }
+    .toggle::after{
+      content:"";position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;left:3px;top:3px;transition:.25s;
+    }
+    .toggle.on{background:var(--p0);}
+    .toggle.on::after{left:23px;}
+
+    .main{padding-top:64px;}
+    .hero{padding:36px 24px 20px;text-align:center;}
+    .hero h1{
+      font-size:clamp(32px,6vw,64px);font-weight:900;letter-spacing:-.02em;
+      background:linear-gradient(135deg,var(--w) 0%,var(--p1) 60%,var(--p0) 100%);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+      margin-bottom:10px;line-height:1.1;
+    }
+    .heroSub{font-size:13px;color:var(--d);margin-bottom:10px;}
+    .hintRow{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;}
+    .hintPill{background:rgba(123,44,255,.15);border:1px solid var(--line);border-radius:20px;padding:5px 13px;font-size:11px;color:var(--m);}
+    .onlineCount{margin-top:10px;font-size:12px;color:var(--p1);font-weight:700;}
+
+    .recommendedWrap{padding:0 24px 8px;}
+    .recommendedTitle{font-size:13px;font-weight:700;color:var(--d);margin-bottom:8px;text-align:center;}
+    .recommendedSection{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;}
+    .recCard{
+      width:180px;border-radius:16px;background:var(--glass);border:1.5px solid var(--line);
+      padding:14px 12px;transition:.2s;position:relative;overflow:hidden;
+    }
+    .recCard:hover{transform:scale(1.03);border-color:var(--p1);}
+    .recEmoji{font-size:30px;margin-bottom:8px;}
+    .recName{font-size:14px;font-weight:800;margin-bottom:4px;color:var(--w);}
+    .recDesc{font-size:11px;color:var(--d);line-height:1.35;}
+    .recPlay{
+      margin-top:9px;display:inline-flex;align-items:center;gap:4px;
+      background:linear-gradient(135deg,var(--p0),var(--p2));color:#fff;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700;
+    }
+
+    .filterBar{display:flex;gap:8px;padding:0 24px 14px;overflow-x:auto;scrollbar-width:none;}
+    .filterBar::-webkit-scrollbar{display:none;}
+    .filterBtn{
+      flex-shrink:0;padding:7px 16px;border-radius:20px;border:1px solid var(--line);background:none;color:var(--m);
+      font-size:13px;font-weight:700;transition:all .2s;
+    }
+    .filterBtn:hover{background:rgba(123,44,255,.15);color:var(--w);}
+    .filterBtn.active{background:linear-gradient(135deg,var(--p0),var(--p2));color:#fff;border-color:transparent;}
+
+    .searchWrap{padding:0 24px 14px;position:relative;}
+    .searchWrap::before{content:"🔍";position:absolute;left:36px;top:11px;font-size:14px;pointer-events:none;}
+    .searchWrap input{
+      width:100%;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:14px;
+      padding:11px 16px 11px 42px;color:var(--w);font-size:14px;font-family:inherit;
+    }
+    .searchWrap input::placeholder{color:var(--d);}
+    .searchWrap input:focus{outline:none;border-color:var(--p0);}
+    .searchMeta{padding:0 24px 14px;font-size:12px;color:var(--d);}
+
+    .gamesGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;padding:0 24px 24px;}
+    .gameCard{
+      border-radius:14px;background:var(--glass);border:1px solid var(--line);overflow:hidden;
+      transition:transform .2s,box-shadow .2s,border-color .2s;position:relative;display:flex;flex-direction:column;
+    }
+    .gameCard:hover{transform:translateY(-4px);box-shadow:var(--shadow2);border-color:rgba(181,108,255,.4);}
+    .gameThumb{height:90px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+    .gameThumbBg{position:absolute;inset:0;opacity:.85;}
+    .gameThumbLetter{
+      font-size:30px;font-weight:900;color:rgba(255,255,255,.9);position:relative;z-index:1;text-shadow:0 2px 8px rgba(0,0,0,.4);
+    }
+    .gameInfo{padding:9px 10px 8px;}
+    .gameName{font-size:12px;font-weight:700;color:var(--w);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:6px;}
+    .gameActions{display:flex;gap:4px;align-items:center;}
+    .favBtn{
+      background:none;border:1px solid var(--line);border-radius:6px;font-size:13px;padding:3px 7px;transition:all .2s;color:var(--d);
+    }
+    .favBtn:hover{border-color:var(--p1);color:var(--p1);}
+    .favBtn.active{background:rgba(123,44,255,.2);border-color:var(--p1);color:#ffd700;}
+
+    .loadMoreWrap{display:none;justify-content:center;padding:0 24px 40px;}
+    .loadMoreBtn{
+      padding:13px 36px;border-radius:40px;background:linear-gradient(135deg,var(--p0),var(--p2));
+      color:#fff;border:none;font-size:14px;font-weight:700;box-shadow:var(--shadow2);transition:all .2s;
+    }
+    .loadMoreBtn:hover{opacity:.9;transform:translateY(-2px);}
+
+    #inlineGamePanel{
+      display:none;flex-direction:column;gap:10px;padding:80px 24px 24px;border-bottom:1px solid var(--line);margin-bottom:12px;
+    }
+    .igp-bar{
+      display:flex;align-items:center;gap:12px;flex-wrap:wrap;position:sticky;top:64px;z-index:200;
+      background:var(--bg0);border-bottom:1px solid var(--line);margin:0 -16px;padding:8px 16px;backdrop-filter:blur(12px);
+    }
+    .igp-back-btn{
+      display:inline-flex;align-items:center;gap:6px;background:rgba(123,44,255,.12);border:1px solid var(--line);
+      border-radius:20px;padding:7px 16px;color:var(--m);font-size:13px;font-weight:700;transition:all .2s;white-space:nowrap;
+    }
+    .igp-back-btn:hover{background:rgba(123,44,255,.25);color:var(--w);border-color:var(--p0);}
+    .igp-title{font-size:18px;font-weight:900;color:var(--w);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0;}
+    .igp-actions{display:flex;align-items:center;gap:6px;margin-left:auto;}
+    .gameBarBtn{
+      display:inline-flex;align-items:center;gap:5px;padding:7px 12px;border-radius:30px;border:1px solid var(--line);
+      background:var(--glass);color:var(--m);font-size:13px;font-weight:700;transition:all .2s;white-space:nowrap;
+    }
+    .gameBarBtn:hover{background:rgba(123,44,255,.2);border-color:var(--p0);color:var(--w);}
+    .igp-layout{display:flex;flex-direction:column;gap:8px;padding-top:10px;}
+    .igp-box{
+      position:relative;border-radius:14px;overflow:hidden;background:#000;border:1px solid var(--line);
+      box-shadow:0 8px 35px rgba(0,0,0,.6);height:min(82vh,980px);min-height:460px;
+    }
+    .gameFrame{width:100%;height:100%;border:none;background:#000;display:block;}
+    .igp-loader{
+      position:absolute;inset:0;background:linear-gradient(135deg,rgba(15,8,30,.97),rgba(25,10,50,.99));
+      display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:10;transition:opacity .3s;
+    }
+    .igp-loader.hidden{opacity:0;pointer-events:none;}
+    .igp-loader-text{font-size:11px;color:var(--d);font-weight:700;letter-spacing:.05em;}
+    .igp-spin{
+      width:40px;height:40px;border:3px solid rgba(123,44,255,.2);border-top-color:var(--p0);border-left-color:var(--p1);
+      border-radius:50%;animation:igpSpin .75s linear infinite;
+    }
+    @keyframes igpSpin{to{transform:rotate(360deg)}}
+    .igp-fullscreen-btn{
+      position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.18);
+      color:#fff;border-radius:8px;padding:6px 10px;font-size:12px;z-index:11;backdrop-filter:blur(6px);
+    }
+    .igp-fullscreen-btn:hover{background:rgba(123,44,255,.65);border-color:var(--p0);}
+    .igpInfo{
+      display:flex;align-items:center;gap:8px;background:var(--glass);border:1px solid var(--line);border-radius:10px;padding:8px 12px;
+    }
+    .igpInfoEmoji{font-size:22px;flex-shrink:0;}
+    .igpInfoTitle{font-size:12px;font-weight:800;color:var(--w);}
+    .igpInfoCat{font-size:10px;color:var(--d);}
+
+    .panelOverlay{
+      position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:1000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);
+    }
+    .panelOverlay.open{display:flex;}
+    .modalBox{
+      width:min(420px,94vw);background:var(--bg1);border:1px solid var(--line);border-radius:var(--r);padding:24px;
+      box-shadow:var(--shadow);backdrop-filter:blur(20px);
+    }
+    .modalBox h2{
+      font-size:20px;font-weight:900;margin-bottom:6px;
+      background:linear-gradient(135deg,var(--w),var(--p1));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+    }
+    .modalSub{font-size:12px;color:var(--d);margin-bottom:16px;}
+    .formGroup{margin-bottom:10px;}
+    .formGroup label{font-size:11px;color:var(--d);display:block;margin-bottom:5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;}
+    .formGroup input,.formGroup textarea{
+      width:100%;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--w);font-size:13px;font-family:inherit;
+    }
+    .formGroup textarea{resize:vertical;min-height:70px;}
+    .formGroup input::placeholder,.formGroup textarea::placeholder{color:var(--d);}
+    .formGroup input:focus,.formGroup textarea:focus{outline:none;border-color:var(--p0);}
+    .formRow{display:flex;gap:8px;margin-top:4px;}
+    .errorMsg{color:#ff6b6b;font-size:12px;margin-bottom:8px;display:none;}
+
+    .appWin{
+      width:min(720px,96vw);max-height:92vh;background:var(--bg1);border:1px solid var(--line);border-radius:var(--r);
+      box-shadow:0 24px 80px rgba(0,0,0,.7);overflow:hidden;display:flex;flex-direction:column;
+    }
+    .winBar{
+      display:flex;align-items:center;justify-content:space-between;height:46px;padding:0 12px 0 14px;border-bottom:1px solid var(--line);
+      background:var(--glass);
+    }
+    .winBarTitle{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--w);}
+    .winClose{
+      width:30px;height:28px;border:none;border-radius:8px;background:none;color:var(--d);font-size:13px;
+    }
+    .winClose:hover{background:#c42b1c;color:#fff;}
+    .appBody{padding:16px;overflow:auto;}
+    .appBody::-webkit-scrollbar{width:4px;}
+    .appBody::-webkit-scrollbar-thumb{background:var(--p2);border-radius:2px;}
+
+    .profileGrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    .profileCard{
+      background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:12px;padding:12px;
+    }
+    .profileCard h4{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--d);margin-bottom:10px;}
+    .profileTop{
+      height:88px;border-radius:10px 10px 0 0;position:relative;margin:-12px -12px 48px -12px;
+      background:linear-gradient(135deg,var(--p2),var(--p0));
+      border-bottom:1px solid var(--line);
+    }
+    .profileAvatarWrap{position:absolute;left:50%;bottom:-38px;transform:translateX(-50%);}
+    .profileAvatar{
+      width:76px;height:76px;border-radius:50%;border:3px solid var(--p1);overflow:hidden;background:var(--glass);
+      display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800;color:#fff;
+    }
+    .profileAvatar img{width:100%;height:100%;object-fit:cover;}
+    .profileStats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+    .statBox{background:var(--glass);border:1px solid var(--line);border-radius:10px;padding:8px;text-align:center;}
+    .statBox span{display:block;font-size:16px;font-weight:900;color:var(--p1);}
+    .statBox small{font-size:10px;color:var(--d);}
+    .friendRow{
+      display:flex;align-items:center;gap:8px;padding:8px;border-radius:8px;background:rgba(255,255,255,.03);
+      margin-bottom:6px;border:1px solid rgba(255,255,255,.06);
+    }
+    .friendName{flex:1;font-size:13px;font-weight:600;}
+    .miniBtn{
+      border:none;border-radius:8px;padding:5px 9px;font-size:11px;font-weight:700;
+      background:rgba(123,44,255,.2);color:var(--m);
+    }
+    .miniBtn:hover{background:rgba(123,44,255,.34);color:#fff;}
+    .miniBtn.danger{background:rgba(255,70,70,.15);color:#ff7a7a;}
+    .miniBtn.danger:hover{background:rgba(255,70,70,.28);color:#fff;}
+    .miniBtn.ok{background:rgba(65,190,120,.15);color:#8cffb6;}
+    .miniBtn.ok:hover{background:rgba(65,190,120,.28);color:#fff;}
+
+    .viewProfileOverlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1200;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+    .viewProfileOverlay.open{display:flex;}
+    .profileViewCard{
+      width:340px;max-width:95vw;border-radius:20px;overflow:hidden;background:var(--bg1);border:1px solid var(--line);
+      box-shadow:0 24px 80px rgba(0,0,0,.7);
+    }
+    .pcBanner{height:96px;position:relative;background:linear-gradient(135deg,var(--p2),var(--p0));}
+    .pcAvatarWrap{position:absolute;left:18px;bottom:-35px;}
+    .pcAvatar{
+      width:72px;height:72px;border-radius:50%;border:4px solid var(--bg1);overflow:hidden;background:var(--glass);
+      display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#fff;
+    }
+    .pcAvatar img{width:100%;height:100%;object-fit:cover;}
+    .pcClose{
+      position:absolute;top:10px;right:10px;width:28px;height:28px;border:none;border-radius:50%;
+      background:rgba(0,0,0,.4);color:#fff;font-size:15px;
+    }
+    .pcBody{padding:44px 18px 16px;}
+    .pcName{font-size:20px;font-weight:900;color:var(--w);}
+    .pcStatus{font-size:12px;color:var(--d);display:flex;align-items:center;gap:6px;margin:3px 0 8px;}
+    .pcDot{width:8px;height:8px;border-radius:50%;background:#3ba55c;box-shadow:0 0 6px #3ba55c;}
+    .pcBio{
+      font-size:12px;color:var(--m);background:rgba(255,255,255,.04);border-radius:8px;padding:8px 10px;margin:7px 0 9px;border-left:2px solid var(--p0);line-height:1.45;
+    }
+    .pcStats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 12px;}
+    .pcStat{text-align:center;background:var(--glass);border-radius:10px;padding:8px 4px;border:1px solid var(--line);}
+    .pcStat span{display:block;font-size:16px;font-weight:900;color:var(--p1);}
+    .pcStat small{font-size:10px;color:var(--d);}
+    .pcPins{display:flex;flex-direction:column;gap:6px;margin:8px 0 10px;}
+    .pcPinItem{
+      background:rgba(123,44,255,.08);border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-size:12px;color:var(--m);
+      transition:background .2s;
+    }
+    .pcPinItem:hover{background:rgba(123,44,255,.2);}
+    .pcActions{display:flex;gap:8px;}
+
+    .footer{text-align:center;padding:22px;font-size:12px;color:var(--d);}
+
+    [data-theme="light"]{
+      --bg0:#f4f0ff;--bg1:#ede6ff;--bg2:#e2d8ff;
+      --w:#1a0040;--m:#4a2e8a;--d:#7b5fc0;
+      --line:rgba(123,44,255,.22);
+      --glass:rgba(255,252,255,.88);--glass2:rgba(248,242,255,.72);
+      --shadow:0 12px 40px rgba(100,50,200,.12);
+      --shadow2:0 10px 30px rgba(123,44,255,.14);
+    }
+    [data-theme="light"] .topbar{background:rgba(244,240,255,.92)!important;}
+    [data-theme="light"] .sidebar{background:rgba(248,245,255,.98)!important;}
+    [data-theme="light"] .bg-orb{opacity:.4;}
+    [data-theme="light"] .gameCard{background:rgba(255,255,255,.9);}
+    [data-theme="light"] .modalBox,[data-theme="light"] .appWin,[data-theme="light"] .profileViewCard{background:rgba(252,250,255,.98)!important;}
+
+    @media(max-width:900px){
+      .profileGrid{grid-template-columns:1fr;}
+      .coinBadge{display:none;}
+      .levelWrap{display:none;}
+    }
+    @media(max-width:600px){
+      .gamesGrid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;padding:0 12px 20px;}
+      .topbar{padding:0 10px;gap:8px;}
+      .hero{padding:28px 12px 14px;}
+      .filterBar,.searchWrap,.searchMeta,.recommendedWrap{padding-left:12px;padding-right:12px;}
+      #inlineGamePanel{padding:76px 12px 16px;}
+      .igp-box{min-height:330px;height:62vh;}
+      .brandText .sub{display:none;}
     }
   </style>
 </head>
@@ -781,527 +430,1315 @@
     <div class="bg-orb o3"></div>
   </div>
 
+  <div id="loaderOverlay" class="loader-overlay visible">
+    <div class="loader-box">
+      <div class="loader-title" id="loaderTitle">Laddar sidan...</div>
+      <div class="loader-track"><div id="loaderFill" class="loader-fill"></div></div>
+      <div id="loaderMsg" class="loader-msg"></div>
+    </div>
+  </div>
+
+  <div class="toastContainer" id="toastContainer"></div>
+
   <header class="topbar">
-    <button id="menuToggle" class="menuBtn" onclick="toggleSidebar()" aria-label="Meny">
+    <button class="menuBtn" onclick="toggleSidebar()" aria-label="Meny">
       <span></span><span></span><span></span>
     </button>
 
-    <div class="brand">
-      <div class="logo">🎮</div>
-      <div class="brandText">
-        <div class="title">Coola Mattespel V4</div>
-        <div class="sub">Jakob-style redesign</div>
+    <a class="brand" href="javascript:void(0)" onclick="goHomeHard()">
+      <div class="logo">
+        <img src="UGS-Files/icon.png" alt="Icon" onerror="this.style.display='none'">
       </div>
-    </div>
+      <div class="brandText">
+        <div class="title">Coola Mattespel</div>
+        <div class="sub">Spelbibliotek</div>
+      </div>
+    </a>
 
     <div class="topRight">
-      <div class="coinBadge">⭐ <span id="favCount">0</span> favoriter</div>
-      <button class="pill" onclick="openProfileModal()">👤 Profil</button>
+      <div class="coinBadge">🪙 <span id="coinDisplay">0</span></div>
+      <div class="levelWrap" style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;">
+        <span class="levelBadge" id="levelDisplay">Nivå 1</span>
+        <div class="xpBar"><div class="xpBarFill" id="xpFill" style="width:0%"></div></div>
+      </div>
+      <button class="pill ghost" id="loginBtn" onclick="openLoginModal(false)">🔐 Logga in</button>
+      <button class="pill ghost" id="profileBtn" onclick="openProfileWindow()" style="display:none">👤 Profil</button>
     </div>
   </header>
 
-  <div id="sidebarOverlay" class="sidebar-overlay" onclick="closeSidebar()"></div>
+  <div class="sideOverlay" id="sideOverlay" onclick="closeSidebar()"></div>
 
-  <aside id="sidebar" class="sidebar">
+  <aside class="sidebar" id="sidebar">
     <div class="sideHead">
-      <h3>Meny</h3>
+      <h3>🎮 Meny</h3>
       <button class="closeBtn" onclick="closeSidebar()">✕</button>
     </div>
-    <div class="sideNavList">
-      <button class="sideNavBtn" onclick="goHome()"><span class="sideNavIcon">🏠</span>Hem</button>
-      <button class="sideNavBtn" onclick="showFavorites()"><span class="sideNavIcon">⭐</span>Favoriter</button>
-      <button class="sideNavBtn" onclick="showRecent()"><span class="sideNavIcon">⏱</span>Senaste</button>
-      <button class="sideNavBtn" onclick="showUpdates()"><span class="sideNavIcon">📢</span>Uppdateringar</button>
-      <button class="sideNavBtn" onclick="openIframe('https://alv3333.github.io/Coola-Mattespel-Soundboard.github.io/')"><span class="sideNavIcon">🔊</span>Soundboard</button>
-      <button class="sideNavBtn" onclick="openIframe('https://studio.pickaxe.co/STUDIOGX4LHRY55GYHQ15/295XP68K97')"><span class="sideNavIcon">🤖</span>AI</button>
-      <button class="sideNavBtn" onclick="openIframe('https://app.supersigmamatteeducation.xo.je')"><span class="sideNavIcon">🌐</span>Browser</button>
-      <button class="sideNavBtn" onclick="openThemePopup()"><span class="sideNavIcon">🎨</span>Tema</button>
+
+    <nav class="sideNavList">
+      <button class="sideNavBtn" onclick="goHomeHard()">
+        <span class="sideNavIcon">🏠</span><span>Hem</span>
+      </button>
+      <button class="sideNavBtn" onclick="showFavorites()">
+        <span class="sideNavIcon">⭐</span><span>Favoriter</span>
+      </button>
+      <button class="sideNavBtn" onclick="openProfileWindow()">
+        <span class="sideNavIcon">👤</span><span>Profil</span>
+      </button>
+      <button class="sideNavBtn" onclick="openExternal('https://app.supersigmamatteeducation.xo.je','Browser')">
+        <span class="sideNavIcon">🌐</span><span>Browser</span>
+      </button>
+      <button class="sideNavBtn" onclick="openExternal('https://alv3333.github.io/Coola-Mattespel-Soundboard.github.io/','Soundboard')">
+        <span class="sideNavIcon">🔊</span><span>Soundboard</span>
+      </button>
+      <button class="sideNavBtn" onclick="showUpdates()">
+        <span class="sideNavIcon">📢</span><span>Uppdateringar</span>
+      </button>
+    </nav>
+
+    <div class="sideToggleRow">
+      <span>🌗 Ljus / Mörkt</span>
+      <button id="darkToggle" class="toggle" onclick="toggleDarkMode()"></button>
     </div>
   </aside>
 
   <main class="main">
     <section class="hero">
       <h1>Coola Mattespel V4</h1>
-      <p class="subtitle">Cool sida med coola mattespel. Sprid denna sidan till alla ni känner.</p>
+      <p class="heroSub">Snygg spelportal med snabb sökning, favoriter, profil och stor spelvy.</p>
       <div class="hintRow">
-        <div class="hintPill">🎮 90+ spel (reducerad lista)</div>
-        <div class="hintPill">⭐ Favoriter</div>
-        <div class="hintPill">🔎 Supersnabb sök</div>
+        <span class="hintPill">🎮 Snabbt bibliotek</span>
+        <span class="hintPill">⭐ Favoriter</span>
+        <span class="hintPill">👤 Profilsystem</span>
+        <span class="hintPill">🌗 Ljus/Mörkt</span>
       </div>
-      <div id="activePlayers" class="activePlayers">Aktiva spelare: ...</div>
+      <div class="onlineCount" id="onlineCount">...</div>
+    </section>
+
+    <section class="recommendedWrap" id="recommendedWrap">
+      <div class="recommendedTitle">✨ Rekommenderade spel</div>
+      <div class="recommendedSection" id="recommendedSection"></div>
     </section>
 
     <div class="filterBar">
-      <button class="filterBtn active" data-filter="all" onclick="setQuickFilter('all')">Alla spel</button>
-      <button class="filterBtn" data-filter="favorites" onclick="setQuickFilter('favorites')">Favoriter</button>
-      <button class="filterBtn" data-filter="recent" onclick="setQuickFilter('recent')">Senaste</button>
+      <button class="filterBtn active" data-filter="all" onclick="setFilter('all', this)">Alla spel</button>
+      <button class="filterBtn" data-filter="favorites" onclick="setFilter('favorites', this)">⭐ Favoriter</button>
     </div>
 
     <div class="searchWrap">
-      <input id="searchInput" placeholder="Sök spel snabbt..." oninput="filterGames()" />
+      <input type="text" id="searchInput" placeholder="Sök bland spelen..." />
     </div>
-    <div id="searchMeta" class="searchMeta">Visar alla spel</div>
+    <div class="searchMeta" id="searchMeta"></div>
 
-    <section id="playArea" class="hidden">
-      <div id="embedContainer">
-        <div id="iframeLoader" class="iframeLoader hidden">Laddar...</div>
-        <iframe id="gameFrame" src="about:blank"></iframe>
-        <button class="fullscreen-btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+    <section id="inlineGamePanel">
+      <div class="igp-bar">
+        <button class="igp-back-btn" onclick="closeGame()">← Visa alla spel</button>
+        <div class="igp-title" id="gameTitle">—</div>
+        <div class="igp-actions">
+          <button class="gameBarBtn" id="gameFavBtn" onclick="toggleGameFav()">☆</button>
+          <button class="gameBarBtn" onclick="reloadGameFrame()">🔄</button>
+        </div>
       </div>
-      <div id="questTrackerPanel">
-        <b>🎯 Spelinfo</b><br />
-        Senast öppnat spel visas här.
+
+      <div class="igp-layout">
+        <div class="igp-box">
+          <iframe class="gameFrame" id="gameFrame" src="about:blank" allowfullscreen></iframe>
+          <div class="igp-loader" id="igpLoader">
+            <div class="igp-spin"></div>
+            <div class="igp-loader-text" id="igpLoaderText">Laddar spel...</div>
+          </div>
+          <button class="igp-fullscreen-btn" onclick="goFullscreen()">⛶ Fullskärm</button>
+        </div>
+
+        <div class="igpInfo">
+          <div class="igpInfoEmoji" id="igpInfoEmoji">🎮</div>
+          <div>
+            <div class="igpInfoTitle" id="igpInfoTitle">—</div>
+            <div class="igpInfoCat" id="igpInfoCat">Spel</div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <section id="gamesSection" class="sectionWrap">
-      <h2 class="sectionTitle">✨ Rekommenderade spel</h2>
-      <div id="recommendedRow" class="recommended-row"></div>
-      <div id="gamesGrid" class="gamesGrid"></div>
-    </section>
+    <section class="gamesGrid" id="gamesGrid"></section>
 
-    <section id="updatesPage" class="panel hidden">
-      <h2>⬆ Uppdateringar</h2>
-      <ul id="updatesList"></ul>
-    </section>
+    <div class="loadMoreWrap" id="loadMoreWrap">
+      <button class="loadMoreBtn" id="loadMoreBtn">Ladda fler</button>
+    </div>
   </main>
 
-  <div id="themePopup" onclick="if(event.target===this)closeThemePopup()">
-    <div class="theme-box">
-      <div class="theme-presets">
-        <button class="theme-btn" data-theme="purple" onclick="setTheme('purple')">PURPLE</button>
-        <button class="theme-btn" data-theme="neon" onclick="setTheme('neon')">NEON</button>
-        <button class="theme-btn" data-theme="gold" onclick="setTheme('gold')">GOLD</button>
-        <button class="theme-btn" data-theme="red" onclick="setTheme('red')">RED</button>
-        <button class="theme-btn" data-theme="blue" onclick="setTheme('blue')">BLUE</button>
-        <button class="theme-btn" data-theme="pink" onclick="setTheme('pink')">PINK</button>
+  <footer class="footer">Coola Mattespel V4 • Byggd för snabb spelstart</footer>
+
+  <!-- LOGIN -->
+  <div class="panelOverlay" id="loginOverlay" onclick="if(event.target===this)closeLoginModal()">
+    <div class="modalBox">
+      <h2 id="loginTitle">Logga in</h2>
+      <p class="modalSub" id="loginSubtitle">Logga in för att spara framsteg och profil.</p>
+      <p class="errorMsg" id="loginError"></p>
+
+      <div class="formGroup">
+        <label>Användarnamn</label>
+        <input id="loginUser" placeholder="Ditt användarnamn..." maxlength="24" />
       </div>
+      <div class="formGroup">
+        <label>Lösenord</label>
+        <input id="loginPass" type="password" placeholder="Ditt lösenord..." maxlength="64" />
+      </div>
+
+      <div class="formRow">
+        <button class="pill ghost" style="flex:1;justify-content:center" onclick="closeLoginModal()">Avbryt</button>
+        <button class="pill primary" style="flex:1;justify-content:center" onclick="doAuth()" id="loginActionBtn">Logga in</button>
+      </div>
+      <p style="text-align:center;margin-top:12px;font-size:12px;color:var(--d);cursor:pointer" onclick="toggleLoginMode()" id="loginToggleText">
+        Inget konto? Registrera
+      </p>
     </div>
   </div>
 
-  <div id="uiToast" class="toast"></div>
+  <!-- PROFILE WINDOW -->
+  <div class="panelOverlay" id="profileOverlay" onclick="if(event.target===this)closeProfileWindow()">
+    <div class="appWin">
+      <div class="winBar">
+        <div class="winBarTitle">👤 Profil</div>
+        <button class="winClose" onclick="closeProfileWindow()">✕</button>
+      </div>
+      <div class="appBody" id="profileBody"></div>
+    </div>
+  </div>
+
+  <!-- PUBLIC PROFILE CARD -->
+  <div class="viewProfileOverlay" id="viewProfileOverlay" onclick="if(event.target===this)closeViewProfile()">
+    <div class="profileViewCard" id="profileViewCard"></div>
+  </div>
 
   <script>
-    const updates = [
-      "Designen är omgjord för att likna Jakobs Spel mycket mer.",
-      "Kraftigt minskad files-lista för snabbare laddning och enklare underhåll.",
-      "Ny topbar, ny sidebar, ny game-card layout och bättre sök.",
-      "Favoriter + senaste spel sparas lokalt i din browser.",
-      "Tips: Lägg till fler spel i files-listan när allt känns stabilt."
+    // -------------------- DATA --------------------
+    const ACCOUNTS_KEY = "cm_accounts_v4";
+    const SESSION_KEY = "cm_session_user_v4";
+    const USER_PREFIX = "cm_user_data_";
+    const LOAD_MSGS = [
+      "Laddar...", "Förbereder spel...", "Nästan klart...", "Optimerar gränssnitt...",
+      "Sätter upp snabbstart..."
     ];
 
-    /* REDUCERAD FILES-LISTA */
-    const files = [
-      "climposter","clworldguessr","clamongUsMULTIPLAYER","clsummerRider3D",
-      "clretrobowl","clretrobowlcollege","cltinyfishing","clslope","clslope3","clrun3",
-      "clsubwaysurferssanfrancisco","cltemplerun2","cldriftboss","clbasketballstars","clbasketrandom",
-      "clbasketbros","clfootballbros","clsoccerbros","clvolleyrandom","clwrestlebros",
-      "clsmashkarts","clhouseofhazards","clgetawayshootout","clrooftopsnipers","clrooftopsnipers2",
-      "clcrossyroad","cltunnelrush","clstickmanhook","clgeometrydash","clgdlite",
-      "clpapasfreezeria","clpapassushiria","clpapaspancakeria","clmotox3m2","clmotox3mspookyland",
-      "clmotox3mwinter","cldrivemady","cleggycar","cl8ballpool","clchess",
-      "clwordle","clblockblast","clbloxorz","clfireboyandwatergirl","clfireboyandwatergirl2",
-      "clducklife","clducklife2","clducklife3","clducklife4","clbitlife",
-      "clcookieclicker","clidlebreakout","clhappywheels","clmariokart64","clmarioparty",
-      "clmarioparty2","clmarioparty3","clsupermario64","clsupermarioworld","clpokemonemerald",
-      "clpokemonfirered","clpokemonsapphire","clnfsunderground2","clgranturismo2","clquake3",
-      "cldoom","cldoom2","clminecraft1-8-8","clportal","clfancypantsadventure",
-      "clfancypantsadventure2","clburritobison","clburritobison2","clraftwars","clraftwars2",
-      "cllearntofly","cllearntofly2","cllearntofly3","clvex","clvex2",
-      "clvex3","clvex4","clvex5","clvex6","clvex7","clvex8"
+    const RECOMMENDED = [
+      { id: "clworldguessr", name: "WorldGuessr", emoji: "🌍", desc: "Gissa länder på Street View" },
+      { id: "EaglercraftZ_1.11.2", name: "Eaglercraft 1.11.2", emoji: "⛰️", desc: "Minecraft i webbläsaren" },
+      { id: "clsummerRider3D", name: "Summer Rider 3D", emoji: "🏄", desc: "Surfa vågorna i sommar" }
     ];
 
-    const recommendedGames = [
-      "climposter",
-      "clworldguessr",
-      "clamongUsMULTIPLAYER",
-      "clsummerRider3D",
-      "clretrobowl"
+    // Reducerad lista
+    const GAMES = [
+      {id:"clworldguessr",name:"WorldGuessr",cat:"Geo"},
+      {id:"EaglercraftZ_1.11.2",name:"Eaglercraft 1.11.2",cat:"Sandbox"},
+      {id:"clsummerRider3D",name:"Summer Rider 3D",cat:"Racing"},
+      {id:"clamongUsMULTIPLAYER",name:"Among Us Multiplayer",cat:"Multiplayer"},
+      {id:"climposter",name:"Imposter",cat:"Action"},
+      {id:"clretrobowl",name:"Retro Bowl",cat:"Sport"},
+      {id:"clretrobowlcollege",name:"Retro Bowl College",cat:"Sport"},
+      {id:"cltinyfishing",name:"Tiny Fishing",cat:"Casual"},
+      {id:"clslope",name:"Slope",cat:"Runner"},
+      {id:"clslope3",name:"Slope 3",cat:"Runner"},
+      {id:"clrun3",name:"Run 3",cat:"Runner"},
+      {id:"clsubwaysurferssanfrancisco",name:"Subway Surfers SF",cat:"Runner"},
+      {id:"cltemplerun2",name:"Temple Run 2",cat:"Runner"},
+      {id:"cldriftboss",name:"Drift Boss",cat:"Driving"},
+      {id:"cldrivemady",name:"Drive Mad",cat:"Driving"},
+      {id:"cleggycar",name:"Eggy Car",cat:"Driving"},
+      {id:"clbasketballstars",name:"Basketball Stars",cat:"Sport"},
+      {id:"clbasketrandom",name:"Basket Random",cat:"Sport"},
+      {id:"clbasketbros",name:"Basket Bros",cat:"Sport"},
+      {id:"clfootballbros",name:"Football Bros",cat:"Sport"},
+      {id:"clsoccerbros",name:"Soccer Bros",cat:"Sport"},
+      {id:"clvolleyrandom",name:"Volley Random",cat:"Sport"},
+      {id:"clwrestlebros",name:"Wrestle Bros",cat:"Sport"},
+      {id:"cl8ballpool",name:"8 Ball Pool",cat:"Sport"},
+      {id:"clchess",name:"Chess",cat:"Puzzle"},
+      {id:"clwordle",name:"Wordle",cat:"Puzzle"},
+      {id:"clblockblast",name:"Block Blast",cat:"Puzzle"},
+      {id:"clbloxorz",name:"Bloxorz",cat:"Puzzle"},
+      {id:"clcrossyroad",name:"Crossy Road",cat:"Arcade"},
+      {id:"cltunnelrush",name:"Tunnel Rush",cat:"Arcade"},
+      {id:"clstickmanhook",name:"Stickman Hook",cat:"Arcade"},
+      {id:"clgeometrydash",name:"Geometry Dash",cat:"Arcade"},
+      {id:"clgdlite",name:"Geometry Dash Lite",cat:"Arcade"},
+      {id:"clsmashkarts",name:"Smash Karts",cat:"Multiplayer"},
+      {id:"clhouseofhazards",name:"House of Hazards",cat:"Multiplayer"},
+      {id:"clgetawayshootout",name:"Getaway Shootout",cat:"Multiplayer"},
+      {id:"clrooftopsnipers",name:"Rooftop Snipers",cat:"Multiplayer"},
+      {id:"clrooftopsnipers2",name:"Rooftop Snipers 2",cat:"Multiplayer"},
+      {id:"clmotox3m2",name:"Moto X3M 2",cat:"Driving"},
+      {id:"clmotox3mspookyland",name:"Moto X3M Spooky",cat:"Driving"},
+      {id:"clmotox3mwinter",name:"Moto X3M Winter",cat:"Driving"},
+      {id:"clducklife",name:"Duck Life",cat:"Casual"},
+      {id:"clducklife2",name:"Duck Life 2",cat:"Casual"},
+      {id:"clducklife3",name:"Duck Life 3",cat:"Casual"},
+      {id:"clducklife4",name:"Duck Life 4",cat:"Casual"},
+      {id:"clbitlife",name:"BitLife",cat:"Simulation"},
+      {id:"clcookieclicker",name:"Cookie Clicker",cat:"Idle"},
+      {id:"clidlebreakout",name:"Idle Breakout",cat:"Idle"},
+      {id:"clhappywheels",name:"Happy Wheels",cat:"Action"},
+      {id:"clpapasfreezeria",name:"Papas Freezeria",cat:"Casual"},
+      {id:"clpapassushiria",name:"Papas Sushiria",cat:"Casual"},
+      {id:"clpapaspancakeria",name:"Papas Pancakeria",cat:"Casual"},
+      {id:"clminecraft1-8-8",name:"Minecraft 1.8.8",cat:"Sandbox"},
+      {id:"clportal",name:"Portal",cat:"Puzzle"},
+      {id:"clfancypantsadventure",name:"Fancy Pants Adventure",cat:"Platform"},
+      {id:"clfancypantsadventure2",name:"Fancy Pants 2",cat:"Platform"},
+      {id:"clvex",name:"Vex",cat:"Platform"},
+      {id:"clvex2",name:"Vex 2",cat:"Platform"},
+      {id:"clvex3",name:"Vex 3",cat:"Platform"},
+      {id:"clvex4",name:"Vex 4",cat:"Platform"},
+      {id:"clvex5",name:"Vex 5",cat:"Platform"},
+      {id:"clvex6",name:"Vex 6",cat:"Platform"},
+      {id:"clvex7",name:"Vex 7",cat:"Platform"},
+      {id:"clvex8",name:"Vex 8",cat:"Platform"},
+      {id:"clraftwars",name:"Raft Wars",cat:"Action"},
+      {id:"clraftwars2",name:"Raft Wars 2",cat:"Action"},
+      {id:"clburritobison",name:"Burrito Bison",cat:"Action"},
+      {id:"clburritobison2",name:"Burrito Bison 2",cat:"Action"},
+      {id:"cllearntofly",name:"Learn to Fly",cat:"Arcade"},
+      {id:"cllearntofly2",name:"Learn to Fly 2",cat:"Arcade"},
+      {id:"cllearntofly3",name:"Learn to Fly 3",cat:"Arcade"},
+      {id:"clfireboyandwatergirl",name:"Fireboy and Watergirl",cat:"Puzzle"},
+      {id:"clfireboyandwatergirl2",name:"Fireboy and Watergirl 2",cat:"Puzzle"},
+      {id:"clquake3",name:"Quake 3",cat:"Shooter"},
+      {id:"cldoom",name:"DOOM",cat:"Shooter"},
+      {id:"cldoom2",name:"DOOM II",cat:"Shooter"},
+      {id:"clpokemonemerald",name:"Pokemon Emerald",cat:"RPG"},
+      {id:"clpokemonfirered",name:"Pokemon FireRed",cat:"RPG"},
+      {id:"clpokemonsapphire",name:"Pokemon Sapphire",cat:"RPG"},
+      {id:"clsupermario64",name:"Super Mario 64",cat:"Platform"},
+      {id:"clsupermarioworld",name:"Super Mario World",cat:"Platform"},
+      {id:"clmariokart64",name:"Mario Kart 64",cat:"Racing"},
+      {id:"clmarioparty",name:"Mario Party",cat:"Party"},
+      {id:"clmarioparty2",name:"Mario Party 2",cat:"Party"},
+      {id:"clmarioparty3",name:"Mario Party 3",cat:"Party"},
+      {id:"clnfsunderground2",name:"NFS Underground 2",cat:"Racing"},
+      {id:"clgranturismo2",name:"Gran Turismo 2",cat:"Racing"},
+      {id:"clsmashkartsworking",name:"Smash Karts (Alt)",cat:"Multiplayer"},
+      {id:"clsnowrider",name:"Snow Rider",cat:"Arcade"},
+      {id:"clgooglebaseball",name:"Google Baseball",cat:"Sport"},
+      {id:"clgoogledino",name:"Google Dino",cat:"Runner"},
+      {id:"clflappybird",name:"Flappy Bird",cat:"Arcade"}
     ];
 
-    const themes = {
-      purple: { "--p0": "#7b2cff", "--p1": "#b56cff", "--p2": "#3a00b7", "--bg0": "#050008", "--bg1": "#0b0014", "--bg2": "#120022" },
-      neon:   { "--p0": "#00ffcc", "--p1": "#00e5ff", "--p2": "#007a5e", "--bg0": "#000a08", "--bg1": "#00150f", "--bg2": "#001a10" },
-      gold:   { "--p0": "#ffaa00", "--p1": "#ffd166", "--p2": "#a06800", "--bg0": "#0a0600", "--bg1": "#130900", "--bg2": "#1a0d00" },
-      red:    { "--p0": "#ff2d55", "--p1": "#ff6b6b", "--p2": "#8b0000", "--bg0": "#080003", "--bg1": "#100008", "--bg2": "#160005" },
-      blue:   { "--p0": "#2979ff", "--p1": "#82b1ff", "--p2": "#0040ca", "--bg0": "#000510", "--bg1": "#000a1f", "--bg2": "#000e2b" },
-      pink:   { "--p0": "#e91e8c", "--p1": "#ff80c8", "--p2": "#9c006a", "--bg0": "#08000a", "--bg1": "#120010", "--bg2": "#180015" }
+    const state = {
+      user: null,
+      data: null,
+      filter: "all",
+      search: "",
+      page: 0,
+      perPage: 60,
+      currentGame: null,
+      currentIsExternal: false
     };
 
-    files.sort((a, b) => a.localeCompare(b, "sv", { sensitivity: "base", numeric: true }));
-
-    let recentGames = JSON.parse(localStorage.getItem("recentGames") || "[]");
-    let favoriteGames = [...new Set(JSON.parse(localStorage.getItem("favoriteGames") || "[]"))];
-    let currentFilter = "all";
-
-    const gamesGrid = document.getElementById("gamesGrid");
-    const recommendedRow = document.getElementById("recommendedRow");
-    const playArea = document.getElementById("playArea");
-    const gameFrame = document.getElementById("gameFrame");
-    const iframeLoader = document.getElementById("iframeLoader");
-    const searchInput = document.getElementById("searchInput");
-    const searchMeta = document.getElementById("searchMeta");
-    const updatesPage = document.getElementById("updatesPage");
-    const updatesList = document.getElementById("updatesList");
-    const gamesSection = document.getElementById("gamesSection");
-    const sidebar = document.getElementById("sidebar");
-    const sidebarOverlay = document.getElementById("sidebarOverlay");
-    const favCount = document.getElementById("favCount");
-    const activePlayers = document.getElementById("activePlayers");
-    const questTrackerPanel = document.getElementById("questTrackerPanel");
-
-    function showToast(message) {
-      const toast = document.getElementById("uiToast");
-      toast.textContent = message;
-      toast.classList.add("show");
-      clearTimeout(showToast._t);
-      showToast._t = setTimeout(() => toast.classList.remove("show"), 1400);
+    // -------------------- STORAGE --------------------
+    function getAccounts() {
+      try { return JSON.parse(localStorage.getItem(ACCOUNTS_KEY) || "{}"); }
+      catch { return {}; }
     }
-
-    function hashHue(str) {
-      let h = 0;
-      for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) % 360;
-      return h;
+    function setAccounts(obj) {
+      localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(obj));
     }
-
-    function displayName(file) {
-      return file
-        .replace(/^cl/i, "")
-        .replace(/[-_]+/g, " ")
-        .replace(/([a-zåäö])([A-ZÅÄÖ])/g, "$1 $2")
-        .replace(/\s+/g, " ")
-        .trim()
-        .replace(/\b\w/g, (m) => m.toUpperCase());
+    function userKey(username) {
+      return USER_PREFIX + username.toLowerCase();
     }
-
-    function saveFavorites() {
-      localStorage.setItem("favoriteGames", JSON.stringify(favoriteGames));
-      favCount.textContent = favoriteGames.length;
-    }
-
-    function isFavorite(file) {
-      return favoriteGames.includes(file);
-    }
-
-    function toggleFavorite(file, quiet = false) {
-      if (isFavorite(file)) {
-        favoriteGames = favoriteGames.filter((f) => f !== file);
-        if (!quiet) showToast(`Tog bort ${displayName(file)} från favoriter`);
-      } else {
-        favoriteGames.unshift(file);
-        favoriteGames = [...new Set(favoriteGames)].slice(0, 300);
-        if (!quiet) showToast(`La till ${displayName(file)} i favoriter`);
-      }
-      saveFavorites();
-      runSearch();
-    }
-
-    function createCard(file, compact = false) {
-      const card = document.createElement("div");
-      card.className = "gameCard";
-      card.onclick = () => openGame(file);
-
-      const thumb = document.createElement("div");
-      thumb.className = "gameThumb";
-      const hue = hashHue(file);
-      thumb.style.background =
-        `linear-gradient(135deg, hsl(${hue} 88% 55%), hsl(${(hue + 45) % 360} 85% 34%))`;
-
-      const letter = document.createElement("div");
-      letter.className = "gameThumbLetter";
-      letter.textContent = (displayName(file)[0] || "?").toUpperCase();
-
-      const info = document.createElement("div");
-      info.className = "gameInfo";
-
-      const name = document.createElement("div");
-      name.className = "gameName";
-      name.textContent = displayName(file);
-
-      const fav = document.createElement("button");
-      fav.className = "favBtn" + (isFavorite(file) ? " active" : "");
-      fav.textContent = "★";
-      fav.title = isFavorite(file) ? "Ta bort favorit" : "Lägg till favorit";
-      fav.onclick = (e) => {
-        e.stopPropagation();
-        toggleFavorite(file);
+    function defaultUserData(username) {
+      return {
+        username,
+        coins: 50,
+        xp: 0,
+        gamesPlayed: 0,
+        favorites: [],
+        friends: [],
+        settings: { darkMode: true },
+        profile: {
+          joinDate: new Date().toISOString().split("T")[0],
+          status: "",
+          bio: "",
+          avatar: "",
+          banner: "",
+          pinnedGames: []
+        }
       };
-
-      if (compact) {
-        name.style.fontSize = "11px";
+    }
+    function getUserData(username) {
+      const raw = localStorage.getItem(userKey(username));
+      if (!raw) return defaultUserData(username);
+      try {
+        const parsed = JSON.parse(raw);
+        const merged = defaultUserData(username);
+        return {
+          ...merged,
+          ...parsed,
+          settings: { ...merged.settings, ...(parsed.settings || {}) },
+          profile: { ...merged.profile, ...(parsed.profile || {}) }
+        };
+      } catch {
+        return defaultUserData(username);
       }
-
-      thumb.appendChild(letter);
-      info.appendChild(name);
-      info.appendChild(fav);
-
-      card.appendChild(thumb);
-      card.appendChild(info);
-      return card;
+    }
+    function saveUserData(username, data) {
+      localStorage.setItem(userKey(username), JSON.stringify(data));
+    }
+    function saveCurrentUser() {
+      if (!state.user || !state.data) return;
+      saveUserData(state.user, state.data);
     }
 
-    function renderRecommended() {
-      recommendedRow.innerHTML = "";
-      recommendedGames.filter((g) => files.includes(g)).forEach((file) => {
-        recommendedRow.appendChild(createCard(file, true));
-      });
+    // -------------------- UTILS --------------------
+    function toast(msg, ms = 2200) {
+      const t = document.createElement("div");
+      t.className = "toast";
+      t.textContent = msg;
+      const c = document.getElementById("toastContainer");
+      c.appendChild(t);
+      setTimeout(() => {
+        if (t.parentNode) t.parentNode.removeChild(t);
+      }, ms);
     }
 
-    function getBaseListByFilter() {
-      if (currentFilter === "favorites") return favoriteGames;
-      if (currentFilter === "recent") return recentGames;
-      return files;
+    function displayName(gameId) {
+      const g = GAMES.find(x => x.id === gameId);
+      if (g) return g.name;
+      return gameId.replace(/^cl/i, "").replace(/[_-]+/g, " ");
     }
 
-    function normalizeSearchText(value) {
-      return (value || "")
+    function getLevel(xp) {
+      return Math.floor((xp || 0) / 100) + 1;
+    }
+
+    function getLevelPct(xp) {
+      return (xp || 0) % 100;
+    }
+
+    function normalize(s) {
+      return (s || "")
         .toLowerCase()
         .normalize("NFD")
         .replace(/[̀-ͯ]/g, "")
         .replace(/[^a-z0-9]/g, "");
     }
 
-    function scoreGameMatch(file, query) {
-      const name = normalizeSearchText(displayName(file));
-      if (!query) return { ok: true, score: 1 };
-      if (name.startsWith(query)) return { ok: true, score: 1000 - name.length };
-      const idx = name.indexOf(query);
-      if (idx !== -1) return { ok: true, score: 700 - idx };
-
-      let qi = 0;
-      for (let i = 0; i < name.length && qi < query.length; i++) {
-        if (name[i] === query[qi]) qi++;
-      }
-      if (qi === query.length) return { ok: true, score: 300 - Math.max(0, name.length - query.length) };
-      return { ok: false, score: -1 };
+    function hashToGrad(name) {
+      const n = name.toLowerCase();
+      if (n.includes("minecraft") || n.includes("eagler")) return "linear-gradient(135deg,#56ab2f,#a8e063)";
+      if (n.includes("slope") || n.includes("run") || n.includes("rush")) return "linear-gradient(135deg,#f093fb,#f5576c)";
+      if (n.includes("chess") || n.includes("word") || n.includes("puzzle")) return "linear-gradient(135deg,#4facfe,#00f2fe)";
+      if (n.includes("car") || n.includes("drift") || n.includes("rider")) return "linear-gradient(135deg,#ffecd2,#fcb69f)";
+      if (n.includes("sport") || n.includes("basket") || n.includes("soccer")) return "linear-gradient(135deg,#43e97b,#38f9d7)";
+      const grads = [
+        "linear-gradient(135deg,#7b2cff,#3a00b7)","linear-gradient(135deg,#ff2d55,#8b0000)",
+        "linear-gradient(135deg,#0ea5e9,#1e40af)","linear-gradient(135deg,#f7971e,#ffd200)",
+        "linear-gradient(135deg,#ec4899,#9d174d)","linear-gradient(135deg,#30cfd0,#667eea)"
+      ];
+      let h = 0;
+      for (let i = 0; i < n.length; i++) h = (h * 31 + n.charCodeAt(i)) & 0xffff;
+      return grads[h % grads.length];
     }
 
-    function renderGames(list) {
-      gamesGrid.innerHTML = "";
-      if (!list.length) {
-        const box = document.createElement("div");
-        box.style.gridColumn = "1 / -1";
-        box.style.padding = "14px";
-        box.style.border = "1px dashed var(--line)";
-        box.style.borderRadius = "12px";
-        box.style.color = "var(--d)";
-        box.textContent = "Inga spel hittades.";
-        gamesGrid.appendChild(box);
-        return;
-      }
-
-      const sorted = [...list].sort((a, b) => {
-        const favDelta = Number(isFavorite(b)) - Number(isFavorite(a));
-        if (favDelta !== 0) return favDelta;
-        return displayName(a).localeCompare(displayName(b), "sv", { sensitivity: "base", numeric: true });
-      });
-
-      sorted.forEach((file) => {
-        gamesGrid.appendChild(createCard(file));
-      });
+    function gameEmoji(name) {
+      const n = name.toLowerCase();
+      if (n.includes("minecraft") || n.includes("eagler")) return "⛰️";
+      if (n.includes("drift") || n.includes("car") || n.includes("racing")) return "🚗";
+      if (n.includes("basket") || n.includes("soccer") || n.includes("sport")) return "⚽";
+      if (n.includes("puzzle") || n.includes("word") || n.includes("chess")) return "🧩";
+      if (n.includes("doom") || n.includes("quake") || n.includes("shooter")) return "🔫";
+      if (n.includes("mario")) return "🍄";
+      return "🎮";
     }
 
-    function runSearch() {
-      const q = normalizeSearchText(searchInput.value);
-      const base = getBaseListByFilter();
-
-      if (!q) {
-        renderGames(base);
-        if (currentFilter === "all") searchMeta.textContent = `Visar alla spel (${base.length})`;
-        if (currentFilter === "favorites") searchMeta.textContent = `Visar favoriter (${base.length})`;
-        if (currentFilter === "recent") searchMeta.textContent = `Visar senaste (${base.length})`;
-        return;
-      }
-
-      const ranked = base
-        .map((file) => ({ file, ...scoreGameMatch(file, q) }))
-        .filter((x) => x.ok)
-        .sort((a, b) => b.score - a.score);
-
-      renderGames(ranked.map((r) => r.file));
-      searchMeta.textContent = `${ranked.length} träffar för "${searchInput.value.trim()}"`;
+    function requireLogin(msg = "Logga in först.") {
+      if (state.user) return true;
+      toast(msg);
+      openLoginModal(false);
+      return false;
     }
 
-    let searchDebounce = null;
-    function filterGames() {
-      clearTimeout(searchDebounce);
-      searchDebounce = setTimeout(runSearch, 90);
+    // -------------------- LOADER --------------------
+    let loaderInterval = null;
+
+    function showPageLoader(title = "Laddar sidan...") {
+      const ov = document.getElementById("loaderOverlay");
+      const fill = document.getElementById("loaderFill");
+      const msg = document.getElementById("loaderMsg");
+      document.getElementById("loaderTitle").textContent = title;
+      fill.style.width = "0%";
+      ov.classList.add("visible");
+
+      let p = 0;
+      clearInterval(loaderInterval);
+      loaderInterval = setInterval(() => {
+        p = Math.min(95, p + Math.random() * 14);
+        fill.style.width = p + "%";
+      }, 160);
+
+      msg.textContent = LOAD_MSGS[Math.floor(Math.random() * LOAD_MSGS.length)];
     }
 
-    function setQuickFilter(filter) {
-      currentFilter = filter;
-      document.querySelectorAll(".filterBtn").forEach((btn) => {
-        btn.classList.toggle("active", btn.dataset.filter === filter);
-      });
-      runSearch();
-    }
-
-    function openGame(game) {
-      updatesPage.classList.add("hidden");
-      gamesSection.classList.remove("hidden");
-      playArea.classList.remove("hidden");
-
-      iframeLoader.classList.remove("hidden");
-      gameFrame.src = `UGS-Files/${game}.html`;
-
-      questTrackerPanel.innerHTML =
-        `<b>🎯 Nu spelar du:</b><br>${displayName(game)}<br><span style="color:var(--d)">Fil: UGS-Files/${game}.html</span>`;
-
-      if (!recentGames.includes(game)) {
-        recentGames.unshift(game);
-        recentGames = recentGames.slice(0, 12);
-        localStorage.setItem("recentGames", JSON.stringify(recentGames));
-      }
-
-      gameFrame.onload = () => {
-        iframeLoader.classList.add("hidden");
-      };
-
+    function hidePageLoader() {
+      const fill = document.getElementById("loaderFill");
+      fill.style.width = "100%";
+      clearInterval(loaderInterval);
       setTimeout(() => {
-        iframeLoader.classList.add("hidden");
-      }, 2500);
-
-      requestAnimationFrame(() => {
-        playArea.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
+        document.getElementById("loaderOverlay").classList.remove("visible");
+      }, 250);
     }
 
-    function openIframe(url) {
-      updatesPage.classList.add("hidden");
-      gamesSection.classList.remove("hidden");
-      playArea.classList.remove("hidden");
-
-      iframeLoader.classList.remove("hidden");
-      gameFrame.src = url;
-      questTrackerPanel.innerHTML =
-        `<b>🌐 Extern sida öppnad</b><br><span style="color:var(--d)">${url}</span>`;
-
-      gameFrame.onload = () => iframeLoader.classList.add("hidden");
-      setTimeout(() => iframeLoader.classList.add("hidden"), 2500);
-      closeSidebar();
-      playArea.scrollIntoView({ behavior: "smooth", block: "start" });
+    function showGameLoader(text = "Laddar spel...") {
+      const l = document.getElementById("igpLoader");
+      document.getElementById("igpLoaderText").textContent = text;
+      l.classList.remove("hidden");
     }
 
-    function toggleFullscreen() {
-      const box = document.getElementById("embedContainer");
-      if (!document.fullscreenElement) box.requestFullscreen();
-      else document.exitFullscreen();
+    function hideGameLoader() {
+      document.getElementById("igpLoader").classList.add("hidden");
     }
 
-    function goHome() {
-      updatesPage.classList.add("hidden");
-      gamesSection.classList.remove("hidden");
-      setQuickFilter("all");
-      closeSidebar();
+    // -------------------- THEME --------------------
+    function applyDarkMode(isDark) {
+      document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
+      const tg = document.getElementById("darkToggle");
+      tg.classList.toggle("on", isDark);
+
+      if (state.user && state.data) {
+        state.data.settings.darkMode = !!isDark;
+        saveCurrentUser();
+      } else {
+        localStorage.setItem("cm_dark_pref_v4", isDark ? "1" : "0");
+      }
     }
 
-    function showFavorites() {
-      updatesPage.classList.add("hidden");
-      gamesSection.classList.remove("hidden");
-      setQuickFilter("favorites");
-      closeSidebar();
+    function toggleDarkMode() {
+      const current = document.documentElement.getAttribute("data-theme") !== "light";
+      applyDarkMode(!current);
     }
 
-    function showRecent() {
-      updatesPage.classList.add("hidden");
-      gamesSection.classList.remove("hidden");
-      setQuickFilter("recent");
-      closeSidebar();
+    // -------------------- HUD --------------------
+    function updateHUD() {
+      const coins = state.data ? state.data.coins : 0;
+      const xp = state.data ? state.data.xp : 0;
+      const lvl = getLevel(xp);
+
+      document.getElementById("coinDisplay").textContent = coins;
+      document.getElementById("levelDisplay").textContent = "Nivå " + lvl;
+      document.getElementById("xpFill").style.width = getLevelPct(xp) + "%";
+
+      const loginBtn = document.getElementById("loginBtn");
+      const profileBtn = document.getElementById("profileBtn");
+      if (state.user) {
+        loginBtn.style.display = "none";
+        profileBtn.style.display = "inline-flex";
+      } else {
+        loginBtn.style.display = "inline-flex";
+        profileBtn.style.display = "none";
+      }
     }
 
-    function showUpdates() {
-      gamesSection.classList.add("hidden");
-      playArea.classList.add("hidden");
-      updatesPage.classList.remove("hidden");
-      closeSidebar();
+    function gain(coins = 0, xp = 0) {
+      if (!state.user || !state.data) return;
+      state.data.coins += coins;
+      state.data.xp += xp;
+      saveCurrentUser();
+      updateHUD();
     }
 
-    function renderUpdates() {
-      updatesList.innerHTML = "";
-      updates.forEach((u) => {
-        const li = document.createElement("li");
-        li.textContent = u;
-        updatesList.appendChild(li);
-      });
-    }
-
+    // -------------------- SIDEBAR --------------------
     function openSidebar() {
-      sidebar.classList.add("open");
-      sidebarOverlay.classList.add("show");
+      document.getElementById("sidebar").classList.add("open");
+      document.getElementById("sideOverlay").classList.add("open");
     }
 
     function closeSidebar() {
-      sidebar.classList.remove("open");
-      sidebarOverlay.classList.remove("show");
+      document.getElementById("sidebar").classList.remove("open");
+      document.getElementById("sideOverlay").classList.remove("open");
     }
 
     function toggleSidebar() {
-      if (sidebar.classList.contains("open")) closeSidebar();
-      else openSidebar();
+      const open = document.getElementById("sidebar").classList.contains("open");
+      if (open) closeSidebar(); else openSidebar();
     }
 
-    function openProfileModal() {
-      showToast("Profil kommer snart i denna version.");
+    // -------------------- RECOMMENDED --------------------
+    function renderRecommended() {
+      const wrap = document.getElementById("recommendedSection");
+      wrap.innerHTML = "";
+      RECOMMENDED.forEach(item => {
+        const card = document.createElement("button");
+        card.className = "recCard";
+        card.innerHTML = `
+          <div class="recEmoji">${item.emoji}</div>
+          <div class="recName">${item.name}</div>
+          <div class="recDesc">${item.desc}</div>
+          <span class="recPlay">▶ Spela nu</span>
+        `;
+        card.onclick = () => openGame(item.id);
+        wrap.appendChild(card);
+      });
     }
 
-    function openThemePopup() {
-      document.getElementById("themePopup").style.display = "flex";
-      updateThemeButtons();
+    // -------------------- GAMES GRID --------------------
+    function setFilter(filter, btn) {
+      state.filter = filter;
+      state.page = 0;
+      document.querySelectorAll(".filterBtn").forEach(b => b.classList.remove("active"));
+      if (btn) btn.classList.add("active");
+      renderGames();
+    }
+
+    function showFavorites() {
+      state.filter = "favorites";
+      state.page = 0;
+      document.querySelectorAll(".filterBtn").forEach(b => b.classList.remove("active"));
+      const favBtn = document.querySelector('.filterBtn[data-filter="favorites"]');
+      if (favBtn) favBtn.classList.add("active");
+      closeSidebar();
+      closeGame(false);
+      renderGames();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function getFilteredGames() {
+      let list = [...GAMES];
+      if (state.filter === "favorites") {
+        if (!state.user || !state.data) return [];
+        const fav = new Set(state.data.favorites || []);
+        list = list.filter(g => fav.has(g.id));
+      }
+      if (state.search) {
+        const q = normalize(state.search);
+        list = list.filter(g => {
+          const a = normalize(g.name);
+          const b = normalize(g.id);
+          return a.includes(q) || b.includes(q);
+        });
+      }
+      list.sort((a, b) => a.name.localeCompare(b.name, "sv", { sensitivity: "base" }));
+      return list;
+    }
+
+    function isFavorite(gameId) {
+      return !!(state.user && state.data && state.data.favorites.includes(gameId));
+    }
+
+    function toggleFav(gameId) {
+      if (!requireLogin("Logga in för att använda favoriter.")) return;
+      const arr = state.data.favorites;
+      const i = arr.indexOf(gameId);
+      if (i >= 0) {
+        arr.splice(i, 1);
+        toast("Tog bort favorit");
+      } else {
+        arr.push(gameId);
+        toast("Favorit sparad");
+        gain(2, 1);
+      }
+      saveCurrentUser();
+      renderGames();
+      refreshGameFavButton();
+    }
+
+    function refreshGameFavButton() {
+      const btn = document.getElementById("gameFavBtn");
+      if (!state.currentGame || !btn) return;
+      btn.textContent = isFavorite(state.currentGame.id) ? "★" : "☆";
+    }
+
+    function renderGames() {
+      const grid = document.getElementById("gamesGrid");
+      const meta = document.getElementById("searchMeta");
+      const loadWrap = document.getElementById("loadMoreWrap");
+      const loadBtn = document.getElementById("loadMoreBtn");
+
+      const filtered = getFilteredGames();
+      const shown = filtered.slice(0, (state.page + 1) * state.perPage);
+
+      grid.innerHTML = "";
+
+      if (!filtered.length) {
+        const p = document.createElement("div");
+        p.style.cssText = "grid-column:1/-1;text-align:center;padding:26px;color:var(--d);";
+        p.innerHTML = state.filter === "favorites"
+          ? "Inga favoriter ännu.<br><small>Klicka ☆ på ett spel.</small>"
+          : "Inga spel matchade sökningen.";
+        grid.appendChild(p);
+      } else {
+        shown.forEach(g => {
+          const card = document.createElement("div");
+          card.className = "gameCard";
+          const emoji = gameEmoji(g.name);
+          const grad = hashToGrad(g.name);
+          const favClass = isFavorite(g.id) ? "favBtn active" : "favBtn";
+          const favText = isFavorite(g.id) ? "★" : "☆";
+
+          card.innerHTML = `
+            <div class="gameThumb">
+              <div class="gameThumbBg" style="background:${grad}"></div>
+              <div class="gameThumbLetter">${emoji}</div>
+            </div>
+            <div class="gameInfo">
+              <div class="gameName">${g.name}</div>
+              <div class="gameActions">
+                <button class="${favClass}" data-fav="${g.id}">${favText}</button>
+              </div>
+            </div>
+          `;
+
+          card.addEventListener("click", (e) => {
+            const fav = e.target.closest("[data-fav]");
+            if (fav) {
+              e.stopPropagation();
+              toggleFav(fav.dataset.fav);
+              return;
+            }
+            openGame(g.id);
+          });
+
+          grid.appendChild(card);
+        });
+      }
+
+      meta.textContent = `${shown.length}/${filtered.length} spel visas`;
+
+      if (shown.length < filtered.length) {
+        loadWrap.style.display = "flex";
+        loadBtn.textContent = `Ladda fler (${filtered.length - shown.length} kvar)`;
+      } else {
+        loadWrap.style.display = "none";
+      }
+    }
+
+    // -------------------- GAME PANEL --------------------
+    function openGame(gameId) {
+      const game = GAMES.find(g => g.id === gameId);
+      if (!game) return;
+
+      state.currentGame = game;
+      state.currentIsExternal = false;
+
+      const panel = document.getElementById("inlineGamePanel");
+      const frame = document.getElementById("gameFrame");
+
+      document.getElementById("gameTitle").textContent = game.name;
+      document.getElementById("igpInfoTitle").textContent = game.name;
+      document.getElementById("igpInfoEmoji").textContent = gameEmoji(game.name);
+      document.getElementById("igpInfoCat").textContent = game.cat || "Spel";
+
+      panel.style.display = "flex";
+      showGameLoader(LOAD_MSGS[Math.floor(Math.random() * LOAD_MSGS.length)]);
+
+      frame.onload = () => hideGameLoader();
+      frame.src = `UGS-Files/${game.id}.html`;
+
+      refreshGameFavButton();
+
+      if (state.user && state.data) {
+        state.data.gamesPlayed = (state.data.gamesPlayed || 0) + 1;
+        gain(1, 2);
+        saveCurrentUser();
+        renderProfileWindow();
+      }
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function openExternal(url, title) {
+      state.currentGame = { id: "__external__", name: title || "Extern sida", cat: "Webb" };
+      state.currentIsExternal = true;
+
+      const panel = document.getElementById("inlineGamePanel");
+      const frame = document.getElementById("gameFrame");
+
+      document.getElementById("gameTitle").textContent = title || "Extern sida";
+      document.getElementById("igpInfoTitle").textContent = title || "Extern sida";
+      document.getElementById("igpInfoEmoji").textContent = "🌐";
+      document.getElementById("igpInfoCat").textContent = "Extern";
+
+      panel.style.display = "flex";
+      showGameLoader("Laddar extern sida...");
+      frame.onload = () => hideGameLoader();
+      frame.src = url;
+
+      refreshGameFavButton();
+      closeSidebar();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function closeGame(scrollTop = true) {
+      const panel = document.getElementById("inlineGamePanel");
+      const frame = document.getElementById("gameFrame");
+      panel.style.display = "none";
+      frame.src = "about:blank";
+      state.currentGame = null;
+      state.currentIsExternal = false;
+      if (scrollTop) window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function reloadGameFrame() {
+      const frame = document.getElementById("gameFrame");
+      if (frame && frame.src && frame.src !== "about:blank") {
+        showGameLoader("Laddar om...");
+        frame.src = frame.src;
+      }
+    }
+
+    function goFullscreen() {
+      const frame = document.getElementById("gameFrame");
+      if (frame.requestFullscreen) frame.requestFullscreen();
+      else if (frame.webkitRequestFullscreen) frame.webkitRequestFullscreen();
+      else if (frame.mozRequestFullScreen) frame.mozRequestFullScreen();
+    }
+
+    function toggleGameFav() {
+      if (!state.currentGame || state.currentIsExternal) return;
+      toggleFav(state.currentGame.id);
+    }
+
+    function goHomeHard() {
+      const f = document.getElementById("gameFrame");
+      if (f) f.src = "about:blank";
+      window.location.reload();
+    }
+
+    // -------------------- LOGIN --------------------
+    function openLoginModal(registerMode) {
+      const ov = document.getElementById("loginOverlay");
+      ov.classList.add("open");
+      ov.dataset.mode = registerMode ? "register" : "login";
+
+      document.getElementById("loginTitle").textContent = registerMode ? "Skapa konto" : "Logga in";
+      document.getElementById("loginSubtitle").textContent = registerMode
+        ? "Skapa konto för att spara framsteg och profil."
+        : "Logga in för att fortsätta.";
+
+      document.getElementById("loginActionBtn").textContent = registerMode ? "Registrera" : "Logga in";
+      document.getElementById("loginToggleText").textContent = registerMode
+        ? "Har du konto? Logga in"
+        : "Inget konto? Registrera";
+
+      document.getElementById("loginError").style.display = "none";
+      document.getElementById("loginUser").value = "";
+      document.getElementById("loginPass").value = "";
+      document.getElementById("loginUser").focus();
+    }
+
+    function closeLoginModal() {
+      document.getElementById("loginOverlay").classList.remove("open");
+    }
+
+    function toggleLoginMode() {
+      const mode = document.getElementById("loginOverlay").dataset.mode === "register";
+      openLoginModal(!mode);
+    }
+
+    function sanitizeUsername(raw) {
+      return (raw || "").trim().replace(/[^a-zA-Z0-9åäöÅÄÖ_\- ]/g, "").slice(0, 24);
+    }
+
+    function doAuth() {
+      const mode = document.getElementById("loginOverlay").dataset.mode || "login";
+      const user = sanitizeUsername(document.getElementById("loginUser").value);
+      const pass = (document.getElementById("loginPass").value || "").trim();
+      const err = document.getElementById("loginError");
+
+      if (!user || !pass) {
+        err.textContent = "Fyll i användarnamn och lösenord.";
+        err.style.display = "block";
+        return;
+      }
+
+      const accounts = getAccounts();
+      const hash = btoa(pass);
+
+      if (mode === "register") {
+        if (accounts[user.toLowerCase()]) {
+          err.textContent = "Användarnamnet är upptaget.";
+          err.style.display = "block";
+          return;
+        }
+
+        accounts[user.toLowerCase()] = hash;
+        setAccounts(accounts);
+
+        const data = defaultUserData(user);
+        saveUserData(user, data);
+
+        state.user = user;
+        state.data = data;
+        localStorage.setItem(SESSION_KEY, user);
+
+        closeLoginModal();
+        afterLogin("Konto skapat! +50 mynt.");
+        return;
+      }
+
+      const saved = accounts[user.toLowerCase()];
+      if (!saved || saved !== hash) {
+        err.textContent = "Fel användarnamn eller lösenord.";
+        err.style.display = "block";
+        return;
+      }
+
+      state.user = user;
+      state.data = getUserData(user);
+      localStorage.setItem(SESSION_KEY, user);
+
+      closeLoginModal();
+      afterLogin("Inloggad!");
+    }
+
+    function logout() {
+      if (state.user && state.data) saveCurrentUser();
+      state.user = null;
+      state.data = null;
+      localStorage.removeItem(SESSION_KEY);
+      updateHUD();
+      applyDarkMode(localStorage.getItem("cm_dark_pref_v4") !== "0");
+      closeProfileWindow();
+      renderGames();
+      toast("Utloggad.");
+    }
+
+    function afterLogin(message) {
+      updateHUD();
+      applyDarkMode(state.data?.settings?.darkMode !== false);
+      renderGames();
+      renderProfileWindow();
+      toast(message);
+    }
+
+    // -------------------- PROFILE --------------------
+    function openProfileWindow() {
+      if (!requireLogin()) return;
+      const ov = document.getElementById("profileOverlay");
+      ov.classList.add("open");
+      renderProfileWindow();
       closeSidebar();
     }
 
-    function closeThemePopup() {
-      document.getElementById("themePopup").style.display = "none";
+    function closeProfileWindow() {
+      document.getElementById("profileOverlay").classList.remove("open");
     }
 
-    function applyTheme(name, save = true) {
-      const theme = themes[name] || themes.purple;
-      Object.entries(theme).forEach(([key, value]) => {
-        document.documentElement.style.setProperty(key, value);
+    function handleProfileAvatarUpload(input) {
+      if (!input.files || !input.files[0] || !state.user || !state.data) return;
+      const file = input.files[0];
+      if (!file.type.startsWith("image/")) return toast("Bara bildfiler är tillåtna.");
+      if (file.size > 5 * 1024 * 1024) return toast("Max 5MB.");
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        state.data.profile.avatar = e.target.result;
+        saveCurrentUser();
+        renderProfileWindow();
+        toast("Profilbild uppdaterad.");
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function handleProfileBannerUpload(input) {
+      if (!input.files || !input.files[0] || !state.user || !state.data) return;
+      const file = input.files[0];
+      if (!file.type.startsWith("image/")) return toast("Bara bildfiler är tillåtna.");
+      if (file.size > 4 * 1024 * 1024) return toast("Max 4MB.");
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        state.data.profile.banner = e.target.result;
+        saveCurrentUser();
+        renderProfileWindow();
+        toast("Banner uppdaterad.");
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function saveProfileMeta() {
+      if (!state.user || !state.data) return;
+      const status = (document.getElementById("profileStatusInput")?.value || "").trim().slice(0, 60);
+      const bio = (document.getElementById("profileBioInput")?.value || "").trim().slice(0, 160);
+      state.data.profile.status = status;
+      state.data.profile.bio = bio;
+      saveCurrentUser();
+      toast("Profil sparad.");
+      renderProfileWindow();
+    }
+
+    function pinCurrentGame() {
+      if (!state.user || !state.data) return;
+      if (!state.currentGame || state.currentIsExternal) return toast("Öppna ett spel först.");
+      const pins = state.data.profile.pinnedGames || [];
+      if (pins.find(p => p.id === state.currentGame.id)) return toast("Spelet är redan pinnat.");
+      pins.unshift({
+        id: state.currentGame.id,
+        name: state.currentGame.name
       });
-      document.documentElement.dataset.theme = name;
-      if (save) localStorage.setItem("theme", name);
-      updateThemeButtons();
+      state.data.profile.pinnedGames = pins.slice(0, 3);
+      saveCurrentUser();
+      toast("Spel pinnat på profilen.");
+      renderProfileWindow();
     }
 
-    function setTheme(name) {
-      applyTheme(name, true);
-      closeThemePopup();
-      showToast(`Tema bytt till ${name.toUpperCase()}`);
+    function addFriendFromInput() {
+      if (!state.user || !state.data) return;
+      const inp = document.getElementById("friendInput");
+      if (!inp) return;
+      const target = sanitizeUsername(inp.value);
+      if (!target) return;
+      if (target.toLowerCase() === state.user.toLowerCase()) return toast("Du kan inte lägga till dig själv.");
+
+      const accounts = getAccounts();
+      if (!accounts[target.toLowerCase()]) return toast("Användaren finns inte.");
+
+      state.data.friends = state.data.friends || [];
+      if (state.data.friends.includes(target)) return toast("Redan vän.");
+      state.data.friends.push(target);
+      saveCurrentUser();
+      inp.value = "";
+      toast("Vän tillagd.");
+      renderProfileWindow();
     }
 
-    function updateThemeButtons() {
-      const current = document.documentElement.dataset.theme || "purple";
-      document.querySelectorAll(".theme-btn").forEach((btn) => {
-        btn.classList.toggle("active", btn.dataset.theme === current);
-      });
+    function removeFriend(name) {
+      if (!state.user || !state.data) return;
+      state.data.friends = (state.data.friends || []).filter(f => f !== name);
+      saveCurrentUser();
+      renderProfileWindow();
+      toast("Vän borttagen.");
     }
 
-    function startFakeOnlineCounter() {
-      let count = 12 + Math.floor(Math.random() * 10);
-      activePlayers.textContent = `Aktiva spelare: ${count}`;
-      setInterval(() => {
-        count += [-1, 0, 1][Math.floor(Math.random() * 3)];
-        if (count < 5) count = 5;
-        if (count > 40) count = 40;
-        activePlayers.textContent = `Aktiva spelare: ${count}`;
-      }, 3500);
+    function renderUsersBrowser(q = "") {
+      const wrap = document.getElementById("profileSearchResults");
+      if (!wrap) return;
+      const accounts = Object.keys(getAccounts());
+      const self = state.user.toLowerCase();
+      const query = normalize(q);
+
+      const list = accounts
+        .filter(u => u !== self)
+        .filter(u => !query || normalize(u).includes(query))
+        .slice(0, 24);
+
+      if (!list.length) {
+        wrap.innerHTML = `<div style="font-size:12px;color:var(--d);padding:8px 0">Inga användare hittades.</div>`;
+        return;
+      }
+
+      wrap.innerHTML = list.map(u => {
+        const data = getUserData(u);
+        const lvl = getLevel(data.xp || 0);
+        const isFriend = (state.data.friends || []).includes(data.username) || (state.data.friends || []).includes(u);
+        const shown = data.username || u;
+        return `
+          <div class="friendRow">
+            <div class="friendName">${shown} <small style="color:var(--d);font-weight:600">Lv ${lvl}</small></div>
+            <button class="miniBtn ok" onclick="viewProfile('${shown.replace(/'/g, "\\'")}')">Visa</button>
+            ${isFriend
+              ? `<button class="miniBtn danger" onclick="removeFriend('${shown.replace(/'/g, "\\'")}')">Ta bort</button>`
+              : `<button class="miniBtn" onclick="addFriendDirect('${shown.replace(/'/g, "\\'")}')">+ Vän</button>`
+            }
+          </div>
+        `;
+      }).join("");
     }
 
+    function addFriendDirect(name) {
+      if (!state.user || !state.data) return;
+      if (!state.data.friends.includes(name)) {
+        state.data.friends.push(name);
+        saveCurrentUser();
+        renderProfileWindow();
+        toast("Vän tillagd.");
+      }
+    }
+
+    function renderProfileWindow() {
+      const body = document.getElementById("profileBody");
+      if (!body) return;
+
+      if (!state.user || !state.data) {
+        body.innerHTML = `<div style="color:var(--d);padding:12px">Inte inloggad.</div>`;
+        return;
+      }
+
+      const p = state.data.profile;
+      const lvl = getLevel(state.data.xp || 0);
+      const avatar = p.avatar
+        ? `<img src="${p.avatar}" alt="avatar">`
+        : `${state.user.charAt(0).toUpperCase()}`;
+      const bannerStyle = p.banner
+        ? `background:url('${p.banner}') center/cover no-repeat;`
+        : `background:linear-gradient(135deg,var(--p2),var(--p0));`;
+
+      const friendsHtml = (state.data.friends || []).length
+        ? (state.data.friends || []).map(f => `
+            <div class="friendRow">
+              <div class="friendName">${f}</div>
+              <button class="miniBtn ok" onclick="viewProfile('${f.replace(/'/g, "\\'")}')">Visa</button>
+              <button class="miniBtn danger" onclick="removeFriend('${f.replace(/'/g, "\\'")}')">Ta bort</button>
+            </div>
+          `).join("")
+        : `<div style="font-size:12px;color:var(--d)">Inga vänner ännu.</div>`;
+
+      const pins = p.pinnedGames || [];
+      const pinsHtml = pins.length
+        ? pins.map(pg => `<div class="friendRow"><div class="friendName">📌 ${pg.name}</div><button class="miniBtn ok" onclick="openGame('${pg.id}')">Spela</button></div>`).join("")
+        : `<div style="font-size:12px;color:var(--d)">Inga pinnade spel.</div>`;
+
+      body.innerHTML = `
+        <div class="profileGrid">
+          <div>
+            <div class="profileCard">
+              <div class="profileTop" style="${bannerStyle}">
+                <div class="profileAvatarWrap">
+                  <label class="profileAvatar" style="cursor:pointer">
+                    ${avatar}
+                    <input id="profileAvatarInput" type="file" accept="image/*" style="display:none" />
+                  </label>
+                </div>
+              </div>
+
+              <div style="text-align:center;margin-top:-6px">
+                <div style="font-size:18px;font-weight:900">${state.user}</div>
+                <div style="font-size:12px;color:var(--d)">Nivå ${lvl} • ${state.data.xp || 0} XP</div>
+              </div>
+
+              <div class="profileStats" style="margin-top:10px">
+                <div class="statBox"><span>${state.data.coins || 0}</span><small>Mynt</small></div>
+                <div class="statBox"><span>${(state.data.favorites || []).length}</span><small>Favoriter</small></div>
+                <div class="statBox"><span>${(state.data.gamesPlayed || 0)}</span><small>Spelade</small></div>
+              </div>
+
+              <div class="formGroup" style="margin-top:10px">
+                <label>Status</label>
+                <input id="profileStatusInput" maxlength="60" placeholder="Online..." value="${(p.status || "").replace(/"/g, "&quot;")}" />
+              </div>
+              <div class="formGroup">
+                <label>Bio</label>
+                <textarea id="profileBioInput" maxlength="160" placeholder="Skriv något om dig själv...">${p.bio || ""}</textarea>
+              </div>
+
+              <div class="formRow">
+                <button class="pill primary" style="flex:1;justify-content:center" onclick="saveProfileMeta()">Spara profil</button>
+                <label class="pill ghost" style="flex:1;justify-content:center">
+                  Banner
+                  <input id="profileBannerInput" type="file" accept="image/*" style="display:none" />
+                </label>
+              </div>
+
+              <div class="formRow" style="margin-top:8px">
+                <button class="pill ghost" style="flex:1;justify-content:center" onclick="viewProfile('${state.user.replace(/'/g, "\\'")}')">Visa min profil</button>
+                <button class="pill ghost" style="flex:1;justify-content:center" onclick="pinCurrentGame()">Pinna nuvarande spel</button>
+              </div>
+
+              <div class="formRow" style="margin-top:8px">
+                <button class="pill ghost" style="width:100%;justify-content:center" onclick="logout()">Logga ut</button>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="profileCard">
+              <h4>Vänner</h4>
+              <div class="formRow" style="margin-bottom:8px">
+                <input id="friendInput" placeholder="Lägg till vän..." style="flex:1;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:10px;padding:8px 10px;color:var(--w);font-size:12px" />
+                <button class="miniBtn ok" onclick="addFriendFromInput()">Lägg till</button>
+              </div>
+              ${friendsHtml}
+            </div>
+
+            <div class="profileCard" style="margin-top:10px">
+              <h4>Pinnade spel</h4>
+              ${pinsHtml}
+            </div>
+
+            <div class="profileCard" style="margin-top:10px">
+              <h4>Bläddra profiler</h4>
+              <input id="profileSearchInput" oninput="renderUsersBrowser(this.value)" placeholder="Sök användare..." style="width:100%;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:10px;padding:8px 10px;color:var(--w);font-size:12px;margin-bottom:8px" />
+              <div id="profileSearchResults"></div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      const avatarInput = document.getElementById("profileAvatarInput");
+      const bannerInput = document.getElementById("profileBannerInput");
+      if (avatarInput) avatarInput.addEventListener("change", function () { handleProfileAvatarUpload(this); });
+      if (bannerInput) bannerInput.addEventListener("change", function () { handleProfileBannerUpload(this); });
+
+      renderUsersBrowser(document.getElementById("profileSearchInput")?.value || "");
+    }
+
+    // -------------------- PUBLIC PROFILE VIEW --------------------
+    function viewProfile(username) {
+      const clean = sanitizeUsername(username);
+      if (!clean) return;
+
+      const data = getUserData(clean);
+      const p = data.profile || {};
+      const lvl = getLevel(data.xp || 0);
+
+      const ov = document.getElementById("viewProfileOverlay");
+      const card = document.getElementById("profileViewCard");
+
+      const avatar = p.avatar
+        ? `<img src="${p.avatar}" alt="avatar">`
+        : clean.charAt(0).toUpperCase();
+
+      const bannerStyle = p.banner
+        ? `background:url('${p.banner}') center/cover no-repeat;`
+        : `background:linear-gradient(135deg,var(--p2),var(--p0));`;
+
+      const pins = p.pinnedGames || [];
+      const pinsHtml = pins.length
+        ? `<div class="pcPins">${pins.map(pg => `<button class="pcPinItem" onclick="openGame('${pg.id}');closeViewProfile()">${pg.name}</button>`).join("")}</div>`
+        : `<div style="font-size:11px;color:var(--d);margin:8px 0">Inga pinnade spel.</div>`;
+
+      let actionBtn = `<button class="pill ghost" style="flex:1;justify-content:center" onclick="closeViewProfile()">Stäng</button>`;
+      if (state.user && state.user.toLowerCase() !== clean.toLowerCase()) {
+        const isFriend = (state.data?.friends || []).includes(clean);
+        actionBtn = isFriend
+          ? `<button class="pill ghost" style="flex:1;justify-content:center" onclick="removeFriend('${clean.replace(/'/g, "\\'")}');closeViewProfile()">Ta bort vän</button>
+             <button class="pill ghost" style="flex:1;justify-content:center" onclick="closeViewProfile()">Stäng</button>`
+          : `<button class="pill primary" style="flex:1;justify-content:center" onclick="addFriendDirect('${clean.replace(/'/g, "\\'")}');closeViewProfile()">Lägg till vän</button>
+             <button class="pill ghost" style="flex:1;justify-content:center" onclick="closeViewProfile()">Stäng</button>`;
+      }
+
+      card.innerHTML = `
+        <div class="pcBanner" style="${bannerStyle}">
+          <div class="pcAvatarWrap"><div class="pcAvatar">${avatar}</div></div>
+          <button class="pcClose" onclick="closeViewProfile()">✕</button>
+        </div>
+        <div class="pcBody">
+          <div class="pcName">${clean}</div>
+          ${(p.status || "").trim() ? `<div class="pcStatus"><span class="pcDot"></span>${p.status}</div>` : ""}
+          <div style="font-size:12px;color:var(--d);margin-bottom:6px">Nivå ${lvl} • Medlem sedan ${p.joinDate || "-"}</div>
+          ${(p.bio || "").trim() ? `<div class="pcBio">${p.bio}</div>` : ""}
+
+          <div class="pcStats">
+            <div class="pcStat"><span>${data.coins || 0}</span><small>Mynt</small></div>
+            <div class="pcStat"><span>${(data.favorites || []).length}</span><small>Favoriter</small></div>
+            <div class="pcStat"><span>${data.gamesPlayed || 0}</span><small>Spelade</small></div>
+          </div>
+
+          <div style="font-size:10px;color:var(--d);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Pinnade spel</div>
+          ${pinsHtml}
+
+          <div class="pcActions">${actionBtn}</div>
+        </div>
+      `;
+
+      ov.classList.add("open");
+    }
+
+    function closeViewProfile() {
+      document.getElementById("viewProfileOverlay").classList.remove("open");
+    }
+
+    // -------------------- UPDATES --------------------
+    function showUpdates() {
+      closeSidebar();
+      closeGame(false);
+
+      const updates = [
+        "Ny design med större iframe och förbättrad spelvy.",
+        "Hem-knappen gör nu en full återställning (som omladdning).",
+        "Logo uppe till vänster använder icon.png och är klickbar för reload.",
+        "Teman borttagna, ersatt med Ljus/Mörkt-toggle.",
+        "Profilsystem med login, avatar, banner, status, bio och vänner.",
+        "Rekommenderade spel matchar referensen."
+      ];
+
+      const panel = document.createElement("div");
+      panel.id = "updatesTempPanel";
+      panel.className = "panelOverlay open";
+      panel.onclick = (e) => { if (e.target === panel) panel.remove(); };
+      panel.innerHTML = `
+        <div class="appWin" style="width:min(620px,96vw);max-height:88vh">
+          <div class="winBar">
+            <div class="winBarTitle">📢 Uppdateringar</div>
+            <button class="winClose" onclick="document.getElementById('updatesTempPanel').remove()">✕</button>
+          </div>
+          <div class="appBody">
+            <div style="display:grid;gap:8px">
+              ${updates.map(u => `<div style="padding:10px 12px;border-radius:10px;background:var(--glass);border:1px solid var(--line);font-size:13px;color:var(--m)">• ${u}</div>`).join("")}
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(panel);
+    }
+
+    // -------------------- EVENTS --------------------
+    document.getElementById("searchInput").addEventListener("input", (e) => {
+      state.search = e.target.value.trim();
+      state.page = 0;
+      renderGames();
+    });
+
+    document.getElementById("loadMoreBtn").addEventListener("click", () => {
+      state.page++;
+      renderGames();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closeSidebar();
+        closeViewProfile();
+      }
+    });
+
+    // -------------------- INIT --------------------
     (function init() {
-      saveFavorites();
-      renderUpdates();
-      renderRecommended();
-      applyTheme(localStorage.getItem("theme") || "purple", false);
-      setQuickFilter("all");
-      startFakeOnlineCounter();
+      showPageLoader("Laddar Coola Mattespel...");
 
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") {
-          closeSidebar();
-          closeThemePopup();
-        }
-      });
+      renderRecommended();
+
+      const sessionUser = localStorage.getItem(SESSION_KEY);
+      const accounts = getAccounts();
+      if (sessionUser && accounts[sessionUser.toLowerCase()]) {
+        state.user = sessionUser;
+        state.data = getUserData(sessionUser);
+      }
+
+      updateHUD();
+      renderGames();
+      renderProfileWindow();
+
+      const prefDark = state.user
+        ? state.data?.settings?.darkMode !== false
+        : (localStorage.getItem("cm_dark_pref_v4") !== "0");
+      applyDarkMode(prefDark);
+
+      // fake online count
+      const onlineEl = document.getElementById("onlineCount");
+      let online = 80 + Math.floor(Math.random() * 50);
+      onlineEl.textContent = `${online} online nu`;
+      setInterval(() => {
+        online += Math.floor(Math.random() * 5) - 2;
+        if (online < 40) online = 40;
+        if (online > 180) online = 180;
+        onlineEl.textContent = `${online} online nu`;
+      }, 3500);
+
+      // startup loader animation
+      let msgi = 0;
+      const msgEl = document.getElementById("loaderMsg");
+      const fill = document.getElementById("loaderFill");
+      const msgs = [...LOAD_MSGS];
+      const swap = setInterval(() => {
+        msgi = (msgi + 1) % msgs.length;
+        msgEl.textContent = msgs[msgi];
+      }, 600);
+      let p = 0;
+      const grow = setInterval(() => {
+        p = Math.min(96, p + 9 + Math.random() * 9);
+        fill.style.width = p + "%";
+      }, 140);
+
+      setTimeout(() => {
+        clearInterval(grow);
+        clearInterval(swap);
+        hidePageLoader();
+      }, 1450);
     })();
   </script>
 </body>
