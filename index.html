@@ -3,151 +3,557 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Jakobs Spel - Arcade Portal</title>
-  <link rel="icon" type="image/png" href="UGS-Files/icon.png">
+  <title>Coola Mattespel V4</title>
+  <link rel="icon" type="image/png" href="UGS-Files/icon.png" />
 
   <script>
     (function () {
       try {
-        const savedTheme = localStorage.getItem("theme");
-        if (savedTheme) document.documentElement.classList.add(`theme-${savedTheme}`);
+        const savedTheme = localStorage.getItem("theme") || "purple";
+        document.documentElement.dataset.theme = savedTheme;
       } catch (e) {}
     })();
   </script>
 
   <style>
-    @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap");
+    :root {
+      --bg0: #050008;
+      --bg1: #0b0014;
+      --bg2: #120022;
+      --p0: #7b2cff;
+      --p1: #b56cff;
+      --p2: #3a00b7;
+      --w: #f5f0ff;
+      --m: #c9b9ff;
+      --d: #8a7bc2;
+      --line: rgba(181, 108, 255, 0.18);
+      --glass: rgba(12, 6, 24, 0.55);
+      --glass-2: rgba(12, 6, 24, 0.35);
+      --shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+      --shadow2: 0 10px 30px rgba(123, 44, 255, 0.18);
+      --r: 18px;
+    }
 
-    * { box-sizing: border-box; }
-
-    html, body {
-      width: 100%;
-      height: 100%;
+    * {
+      box-sizing: border-box;
       margin: 0;
-      font-family: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
-      color: white;
-      transition: background .6s ease;
+      padding: 0;
     }
 
+    html,
     body {
-      --theme-r: 30;
-      --theme-g: 79;
-      --theme-b: 163;
-      background-size: 280% 280%;
-      animation: bgMove 34s ease infinite;
-      transition: background .3s ease;
+      min-height: 100%;
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      color: var(--w);
+      background: var(--bg0);
+      overflow-x: hidden;
     }
 
-    button, .chat-send, .sidebar-btn, .game-btn, .theme-btn {
-      font-family: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
-      letter-spacing: .2px;
+    .hidden {
+      display: none !important;
     }
 
-
-    @keyframes bgMove {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    body.blue {
-      --accent: #1e4fa3; --accent-dark: #0e2a52;
-      background-image: linear-gradient(180deg, #0a2a6c, #000, #0a2a6c);
-    }
-    body.red {
-      --accent: #a30000; --accent-dark: #520000;
-      background-image: linear-gradient(180deg, #5a0000, #000, #5a0000);
-    }
-    body.green {
-      --accent: #00a300; --accent-dark: #004d00;
-      background-image: linear-gradient(180deg, #004d1a, #000, #004d1a);
-    }
-    body.yellow {
-      --accent: #ffd000; --accent-dark: #b89a00;
-      background-image: linear-gradient(180deg, #665500, #000, #665500);
-    }
-    body.orange {
-      --accent: #ff8c00; --accent-dark: #c45f00;
-      background-image: linear-gradient(180deg, #5a2a00, #000, #5a2a00);
-    }
-    body.gray {
-      --accent: #aaaaaa; --accent-dark: #666666;
-      background-image: linear-gradient(180deg, #2b2b2b, #000, #2b2b2b);
-    }
-    body.purple {
-      --accent: #8a2be2; --accent-dark: #4b0082;
-      background-image: linear-gradient(180deg, #2b0040, #000, #2b0040);
-    }
-    body.pink {
-      --accent: #ff69b4; --accent-dark: #c71585;
-      background-image: linear-gradient(180deg, #4a0028, #000, #4a0028);
-    }
-
-    body::before,
-    body::after {
-      content: "";
+    .bg {
       position: fixed;
-      inset: -40%;
-      z-index: -1;
-      filter: blur(120px);
-      opacity: .55;
-      animation: auroraMove 40s ease-in-out infinite;
+      inset: 0;
+      z-index: -4;
       pointer-events: none;
     }
 
-    body::before {
-      background:
-        radial-gradient(circle at 30% 30%, var(--accent), transparent 60%),
-        radial-gradient(circle at 70% 40%, var(--accent-dark), transparent 65%),
-        radial-gradient(circle at 50% 70%, var(--accent), transparent 60%);
+    .bg-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(123, 44, 255, 0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(123, 44, 255, 0.07) 1px, transparent 1px);
+      background-size: 40px 40px;
     }
 
-    body::after {
-      background:
-        radial-gradient(circle at 60% 30%, var(--accent-dark), transparent 60%),
-        radial-gradient(circle at 20% 60%, var(--accent), transparent 65%),
-        radial-gradient(circle at 50% 50%, rgba(var(--theme-r), var(--theme-g), var(--theme-b), .22), transparent 62%);
-      animation-duration: 60s;
-      opacity: .45;
+    .bg-noise {
+      position: absolute;
+      inset: 0;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     }
 
-    @keyframes auroraMove {
-      0% { transform: translate(0, 0) rotate(0deg); }
-      50% { transform: translate(10%, -8%) rotate(180deg); }
-      100% { transform: translate(0, 0) rotate(360deg); }
+    .bg-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      animation: drift 18s ease-in-out infinite alternate;
     }
 
-    .app {
+    .bg-orb.o1 {
+      width: 620px;
+      height: 620px;
+      top: -200px;
+      left: -200px;
+      background: radial-gradient(circle, rgba(123, 44, 255, 0.25), transparent 70%);
+    }
+
+    .bg-orb.o2 {
+      width: 460px;
+      height: 460px;
+      bottom: -140px;
+      right: -120px;
+      background: radial-gradient(circle, rgba(58, 0, 183, 0.32), transparent 70%);
+      animation-delay: -9s;
+    }
+
+    .bg-orb.o3 {
+      width: 320px;
+      height: 320px;
+      top: 40%;
+      left: 60%;
+      background: radial-gradient(circle, rgba(181, 108, 255, 0.18), transparent 70%);
+      animation-delay: -4s;
+    }
+
+    @keyframes drift {
+      0% {
+        transform: translate(0, 0) scale(1);
+      }
+      100% {
+        transform: translate(40px, 30px) scale(1.1);
+      }
+    }
+
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      height: 64px;
       display: flex;
-      width: 100%;
-      height: 100%;
+      align-items: center;
+      gap: 12px;
+      padding: 0 16px;
+      background: rgba(5, 0, 8, 0.88);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(20px);
+    }
+
+    .menuBtn {
+      width: 44px;
+      height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: none;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 6px;
+      padding: 0 11px;
+      flex-shrink: 0;
+    }
+
+    .menuBtn span {
+      display: block;
+      height: 2px;
+      background: var(--p1);
+      border-radius: 2px;
+    }
+
+    .menuBtn:hover {
+      background: rgba(123, 44, 255, 0.2);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--p2), var(--p0));
+      display: grid;
+      place-items: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    .brandText {
+      min-width: 0;
+      line-height: 1.1;
+    }
+
+    .brandText .title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--w);
+    }
+
+    .brandText .sub {
+      font-size: 11px;
+      color: var(--d);
+    }
+
+    .topRight {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .coinBadge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 20px;
+      padding: 6px 12px;
+      border: 1px solid var(--line);
+      background: rgba(123, 44, 255, 0.2);
+      color: var(--m);
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .pill {
+      border: 1px solid var(--line);
+      background: var(--glass);
+      color: var(--m);
+      border-radius: 40px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .pill:hover {
+      background: rgba(123, 44, 255, 0.2);
+      color: var(--w);
+    }
+
+    .main {
+      padding-top: 64px;
+    }
+
+    .hero {
+      padding: 36px 24px 20px;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: clamp(32px, 6vw, 64px);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, var(--w) 0%, var(--p1) 60%, var(--p0) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero .subtitle {
+      color: var(--m);
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    .hintRow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 8px;
+    }
+
+    .hintPill {
+      background: rgba(123, 44, 255, 0.15);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 5px 13px;
+      font-size: 11px;
+      color: var(--m);
+    }
+
+    .activePlayers {
+      font-size: 12px;
+      color: var(--d);
+      margin-bottom: 8px;
+    }
+
+    .filterBar {
+      display: flex;
+      gap: 8px;
+      padding: 0 24px 14px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .filterBar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .filterBtn {
+      flex-shrink: 0;
+      padding: 7px 16px;
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      background: none;
+      color: var(--m);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .filterBtn:hover {
+      background: rgba(123, 44, 255, 0.15);
+      color: var(--w);
+    }
+
+    .filterBtn.active {
+      background: linear-gradient(135deg, var(--p0), var(--p2));
+      border-color: transparent;
+      color: white;
+    }
+
+    .searchWrap {
+      padding: 0 24px 14px;
       position: relative;
     }
 
-    .menu-toggle {
-      position: fixed;
-      top: 14px;
-      left: 14px;
-      width: 46px;
-      height: 46px;
-      border: none;
-      border-radius: 12px;
-      background: linear-gradient(135deg, var(--accent-dark), var(--accent));
-      color: white;
-      font-size: 28px;
+    .searchWrap::before {
+      content: "🔍";
+      position: absolute;
+      left: 36px;
+      top: 11px;
+      font-size: 14px;
+      pointer-events: none;
+    }
+
+    .searchWrap input {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 11px 16px 11px 42px;
+      color: var(--w);
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    .searchWrap input::placeholder {
+      color: var(--d);
+    }
+
+    .searchWrap input:focus {
+      outline: none;
+      border-color: var(--p0);
+    }
+
+    .searchMeta {
+      padding: 0 24px 14px;
+      color: var(--d);
+      font-size: 12px;
+    }
+
+    .sectionWrap {
+      padding: 0 24px 24px;
+    }
+
+    .sectionTitle {
+      font-size: 18px;
+      color: var(--m);
+      margin-bottom: 10px;
+    }
+
+    .recommended-row {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      scrollbar-width: thin;
+      margin-bottom: 14px;
+    }
+
+    .recommended-row .gameCard {
+      min-width: 170px;
+    }
+
+    .gamesGrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 14px;
+    }
+
+    .gameCard {
+      border-radius: 14px;
+      background: var(--glass);
+      border: 1px solid var(--line);
+      overflow: hidden;
       cursor: pointer;
-      z-index: 1200;
-      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.4);
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .gameCard:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow2);
+      border-color: rgba(181, 108, 255, 0.4);
+    }
+
+    .gameThumb {
+      height: 90px;
+      position: relative;
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+    }
+
+    .gameThumbLetter {
+      position: relative;
+      z-index: 2;
+      font-size: 32px;
+      font-weight: 900;
+      color: rgba(255, 255, 255, 0.92);
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    .gameInfo {
+      padding: 9px 10px 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .gameName {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--w);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
+    }
+
+    .favBtn {
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: none;
+      color: var(--d);
+      font-size: 13px;
+      padding: 3px 7px;
+      cursor: pointer;
+      transition: 0.2s;
+      flex-shrink: 0;
+    }
+
+    .favBtn:hover {
+      border-color: var(--p1);
+      color: var(--p1);
+    }
+
+    .favBtn.active {
+      background: rgba(123, 44, 255, 0.2);
+      border-color: var(--p1);
+      color: #ffd700;
+    }
+
+    #playArea {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 260px;
+      gap: 12px;
+      padding: 0 24px 16px;
+      margin-top: 4px;
+    }
+
+    #embedContainer {
+      background: var(--glass);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      overflow: hidden;
+      min-height: 420px;
+      position: relative;
+      box-shadow: var(--shadow);
+    }
+
+    #gameFrame {
+      width: 100%;
+      height: 100%;
+      min-height: 420px;
+      border: none;
+      background: #000;
+    }
+
+    .iframeLoader {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      background: rgba(0, 0, 0, 0.65);
+      color: var(--m);
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      z-index: 2;
+    }
+
+    .fullscreen-btn {
+      position: absolute;
+      right: 10px;
+      bottom: 10px;
+      border: none;
+      border-radius: 30px;
+      padding: 9px 14px;
+      color: white;
+      background: linear-gradient(135deg, var(--p0), var(--p2));
+      cursor: pointer;
+      font-weight: 700;
+      box-shadow: var(--shadow2);
+      z-index: 3;
+    }
+
+    #questTrackerPanel {
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: var(--glass);
+      padding: 12px;
+      box-shadow: var(--shadow);
+      color: var(--m);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .panel {
+      margin: 0 24px 24px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: var(--glass);
+      box-shadow: var(--shadow);
+      padding: 16px;
+    }
+
+    .panel h2 {
+      font-size: 22px;
+      margin-bottom: 8px;
+    }
+
+    .panel ul {
+      margin-left: 18px;
+      color: var(--m);
+      display: grid;
+      gap: 6px;
     }
 
     .sidebar-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, .35);
+      z-index: 1050;
+      background: rgba(0, 0, 0, 0.5);
       opacity: 0;
       pointer-events: none;
-      transition: opacity .2s ease;
-      z-index: 1000;
+      transition: 0.25s;
     }
 
     .sidebar-overlay.show {
@@ -156,1613 +562,430 @@
     }
 
     .sidebar {
-      width: 210px;
-      background: rgba(0, 0, 0, .65);
-      backdrop-filter: blur(10px);
-      padding: 72px 8px 10px;
-      flex-shrink: 0;
       position: fixed;
       top: 0;
-      left: 0;
-      height: 100%;
-      transform: translateX(-110%);
-      transition: transform .25s ease;
+      left: -360px;
+      bottom: 0;
+      width: 300px;
+      background: var(--bg1);
+      border-right: 1px solid var(--line);
       z-index: 1100;
+      display: flex;
+      flex-direction: column;
+      transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(30px);
     }
 
     .sidebar.open {
-      transform: translateX(0);
+      left: 0;
     }
 
-    .sidebar-btn {
-      width: 100%;
-      margin-bottom: 6px;
-      padding: 10px 12px;
-      border: none;
-      border-radius: 10px;
-      background: linear-gradient(135deg, var(--accent-dark), var(--accent));
-      color: white;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
+    .sideHead {
+      height: 64px;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--line);
       display: flex;
       align-items: center;
-      justify-content: flex-start;
-      gap: 10px;
-      text-align: left;
-    }
-
-    .sidebar-btn .icon {
-      width: 24px;
-      text-align: center;
-      font-size: 20px;
-      line-height: 1;
+      justify-content: space-between;
       flex-shrink: 0;
     }
 
-    .sidebar-btn .label {
-      white-space: nowrap;
-      line-height: 1.1;
-    }
-
-       .chat-panel {
-      display: none !important;
-      position: fixed;
-      top: 72px;
-      left: 224px;
-      width: 320px;
-      height: calc(100dvh - 84px);
-      background: rgba(0, 0, 0, .72);
-      border: 1px solid rgba(255, 255, 255, .16);
-      border-radius: 14px;
-      backdrop-filter: blur(10px);
-      display: flex;
-      flex-direction: column;
-      transform: translateX(-24px);
-      opacity: 0;
-      pointer-events: none;
-      transition: transform .25s ease, opacity .2s ease;
-      z-index: 1080;
-      overflow: hidden;
-    }
-
-
-
-    .sidebar.open + .chat-panel {
-      transform: translateX(0);
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .chat-header {
-      padding: 10px 12px;
-      font-weight: 800;
-      letter-spacing: .5px;
-      border-bottom: 1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.04);
-    }
-
-    .chat-messages {
-      flex: 1;
-      overflow-y: auto;
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .chat-msg {
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 10px;
-      padding: 8px;
-    }
-
-    .chat-meta {
-      font-size: 11px;
-      opacity: .72;
-      margin-bottom: 4px;
-    }
-
-    .chat-meta.neon {
-      font-weight: 800;
-      background: linear-gradient(90deg,#00fff7,#6f7bff,#ff5bf2,#00fff7);
-      background-size: 220% 100%;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      animation: loaderShine 2.6s linear infinite;
-    }
-
-    .chat-text {
-      font-size: 13px;
-      line-height: 1.3;
-      word-break: break-word;
-    }
-
-    .chat-msg.style-chatBubble {
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.24);
-      box-shadow: 0 4px 14px rgba(0,0,0,.35);
-    }
-
-    .chat-msg.style-bgNebula {
-      background:
-        radial-gradient(circle at 20% 20%, rgba(95, 0, 161, .35), transparent 55%),
-        radial-gradient(circle at 80% 70%, rgba(0, 98, 255, .28), transparent 60%),
-        rgba(255,255,255,.05);
-    }
-
-    .chat-controls {
-      border-top: 1px solid rgba(255,255,255,.12);
-      padding: 10px;
-      background: rgba(255,255,255,.03);
-    }
-
-    .chat-name,
-    .chat-input {
-      width: 100%;
-      border: none;
-      border-radius: 8px;
-      padding: 8px;
-      margin-bottom: 8px;
-      font-size: 13px;
-      outline: none;
-    }
-
-    .chat-row {
-      display: flex;
-      gap: 8px;
-    }
-
-    .chat-send {
-      border: none;
-      border-radius: 8px;
-      padding: 8px 12px;
-      cursor: pointer;
-      background: linear-gradient(135deg, var(--accent-dark), var(--accent));
-      color: white;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-
-    .main {
-      width: 100%;
-      padding: 25px;
-      overflow-y: auto;
-    }
-
-    .header { text-align: center; margin-bottom: 20px; }
-
-    .header h1 {
-      font-size: 52px;
-      margin: 0;
-      background: linear-gradient(90deg, #4da3ff, #fff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .subtitle {
-      margin-top: 8px;
-      font-size: 18px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      opacity: 0.75;
-      background: linear-gradient(90deg, var(--accent), #ffffff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    /* NYTT: Aktiva spelare */
-
-    .discord-banner {
-      margin: 12px auto 8px;
-      max-width: 760px;
-      padding: 10px 14px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,.3);
-      background: linear-gradient(135deg, rgba(88,101,242,.34), rgba(0,0,0,.35));
-      box-shadow: 0 10px 24px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.2);
-      text-align: center;
-      font-weight: 800;
-      font-size: 14px;
-      letter-spacing: .4px;
-    }
-    .discord-banner a {
-      color: #dbeafe;
-      text-decoration: none;
-      border-bottom: 1px dashed rgba(219,234,254,.7);
-    }
-    .discord-banner a:hover { color: #fff; border-bottom-color: #fff; }
-
-    .active-players {
-      margin-top: 8px;
+    .sideHead h3 {
       font-size: 15px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      color: #fff;
-      background: linear-gradient(90deg, #ffffff, var(--accent));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: var(--w);
     }
 
-    .search-box input {
-      margin-top: 20px;
-      padding: 14px;
-      width: 100%;
-      max-width: 420px;
-      border-radius: 12px;
-      border: none;
-      font-size: 16px;
-    }
-
-    /* Arcade facelift inspired by classic unblocked game portals */
-    body.blue {
-      --accent: #34d4ff;
-      --accent-dark: #0a3f82;
-      background-image:
-        radial-gradient(circle at 12% 10%, rgba(48, 194, 255, 0.22), transparent 35%),
-        radial-gradient(circle at 88% 2%, rgba(89, 0, 255, 0.2), transparent 32%),
-        linear-gradient(180deg, #05080f 0%, #070b19 40%, #04060c 100%);
-    }
-
-    .main {
-      width: min(1560px, calc(100% - 18px));
-      margin: 0 auto;
-      padding: 22px;
-    }
-
-    .header {
-      margin: 4px auto 24px;
-      max-width: 1300px;
-      border-radius: 24px;
-      padding: 26px 22px 20px;
-      background:
-        linear-gradient(120deg, rgba(17, 26, 48, 0.9), rgba(9, 15, 30, 0.82)),
-        repeating-linear-gradient(140deg, rgba(255, 255, 255, 0.03) 0 2px, transparent 2px 12px);
-      border: 1px solid rgba(99, 195, 255, 0.35);
-      box-shadow:
-        0 24px 42px rgba(0, 0, 0, 0.45),
-        0 0 0 1px rgba(78, 182, 255, 0.18) inset;
-    }
-
-    .header h1 {
-      font-size: clamp(40px, 7vw, 74px);
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      line-height: .96;
-      text-shadow: 0 8px 24px rgba(0, 149, 255, 0.25);
-      background: linear-gradient(180deg, #ebfaff 15%, #66d8ff 54%, #3e79ff 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .subtitle {
-      margin-top: 14px;
-      font-size: clamp(12px, 2vw, 18px);
-      letter-spacing: 1.7px;
-      opacity: 0.94;
-      color: #caebff;
-      text-transform: uppercase;
-    }
-
-    .discord-banner {
-      max-width: 980px;
-      border-radius: 14px;
-      border: 1px solid rgba(112, 203, 255, 0.36);
-      background: linear-gradient(130deg, rgba(2, 14, 32, 0.75), rgba(20, 30, 54, 0.8));
-    }
-
-    .search-box input {
-      margin-top: 18px;
-      max-width: 540px;
-      border: 1px solid rgba(110, 211, 255, 0.34);
-      border-radius: 13px;
-      background: rgba(6, 12, 24, 0.86);
-      color: #ecf9ff;
-      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
-    }
-
-    .search-box input::placeholder {
-      color: rgba(190, 233, 255, 0.74);
-      letter-spacing: .2px;
-    }
-
-    .games-grid {
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 16px;
-      padding: 8px 2px 18px;
-    }
-
-    .game-card {
-      border-radius: 14px;
-      border: 1px solid rgba(88, 172, 255, 0.28);
-      background:
-        linear-gradient(175deg, rgba(20, 28, 48, 0.85), rgba(7, 12, 24, 0.9));
-      padding: 8px;
-      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
-      transition: transform .16s ease, border-color .18s ease, box-shadow .18s ease;
-    }
-
-    .game-card:hover {
-      transform: translateY(-4px);
-      border-color: rgba(109, 206, 255, 0.72);
-      box-shadow: 0 18px 34px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(104, 194, 255, 0.14);
-    }
-
-    .game-preview {
-      margin-bottom: 8px;
-      border-radius: 10px;
-      border: 1px solid rgba(133, 208, 255, 0.28);
-      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.42);
-    }
-
-    .game-name-chip {
-      left: 6px;
-      right: 6px;
-      bottom: 6px;
-      padding: 6px 8px;
+    .closeBtn {
+      width: 30px;
+      height: 30px;
       border-radius: 8px;
-      font-size: 11px;
-      letter-spacing: .6px;
-      border: 1px solid rgba(160, 222, 255, 0.24);
-      background: rgba(2, 8, 18, 0.72);
-    }
-
-    .game-btn {
-      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: none;
+      color: var(--m);
+      cursor: pointer;
       font-size: 14px;
-      letter-spacing: .5px;
-      text-transform: uppercase;
-      padding: 11px 8px;
-      border: 1px solid rgba(137, 219, 255, 0.24);
-      background:
-        linear-gradient(180deg, rgba(51, 180, 255, 0.22), rgba(36, 91, 180, 0.2)),
-        linear-gradient(120deg, #183665, #0b1d39 58%, #09142a);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.24), 0 10px 20px rgba(0,0,0,.38);
     }
 
-    .group-header {
-      border-top: 1px solid rgba(104, 193, 255, 0.24);
-      padding-top: 12px;
-      color: #90deff;
-      text-shadow: 0 3px 12px rgba(43, 174, 255, 0.3);
-    }
-
-    .sidebar {
-      width: 220px;
-      background: linear-gradient(180deg, rgba(7, 12, 23, 0.94), rgba(5, 9, 18, 0.92));
-      border-right: 1px solid rgba(97, 188, 255, 0.26);
-    }
-
-    #embedContainer {
-      display: none;
-      margin: 0 auto;
-      width: 100%;
-      aspect-ratio: 16/9;
-      background: #000;
-      border-radius: 18px;
-      overflow: hidden;
-      position: relative;
-      border: 1px solid rgba(255,255,255,.18);
-      box-shadow: 0 20px 46px rgba(0,0,0,.45);
-    }
-
-    #embedContainer iframe { width: 100%; height: 100%; border: none; }
-
-    #playArea {
-      display: none;
-      margin: 20px auto;
-      width: min(100%, 1420px);
-      grid-template-columns: minmax(760px, 1080px) 320px;
-      justify-content: center;
-      gap: 14px;
-      align-items: start;
-    }
-
-    #questTrackerPanel {
-      background: linear-gradient(165deg, rgba(8,10,20,.9), rgba(15,23,42,.82));
-      border: 1px solid rgba(148,163,184,.34);
-      border-radius: 16px;
-      padding: 12px;
-      min-height: 120px;
-    }
-    .tracker-title { font-weight: 900; margin-bottom: 8px; }
-    .tracker-empty { opacity: .8; font-size: 13px; }
-
-    html.theme-cyber #embedContainer,
-    html.theme-cyber #questTrackerPanel,
-    html.theme-cyber .shop-shell,
-    html.theme-cyber .roadmap-shell {
-      border-color: rgba(34,211,238,.7);
-      box-shadow:
-        0 0 0 1px rgba(34,211,238,.35) inset,
-        0 0 18px rgba(34,211,238,.45),
-        0 0 36px rgba(34,211,238,.2);
-    }
-    html.theme-cyber #embedContainer::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      border-radius: 18px;
-      box-shadow: 0 0 20px rgba(34,211,238,.55) inset;
-    }
-
-    #iframeLoader {
-      position: absolute;
-      inset: 0;
-      z-index: 6;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0, 0, 0, 0.72);
-      backdrop-filter: blur(4px);
-      pointer-events: none;
-    }
-
-    #iframeLoader.show {
+    .sideNavList {
+      padding: 8px;
       display: flex;
+      flex-direction: column;
+      gap: 2px;
+      overflow-y: auto;
     }
 
-    .loader-box {
-      width: min(460px, 85%);
-      text-align: center;
-      padding: 22px 20px 18px;
-      border-radius: 16px;
-      background: rgba(10, 10, 10, 0.78);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.45);
-    }
-
-    .loader-title {
-      font-size: 22px;
-      font-weight: 800;
-      margin-bottom: 12px;
-      letter-spacing: 1px;
-    }
-
-    .loader-track {
+    .sideNavBtn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
       width: 100%;
-      height: 14px;
-      border-radius: 999px;
-      overflow: hidden;
-      background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.08));
-      border: 1px solid rgba(255,255,255,.24);
-      box-shadow: inset 0 2px 4px rgba(0,0,0,.35);
-    }
-
-    .loader-fill {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      border-radius: inherit;
-      transform-origin: left center;
-      transform: scaleX(0);
-      background:
-        linear-gradient(100deg, rgba(255,255,255,.32) 0%, rgba(255,255,255,0) 35%),
-        linear-gradient(90deg, var(--accent-dark), var(--accent), #ffffff);
-      background-size: 200% 100%, 100% 100%;
-      animation: loaderShine 1.4s linear infinite, loaderPulse 1.8s ease-in-out infinite;
-      will-change: transform;
-    }
-
-    .loader-fill::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: repeating-linear-gradient(
-        120deg,
-        rgba(255,255,255,.18) 0 8px,
-        rgba(255,255,255,0) 8px 16px
-      );
-      animation: loaderStripes 1.1s linear infinite;
-      mix-blend-mode: soft-light;
-      opacity: .55;
-    }
-
-    @keyframes loaderShine {
-      0% { background-position: -160% 0, 0 0; }
-      100% { background-position: 180% 0, 0 0; }
-    }
-
-    @keyframes loaderPulse {
-      0%, 100% { filter: brightness(.95) saturate(1); }
-      50% { filter: brightness(1.08) saturate(1.15); }
-    }
-
-    @keyframes loaderStripes {
-      0% { transform: translateX(-18px); }
-      100% { transform: translateX(18px); }
-    }
-
-    .loader-message {
-      margin-top: 10px;
-      font-size: 14px;
-      opacity: 0.9;
-      min-height: 20px;
-    }
-
-    .fullscreen-btn {
-      position: absolute;
-      bottom: 10px;
-      right: 10px;
-      padding: 10px 20px;
-      border: none;
+      padding: 13px 14px;
       border-radius: 12px;
-      background: linear-gradient(135deg, var(--accent-dark), var(--accent));
-      color: white;
+      border: none;
+      background: none;
+      color: var(--m);
       cursor: pointer;
-      z-index: 7;
+      text-align: left;
+      font-size: 15px;
+      font-weight: 600;
+      transition: 0.2s;
     }
 
-    .games-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 18px;
+    .sideNavBtn:hover {
+      background: rgba(123, 44, 255, 0.15);
+      color: var(--w);
     }
 
-    .group-header {
-      grid-column: 1 / -1;
-      margin: 8px 0 2px;
-      font-size: 22px;
-      font-weight: 800;
-      letter-spacing: 2px;
-      color: var(--accent);
-      text-transform: uppercase;
-    }
-
-    .game-card { position: relative; }
-
-    .game-preview {
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      margin-bottom: 12px;
-      border-radius: 16px;
-      position: relative;
-      border: 1px solid rgba(255,255,255,.2);
-      background:
-        linear-gradient(135deg, rgba(255,255,255,.2), rgba(255,255,255,.02) 45%),
-        linear-gradient(225deg, rgba(0,0,0,.35), rgba(255,255,255,.02)),
-        linear-gradient(120deg, color-mix(in oklab, var(--accent) 58%, #fff 10%), color-mix(in oklab, var(--accent-dark) 86%, #000 18%));
-      overflow: hidden;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.26), 0 12px 28px rgba(0,0,0,.32);
-    }
-
-    .game-preview::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background:
-        repeating-linear-gradient(115deg, rgba(255,255,255,.12) 0 6px, transparent 6px 18px),
-        linear-gradient(180deg, transparent 0 68%, rgba(0,0,0,.36) 100%);
-      opacity: .45;
-      pointer-events: none;
-    }
-
-    .game-title {
-      margin-top: 8px;
-      display: block;
-      font-size: 13px;
-      font-weight: 800;
+    .sideNavIcon {
+      width: 24px;
       text-align: center;
-      color: rgba(255,255,255,.96);
-      text-shadow: 0 2px 8px rgba(0,0,0,.35);
+      font-size: 17px;
+      flex-shrink: 0;
     }
-
-    .game-name-chip {
-      position: absolute;
-      left: 10px;
-      right: 10px;
-      bottom: 10px;
-      font-size: 12px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: .8px;
-      text-align: center;
-      padding: 7px 10px;
-      border-radius: 10px;
-      background: rgba(0,0,0,.44);
-      border: 1px solid rgba(255,255,255,.18);
-      backdrop-filter: blur(7px);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .game-btn {
-      width: 100%;
-      padding: 10px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.26);
-      background:
-        linear-gradient(160deg, rgba(255,255,255,.2), rgba(255,255,255,.04)),
-        linear-gradient(120deg, color-mix(in oklab, var(--accent) 80%, #fff 10%), color-mix(in oklab, var(--accent-dark) 92%, #000 24%));
-      color: white;
-      font-size: 16px;
-      font-weight: 900;
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 20px 44px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.3);
-      transition: transform .16s ease, box-shadow .2s ease, filter .2s ease, border-color .2s ease;
-    }
-
-    .game-btn:hover {
-      transform: translateY(-4px) scale(1.018);
-      box-shadow: 0 24px 46px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.34);
-      border-color: rgba(255,255,255,.45);
-      filter: brightness(1.12) saturate(1.08);
-    }
-
-    .game-btn:active {
-      transform: translateY(2px) scale(.97);
-      box-shadow:
-        0 3px 8px rgba(0, 0, 0, 0.45),
-        inset 0 3px 6px rgba(0, 0, 0, 0.35);
-    }
-
-    .game-btn:hover::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: 16px;
-      pointer-events: none;
-      box-shadow: 0 0 20px color-mix(in oklab, var(--accent) 80%, #fff 20%);
-      opacity: .75;
-    }
-
-    .sidebar-btn, .chat-send, .theme-btn, .fullscreen-btn, .profile-btn {
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.24);
-      box-shadow: 0 10px 26px rgba(0,0,0,.36), inset 0 1px 0 rgba(255,255,255,.2);
-      transition: transform .14s ease, filter .18s ease, box-shadow .18s ease;
-    }
-
-    .sidebar-btn:hover, .chat-send:hover, .theme-btn:hover, .fullscreen-btn:hover, .profile-btn:hover {
-      transform: translateY(-2px);
-      filter: brightness(1.08);
-      box-shadow: 0 14px 32px rgba(0,0,0,.44), inset 0 1px 0 rgba(255,255,255,.26);
-    }
-
-    .favorite {
-      position: absolute;
-      top: 10px;
-      right: 12px;
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      border: 1px solid rgba(255,255,255,.28);
-      background: rgba(0,0,0,.42);
-      color: rgba(255,255,255,.75);
-      display: grid;
-      place-items: center;
-      font-size: 16px;
-      cursor: pointer;
-      transition: transform .14s ease, background .16s ease, color .16s ease, box-shadow .16s ease;
-      z-index: 2;
-    }
-
-    .favorite:hover { transform: scale(1.08); background: rgba(255,255,255,.16); color: #fff; }
-    .favorite.active { color: #ffd54a; background: rgba(255,205,64,.22); box-shadow: 0 0 16px rgba(255,205,64,.45); }
-
-    .toast {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0,0,0,.75);
-      border: 1px solid rgba(255,255,255,.22);
-      border-radius: 999px;
-      padding: 10px 14px;
-      font-size: 13px;
-      z-index: 2600;
-      backdrop-filter: blur(8px);
-      opacity: 0;
-      transition: opacity .18s ease, transform .18s ease;
-    }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(-6px); }
 
     #themePopup {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, .6);
+      z-index: 1300;
       display: none;
       align-items: center;
       justify-content: center;
+      background: rgba(0, 0, 0, 0.62);
+      padding: 12px;
     }
 
     .theme-box {
-      width: min(760px, 94vw);
-      background: rgba(8,8,12,.92);
-      padding: 24px;
-      border-radius: 22px;
-      border: 1px solid rgba(255,255,255,.18);
-      backdrop-filter: blur(14px);
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 18px;
+      width: min(760px, 96vw);
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: var(--bg1);
+      padding: 14px;
+      box-shadow: var(--shadow);
     }
 
     .theme-presets {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 12px;
-      align-content: start;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
     }
 
     .theme-btn {
-      padding: 14px 10px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,.16);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--w);
       cursor: pointer;
-      font-size: 12px;
+      padding: 12px 10px;
       font-weight: 800;
-      color: #fff;
-      letter-spacing: .5px;
-      background: linear-gradient(135deg, color-mix(in oklab, var(--accent-dark) 80%, #000), var(--accent));
+      letter-spacing: 0.04em;
+      transition: 0.2s;
     }
 
-
-    .theme-btn.locked {
-      opacity: .6;
-      filter: grayscale(.4);
-      cursor: not-allowed;
-      border-color: rgba(250,204,21,.45);
+    .theme-btn:hover {
+      border-color: var(--p1);
+      background: rgba(123, 44, 255, 0.2);
     }
-    .theme-btn .req { display:block; font-size:10px; opacity:.85; margin-top:4px; }
 
-    .roadmap-shell {
-      background: radial-gradient(circle at top, rgba(56,189,248,.16), transparent 52%), linear-gradient(165deg, rgba(8,10,20,.92), rgba(15,23,42,.88));
-      border: 1px solid rgba(148, 163, 184, .32);
-      border-radius: 20px;
-      padding: 18px;
-    }
-    .roadmap-progress-wrap { margin-bottom: 18px; }
-    .roadmap-progress-title { font-weight: 800; margin-bottom: 8px; }
-    .roadmap-progress-track { height: 14px; border-radius: 999px; background: rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.2); overflow:hidden; }
-    .roadmap-progress-fill { height:100%; width:0; background: linear-gradient(90deg, #22d3ee, #818cf8, #f472b6); border-radius:inherit; }
-    .roadmap-progress-text { margin-top: 8px; font-size: 13px; opacity:.9; }
-    .roadmap-rewards { display:grid; grid-template-columns: repeat(auto-fit,minmax(190px,1fr)); gap:10px; }
-    .roadmap-reward { background: linear-gradient(165deg, rgba(255,255,255,.08), rgba(255,255,255,.03)); border:1px solid rgba(255,255,255,.2); border-radius:12px; padding:10px; }
-    .roadmap-reward.unlocked { border-color: rgba(34,197,94,.55); box-shadow: 0 0 0 1px rgba(34,197,94,.2) inset; }
-
-    .profile-visual-card {
-      border-radius: 16px;
-      padding: 14px;
-      background: radial-gradient(circle at 20% 10%, rgba(56,189,248,.22), transparent 45%), radial-gradient(circle at 80% 0%, rgba(236,72,153,.16), transparent 40%), linear-gradient(165deg, rgba(15,23,42,.95), rgba(30,41,59,.88));
-      border: 1px solid rgba(255,255,255,.25);
-      box-shadow: 0 14px 24px rgba(0,0,0,.35);
-    }
-    .profile-visual-name { font-size: 20px; font-weight: 900; letter-spacing: .2px; }
-    .profile-visual-stats { margin-top: 8px; display:grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap:8px; }
-    .profile-stat { background: rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.16); border-radius:10px; padding:8px; font-size:12px; }
-    .profile-badges { margin-top:10px; display:flex; flex-wrap:wrap; gap:6px; }
-
-    .recommended-section { margin: 20px 0 42px; }
-    .recommended-title {
-      margin: 0 0 10px;
-      font-size: 22px;
-      letter-spacing: 1px;
+    .theme-btn.active {
+      border-color: transparent;
+      background: linear-gradient(135deg, var(--p0), var(--p2));
       color: #fff;
     }
-    .recommended-row {
-      display: flex;
-      gap: 12px;
-      overflow-x: auto;
-      padding-bottom: 4px;
-    }
-    .recommended-row .recommended-btn { min-width: 180px; }
 
-    #searchInput {
-      width: 100%;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.18);
-      background: rgba(0,0,0,.38);
-      color: #fff;
-      padding: 12px 14px;
-      outline: none;
-      transition: border-color .15s ease, box-shadow .15s ease;
-    }
-
-    #searchInput:focus {
-      border-color: rgba(255,255,255,.42);
-      box-shadow: 0 0 0 3px rgba(255,255,255,.12);
-    }
-
-    .search-meta {
-      margin-top: 6px;
-      font-size: 12px;
-      opacity: .82;
-      min-height: 16px;
-    }
-
-
-    .profile-btn {
+    .toast {
       position: fixed;
-      top: 12px;
-      right: 12px;
-      z-index: 1200;
-      border: 1px solid rgba(255,255,255,.35);
-      border-radius: 16px;
-      padding: 14px 20px;
-      font-size: 17px;
-      font-weight: 800;
-      letter-spacing: .2px;
-      color: white;
-      background: linear-gradient(135deg, color-mix(in srgb, var(--accent-dark) 78%, #000), var(--accent), #ffffff1a);
-      cursor: pointer;
-      box-shadow: 0 12px 28px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.22);
-      transition: transform .16s ease, box-shadow .16s ease, filter .16s ease;
-    }
-    .profile-btn:hover { transform: translateY(-2px); box-shadow: 0 16px 32px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.26); filter: brightness(1.06); }
-    .profile-btn:active { transform: translateY(1px) scale(.98); }
-    .chat-status { font-size: 12px; margin-bottom: 8px; opacity: .9; }
-    .chat-msg { animation: popIn .25s ease; }
-    @keyframes popIn { from { transform: translateY(8px); opacity: 0;} to { transform: translateY(0); opacity: 1; } }
-    .modal { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,.62); z-index: 1500; }
-    .modal-box { width: min(520px, 90vw); max-height: 85vh; overflow: auto; background: linear-gradient(165deg, rgba(255,255,255,.08), rgba(0,0,0,.7)); border: 1px solid rgba(255,255,255,.22); border-radius: 18px; padding: 18px; box-shadow: 0 24px 60px rgba(0,0,0,.5); backdrop-filter: blur(14px); }
-    .modal-box.wide { width: min(760px, 94vw); }
-    .auth-input { width: 100%; margin-bottom: 8px; border: none; border-radius: 8px; padding: 9px; }
-    .info-card { margin-top: 10px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.12); border-radius: 10px; padding: 10px; }
-    html.theme-blue body { --accent: #1e4fa3; --accent-dark: #0e2a52; background-image: linear-gradient(180deg, #0a2a6c, #000, #0a2a6c); }
-    html.theme-red body { --accent: #a30000; --accent-dark: #520000; background-image: linear-gradient(180deg, #5a0000, #000, #5a0000); }
-    html.theme-green body { --accent: #00a300; --accent-dark: #004d00; background-image: linear-gradient(180deg, #004d1a, #000, #004d1a); }
-    html.theme-yellow body { --accent: #ffd000; --accent-dark: #b89a00; background-image: linear-gradient(180deg, #665500, #000, #665500); }
-    html.theme-orange body { --accent: #ff8c00; --accent-dark: #c45f00; background-image: linear-gradient(180deg, #5a2a00, #000, #5a2a00); }
-    html.theme-gray body { --accent: #aaaaaa; --accent-dark: #666666; background-image: linear-gradient(180deg, #2b2b2b, #000, #2b2b2b); }
-    html.theme-purple body { --accent: #8a2be2; --accent-dark: #4b0082; background-image: linear-gradient(180deg, #2b0040, #000, #2b0040); }
-    html.theme-pink body { --accent: #ff69b4; --accent-dark: #c71585; background-image: linear-gradient(180deg, #4a0028, #000, #4a0028); }
-    html.theme-cyan body { --accent: #00d4ff; --accent-dark: #005f7a; background-image: linear-gradient(180deg, #002c36, #000, #003d4d); }
-    html.theme-sunset body { --accent: #ff6b6b; --accent-dark: #7a1b4d; background-image: linear-gradient(180deg, #4a1736, #14010a, #6a2e25); }
-    html.theme-neon body { --accent: #39ff14; --accent-dark: #0f5a19; background-image: linear-gradient(180deg, #05210b, #000, #0a2d0f); }
-    html.theme-ocean body { --accent: #38bdf8; --accent-dark: #075985; background-image: linear-gradient(180deg, #03283e, #000, #063755); }
-    html.theme-lava body { --accent: #fb923c; --accent-dark: #7c2d12; background-image: linear-gradient(180deg, #431407, #000, #7c2d12); }
-    html.theme-forest body { --accent: #4ade80; --accent-dark: #14532d; background-image: linear-gradient(180deg, #052e16, #000, #14532d); }
-    html.theme-midnight body { --accent: #a78bfa; --accent-dark: #312e81; background-image: linear-gradient(180deg, #1e1b4b, #000, #312e81); }
-    html.theme-candy body { --accent: #f472b6; --accent-dark: #9d174d; background-image: linear-gradient(180deg, #4a044e, #000, #831843); }
-    html.theme-gold body { --accent: #facc15; --accent-dark: #92400e; background-image: linear-gradient(180deg, #3f2a00, #000, #713f12); }
-    html.theme-arctic body { --accent: #93c5fd; --accent-dark: #1e3a8a; background-image: linear-gradient(180deg, #0b1b44, #000, #1d4ed8); }
-    html.theme-emerald body { --accent: #34d399; --accent-dark: #065f46; background-image: linear-gradient(180deg, #022c22, #000, #065f46); }
-    html.theme-rose body { --accent: #fb7185; --accent-dark: #9f1239; background-image: linear-gradient(180deg, #4c0519, #000, #9f1239); }
-    html.theme-storm body { --accent: #94a3b8; --accent-dark: #334155; background-image: linear-gradient(180deg, #0f172a, #000, #1e293b); }
-    html.theme-cyber body { --accent: #22d3ee; --accent-dark: #155e75; background-image: linear-gradient(180deg, #083344, #000, #164e63); }
-    html.theme-dusk body { --accent: #c084fc; --accent-dark: #6b21a8; background-image: linear-gradient(180deg, #2e1065, #000, #581c87); }
-
-    .intro-overlay { position: fixed; inset: 0; z-index: 2200; display:flex; align-items:center; justify-content:center; background-image: inherit; background-size: 400% 400%; animation: bgMove 25s ease infinite; overflow:hidden; }
-    .intro-overlay::before,
-    .intro-overlay::after {
-      content: "";
-      position: absolute;
-      inset: -40%;
-      filter: blur(120px);
+      right: 20px;
+      bottom: 20px;
+      z-index: 2000;
+      background: var(--glass);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 14px;
+      color: var(--w);
+      font-size: 13px;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transform: translateY(6px);
+      transition: 0.2s;
       pointer-events: none;
     }
-    .intro-overlay::before {
-      background:
-        radial-gradient(circle at 30% 30%, var(--accent), transparent 60%),
-        radial-gradient(circle at 70% 40%, var(--accent-dark), transparent 65%),
-        radial-gradient(circle at 50% 70%, var(--accent), transparent 60%);
-      opacity: .55;
-      animation: auroraMove 40s ease-in-out infinite;
-    }
-    .intro-overlay::after {
-      background:
-        radial-gradient(circle at 60% 30%, var(--accent-dark), transparent 60%),
-        radial-gradient(circle at 20% 60%, var(--accent), transparent 65%);
-      opacity: .4;
-      animation: auroraMove 60s ease-in-out infinite;
-    }
-    .intro-box { position: relative; z-index: 1; text-align:center; background: rgba(0,0,0,.55); padding: 26px; border: 1px solid rgba(255,255,255,.24); border-radius: 16px; width:min(520px,88vw); }
-    .intro-loader-box .loader-title { margin-bottom: 14px; }
-    .intro-overlay.fade-out { animation: introFadeOut .55s ease forwards; }
-    @keyframes introFadeOut { from { opacity:1; } to { opacity:0; visibility:hidden; } }
-    .admin-actions { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px; }
-    body.popup-open .favorite { pointer-events: none; }
 
-    .admin-modal-box {
-      background: linear-gradient(160deg, rgba(255,255,255,.1), rgba(0,0,0,.76));
-      border: 1px solid rgba(255,255,255,.24);
-    }
-    .admin-modal-head { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; }
-    .admin-modal-head h3 { margin:0; letter-spacing:.4px; }
-    .admin-badge {
-      font-size: 12px;
-      font-weight: 800;
-      border-radius: 999px;
-      padding: 6px 10px;
-      border: 1px solid rgba(255,255,255,.24);
-      background: rgba(0,0,0,.35);
-    }
-    .admin-badge.offline { background: rgba(180,40,40,.35); border-color: rgba(255,90,90,.45); }
-    .admin-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:10px; }
-
-    .chat-tabs { display:flex; gap:6px; }
-    .chat-tab { border:none; border-radius:999px; padding:6px 10px; background:rgba(255,255,255,.12); color:#fff; font-weight:700; cursor:pointer; }
-    .chat-tab.active { background: linear-gradient(135deg, var(--accent-dark), var(--accent)); }
-    .chat-view { display:flex; flex-direction:column; min-height:0; flex:1; }
-    .private-friends { display:flex; gap:6px; overflow-x:auto; padding:8px; border-bottom:1px solid rgba(255,255,255,.12); }
-    .private-friend-btn { border:none; border-radius:999px; padding:6px 12px; cursor:pointer; color:#fff; background:rgba(255,255,255,.14); white-space:nowrap; }
-    .private-friend-btn.active { background: linear-gradient(135deg, var(--accent-dark), var(--accent)); }
-    .profile-modal-box {
-      background:
-        radial-gradient(circle at 0% 0%, rgba(99,102,241,.22), transparent 40%),
-        radial-gradient(circle at 100% 0%, rgba(236,72,153,.16), transparent 34%),
-        linear-gradient(155deg, rgba(10,10,16,.96), rgba(18,26,40,.95));
-      border: 1px solid rgba(120,180,255,.4);
-      box-shadow: 0 24px 44px rgba(0,0,0,.52);
-      padding: 18px;
-    }
-    .profile-modal-header { margin-bottom: 12px; }
-    .profile-modal-title { margin: 0; font-size: 26px; letter-spacing: .4px; }
-    .profile-modal-subtitle { margin: 6px 0 0; opacity: .82; font-size: 13px; }
-    .profile-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-    .profile-section {
-      background: linear-gradient(165deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
-      border:1px solid rgba(255,255,255,.2);
-      border-radius:14px;
-      padding:12px;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
-    }
-    .profile-section h4 { margin:0 0 10px; font-size: 16px; }
-    .profile-actions { display:flex; flex-wrap:wrap; gap:8px; margin-bottom: 6px; }
-    .profile-actions .chat-send { flex:1; min-width: 110px; }
-
-    .quest-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 12px;
-      background: transparent;
-      border: none;
-      padding: 0;
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
     }
 
-    .quest-item {
-      background: linear-gradient(160deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
-      border: 1px solid rgba(255,255,255,.18);
-      border-radius: 14px;
-      padding: 12px;
-      box-shadow: 0 8px 18px rgba(0,0,0,.28);
-      display: grid;
-      gap: 8px;
+    @media (max-width: 900px) {
+      .coinBadge {
+        display: none;
+      }
+
+      #playArea {
+        grid-template-columns: 1fr;
+      }
+
+      #questTrackerPanel {
+        margin-top: 8px;
+      }
+
+      .theme-presets {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
     }
 
-    .quest-head { display:flex; align-items:center; justify-content:space-between; gap:8px; }
-    .quest-title { font-weight: 800; font-size: 14px; line-height: 1.3; }
-    .quest-reward { font-size: 12px; opacity:.9; }
-    .quest-status { font-size: 11px; padding: 4px 8px; border-radius: 999px; border:1px solid rgba(255,255,255,.2); }
-    .quest-status.done { background: rgba(34,197,94,.2); color:#bbf7d0; border-color: rgba(34,197,94,.45); }
-    .quest-status.claimed { background: rgba(56,189,248,.2); color:#bae6fd; border-color: rgba(56,189,248,.45); }
-    .quest-status.progress { background: rgba(250,204,21,.18); color:#fef08a; border-color: rgba(250,204,21,.35); }
-    .quest-progress { font-size: 12px; opacity: .88; }
-    .quest-progress-track { height: 10px; border-radius: 999px; background: rgba(255,255,255,.1); overflow:hidden; border:1px solid rgba(255,255,255,.15); }
-    .quest-progress-fill { height: 100%; width: 0; border-radius: inherit; background: linear-gradient(90deg, var(--accent-dark), var(--accent), #fff); transition: width .25s ease; }
+    @media (max-width: 600px) {
+      .topbar {
+        padding: 0 10px;
+        gap: 8px;
+      }
 
-    .shop-shell {
-      background: linear-gradient(165deg, rgba(8,10,20,.82), rgba(15,23,42,.72));
-      border: 1px solid rgba(148, 163, 184, .32);
-      border-radius: 16px;
-      padding: 14px;
-      box-shadow: 0 14px 32px rgba(0,0,0,.35);
-    }
-    .shop-balance {
-      font-weight: 800;
-      font-size: 18px;
-      margin-bottom: 12px;
-      letter-spacing: .4px;
-    }
-    .shop-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 12px;
-    }
-    .shop-item {
-      background: linear-gradient(165deg, rgba(30,41,59,.72), rgba(30,41,59,.4));
-      border: 1px solid rgba(148,163,184,.28);
-      border-radius: 14px;
-      padding: 12px;
-      display: grid;
-      gap: 8px;
-      transition: transform .16s ease, border-color .16s ease;
-    }
-    .shop-item:hover { transform: translateY(-3px); border-color: rgba(255,255,255,.45); }
-    .shop-item.owned { border-color: rgba(34,197,94,.55); }
-    .shop-item-top { display:flex; align-items:center; justify-content:space-between; gap:8px; }
-    .shop-item-title { font-weight: 800; }
-    .shop-item-desc { font-size: 12px; opacity: .86; min-height: 34px; }
-    .shop-item-price { font-size: 13px; opacity: .9; }
-    .tag { font-size: 11px; border-radius: 999px; padding: 4px 8px; border: 1px solid rgba(255,255,255,.25); }
-    .tag.owned { border-color: rgba(34,197,94,.7); color: #bbf7d0; }
-    .tag.missing { border-color: rgba(251,191,36,.5); color: #fde68a; }
+      .brandText .sub {
+        display: none;
+      }
 
+      .hero {
+        padding: 26px 12px 14px;
+      }
 
-    /* Final visual overrides (kept near end to win cascade). */
-    body.blue {
-      --accent: #34d4ff;
-      --accent-dark: #0a3f82;
-      background-image:
-        radial-gradient(circle at 12% 10%, rgba(48, 194, 255, 0.22), transparent 35%),
-        radial-gradient(circle at 88% 2%, rgba(89, 0, 255, 0.2), transparent 32%),
-        linear-gradient(180deg, #05080f 0%, #070b19 40%, #04060c 100%);
-    }
-    .main { width: min(1560px, calc(100% - 18px)); margin: 0 auto; padding: 22px; }
-    .header {
-      margin: 4px auto 24px; max-width: 1300px; border-radius: 24px; padding: 26px 22px 20px;
-      background: linear-gradient(120deg, rgba(17, 26, 48, 0.9), rgba(9, 15, 30, 0.82)),
-                  repeating-linear-gradient(140deg, rgba(255, 255, 255, 0.03) 0 2px, transparent 2px 12px);
-      border: 1px solid rgba(99, 195, 255, 0.35);
-      box-shadow: 0 24px 42px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(78, 182, 255, 0.18) inset;
-    }
-    .header h1 {
-      font-size: clamp(40px, 7vw, 74px); font-weight: 900; text-transform: uppercase; letter-spacing: 2px; line-height: .96;
-      text-shadow: 0 8px 24px rgba(0, 149, 255, 0.25);
-      background: linear-gradient(180deg, #ebfaff 15%, #66d8ff 54%, #3e79ff 100%);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    }
-    .subtitle { margin-top: 14px; font-size: clamp(12px, 2vw, 18px); letter-spacing: 1.7px; opacity: 0.94; color: #caebff; text-transform: uppercase; }
-    .discord-banner { max-width: 980px; border-radius: 14px; border: 1px solid rgba(112, 203, 255, 0.36); background: linear-gradient(130deg, rgba(2, 14, 32, 0.75), rgba(20, 30, 54, 0.8)); }
-    .search-box input {
-      margin-top: 18px; max-width: 540px; border: 1px solid rgba(110, 211, 255, 0.34); border-radius: 13px;
-      background: rgba(6, 12, 24, 0.86); color: #ecf9ff; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
-    }
-    .search-box input::placeholder { color: rgba(190, 233, 255, 0.74); letter-spacing: .2px; }
-    .games-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; padding: 8px 2px 18px; }
-    .game-card {
-      position: relative; border-radius: 14px; border: 1px solid rgba(88, 172, 255, 0.28); background: linear-gradient(175deg, rgba(20, 28, 48, 0.85), rgba(7, 12, 24, 0.9));
-      padding: 8px; box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35); transition: transform .16s ease, border-color .18s ease, box-shadow .18s ease;
-    }
-    .game-card:hover { transform: translateY(-4px); border-color: rgba(109, 206, 255, 0.72); box-shadow: 0 18px 34px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(104, 194, 255, 0.14); }
-    .game-preview { width: 100%; aspect-ratio: 16 / 9; margin-bottom: 8px; border-radius: 10px; border: 1px solid rgba(133, 208, 255, 0.28); box-shadow: 0 12px 24px rgba(0, 0, 0, 0.42); }
-    .game-name-chip {
-      left: 6px; right: 6px; bottom: 6px; padding: 6px 8px; border-radius: 8px; font-size: 11px; letter-spacing: .6px;
-      border: 1px solid rgba(160, 222, 255, 0.24); background: rgba(2, 8, 18, 0.72);
-    }
-    .game-btn {
-      width: 100%; border-radius: 10px; font-size: 14px; letter-spacing: .5px; text-transform: uppercase; padding: 11px 8px;
-      border: 1px solid rgba(137, 219, 255, 0.24); background: linear-gradient(180deg, rgba(51, 180, 255, 0.22), rgba(36, 91, 180, 0.2)), linear-gradient(120deg, #183665, #0b1d39 58%, #09142a);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.24), 0 10px 20px rgba(0,0,0,.38);
-    }
-    .group-header {
-      grid-column: 1 / -1; margin: 8px 0 2px; font-size: 22px; font-weight: 800; letter-spacing: 2px;
-      border-top: 1px solid rgba(104, 193, 255, 0.24); padding-top: 12px; color: #90deff; text-transform: uppercase; text-shadow: 0 3px 12px rgba(43, 174, 255, 0.3);
-    }
-    .sidebar { width: 220px; background: linear-gradient(180deg, rgba(7, 12, 23, 0.94), rgba(5, 9, 18, 0.92)); border-right: 1px solid rgba(97, 188, 255, 0.26); }
+      .filterBar,
+      .searchWrap,
+      .searchMeta,
+      .sectionWrap,
+      #playArea {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
 
-    @media (max-width: 768px) {
-      .header h1 { font-size: 34px; }
-      .subtitle { font-size: 14px; letter-spacing: 1px; }
+      .panel {
+        margin-left: 12px;
+        margin-right: 12px;
+      }
 
-    .active-players { font-size: 12px; } /* NYTT */
-      .menu-toggle { top: 12px; left: 12px; width: 42px; height: 42px; font-size: 24px; }
-      .sidebar { width: 190px; padding-top: 66px; }
-      .sidebar-btn { font-size: 15px; padding: 10px; }
-      .sidebar-btn .icon { width: 22px; font-size: 18px; }
-      .main { padding: 16px; }
-      .loader-title { font-size: 20px; }
-      .loader-message { font-size: 13px; }
+      .gamesGrid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 10px;
+      }
 
-      .profile-btn { top: 10px; right: 10px; padding: 12px 14px; font-size: 15px; border-radius: 13px; }
-      .profile-grid { grid-template-columns: 1fr; }
-      .profile-actions .chat-send { min-width: 100%; }
-
-      #playArea { grid-template-columns: 1fr; }
-      #embedContainer { width: 100%; }
-      .chat-panel {
-        left: 10px;
-        right: 10px;
-        width: auto;
-        top: 66px;
-        height: 46dvh;
+      .sidebar {
+        width: 260px;
       }
     }
   </style>
-<body class="blue" id="appBody">
-  <div class="app">
-    <button id="menuToggle" class="menu-toggle" onclick="toggleSidebar()" aria-label="Öppna meny" aria-expanded="false">☰</button>
-    <div id="sidebarOverlay" class="sidebar-overlay" onclick="closeSidebar()"></div>
-    <button id="profileBtn" class="profile-btn" onclick="openProfileModal()">👤 Profil</button>
-
-    <div class="sidebar" id="sidebar">
-      <button class="sidebar-btn" onclick="goHome()"><span class="icon">🏠</span><span class="label">Hem</span></button>
-      <button id="favoritesBtn" class="sidebar-btn" onclick="showFavorites()"><span class="icon">⭐</span><span id="favoritesLabel" class="label">Favoriter (0)</span></button>
-      <button class="sidebar-btn" onclick="showRecent()"><span class="icon">⏱</span><span class="label">Senaste</span></button>
-      <button class="sidebar-btn" onclick="openIframe('https://alv3333.github.io/Coola-Mattespel-Soundboard.github.io/')"><span class="icon">🔊</span><span class="label">Soundboard</span></button>
-      <button class="sidebar-btn" onclick="openIframe('https://studio.pickaxe.co/STUDIOGX4LHRY55GYHQ15/295XP68K97')"><span class="icon">🤖</span><span class="label">AI</span></button>
-      <button class="sidebar-btn" onclick="openIframe('https://app.supersigmamatteeducation.xo.je')"><span class="icon">🔎</span><span class="label">Browser</span></button>
-      <button class="sidebar-btn" onclick="openIframe('https://docs.google.com/forms/d/e/1FAIpQLScUxR7Ychb0ivMguYI-3BHwb8D3ZH2x7n1vkpXuYjNeVlU3Cg/viewform?usp=header')"><span class="icon">📩</span><span class="label">Förslag</span></button>
-      <button class="sidebar-btn" onclick="showQuests()"><span class="icon">🎯</span><span class="label">Quests</span></button>
-      <button class="sidebar-btn" onclick="showShop()"><span class="icon">🛒</span><span class="label">Shop</span></button>
-      <button class="sidebar-btn" onclick="showInventory()"><span class="icon">🎒</span><span class="label">Inventory</span></button>
-      <button class="sidebar-btn" onclick="showRoadmap()"><span class="icon">🧭</span><span class="label">Roadmap</span></button>
-      <button class="sidebar-btn" onclick="openThemePopup()"><span class="icon">🎨</span><span class="label">Tema</span></button>
-    </div>
-    <div class="chat-panel" id="chatPanel">
-      <div class="chat-header">
-        <span>💬 Chat</span>
-        <div class="chat-tabs">
-          <button id="globalTabBtn" class="chat-tab active" onclick="setChatTab('global')">Global</button>
-          <button id="privateTabBtn" class="chat-tab" onclick="setChatTab('private')">Privat</button>
-        </div>
-      </div>
-      <div id="globalChatView" class="chat-view">
-        <div class="chat-messages" id="chatMessages"></div>
-        <div class="chat-controls">
-          <div id="chatStatus" class="chat-status">Logga in för att chatta.</div>
-          <div class="chat-row">
-            <input id="chatInput" class="chat-input" maxlength="200" placeholder="Skriv meddelande..." />
-            <button id="chatSend" class="chat-send">Skicka</button>
-          </div>
-        </div>
-      </div>
-      <div id="privateChatView" class="chat-view" style="display:none;">
-        <div id="privateFriendsList" class="private-friends"></div>
-        <div id="privateMessages" class="chat-messages"></div>
-        <div class="chat-controls">
-          <div id="privateStatus" class="chat-status">Välj en vän för privat chatt.</div>
-          <div class="chat-row">
-            <input id="privateInput" class="chat-input" maxlength="200" placeholder="Privat meddelande..." />
-            <button id="privateSend" class="chat-send">Skicka</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="main">
-      <div class="header">
-        <h1>Jakobs Spel V4</h1>
-        <p class="subtitle">Arcade-känsla • snabba laddningar • massor av spel</p>
-        <div class="discord-banner">Ny design med mer "riktig spelsida"-känsla ⚡<a href="" target="_blank" rel="noopener noreferrer"></a></div>
-                <p id="activePlayers" class="active-players">Aktiva spelare: ...</p> <!-- NYTT -->
-        <div class="search-box">
-         <input id="searchInput" placeholder="Sök spel snabbt..." oninput="filterGames()" />
-         <div id="searchMeta" class="search-meta"></div>
-        </div>
-      </div>
-
-      <div id="playArea">
-        <div id="embedContainer">
-          <div id="iframeLoader">
-            <div class="loader-box">
-              <div class="loader-title">Laddar</div>
-              <div class="loader-track">
-                <div id="loaderFill" class="loader-fill"></div>
-              </div>
-              <div id="loaderMessage" class="loader-message"></div>
-            </div>
-          </div>
-          <iframe id="gameFrame"></iframe>
-          <button class="fullscreen-btn" onclick="toggleFullscreen()">Fullscreen</button>
-        </div>
-        <div id="questTrackerPanel"><div class="tracker-title">🎯 Quest progression</div><div class="tracker-empty">Starta ett spel med quest för att se progress här.</div></div>
-      </div>
-
-      <div id="recommendedSection" class="recommended-section">
-        <h2 class="recommended-title">Rekommenderade spel:</h2>
-        <div id="recommendedRow" class="recommended-row"></div>
-      </div>
-<div id="updatesPage" style="display:none;margin-top:30px;">
-  <h2 style="font-size:28px;margin-bottom:15px;">⬆ Uppdateringar</h2>
-
-  <div id="updatesList" style="
-    background:rgba(0,0,0,.6);
-    padding:20px;
-    border-radius:14px;
-    border:1px solid rgba(255,255,255,.15);
-    line-height:1.6;
-    font-size:16px;
-  ">
+</head>
+<body>
+  <div class="bg">
+    <div class="bg-grid"></div>
+    <div class="bg-noise"></div>
+    <div class="bg-orb o1"></div>
+    <div class="bg-orb o2"></div>
+    <div class="bg-orb o3"></div>
   </div>
-</div>
-      <div id="questsPage" style="display:none;margin-top:30px;">
-  <h2 style="font-size:28px;margin-bottom:6px;">🎯 Quests</h2>
-  <div id="questResetTimer" class="search-meta">Quests nollställs om --:--:--</div>
-  <div id="questCard" class="shop-shell quest-list"></div>
-</div>
-<div id="shopPage" style="display:none;margin-top:30px;">
-  <h2 style="font-size:28px;margin-bottom:15px;">🛒 Shop</h2>
-  <div id="shopList" class="shop-shell"></div>
-</div>
-<div id="inventoryPage" style="display:none;margin-top:30px;">
-  <h2 style="font-size:28px;margin-bottom:15px;">🎒 Inventory</h2>
-  <div id="inventoryList" class="shop-shell"></div>
-</div>
-<div id="roadmapPage" style="display:none;margin-top:30px;">
-  <h2 style="font-size:28px;margin-bottom:15px;">🧭 Roadmap</h2>
-  <div id="roadmapCard" class="roadmap-shell"></div>
-</div>
-      <div class="games-grid" id="gamesGrid"></div>
+
+  <header class="topbar">
+    <button id="menuToggle" class="menuBtn" onclick="toggleSidebar()" aria-label="Meny">
+      <span></span><span></span><span></span>
+    </button>
+
+    <div class="brand">
+      <div class="logo">🎮</div>
+      <div class="brandText">
+        <div class="title">Coola Mattespel V4</div>
+        <div class="sub">Jakob-style redesign</div>
+      </div>
     </div>
-  </div>
+
+    <div class="topRight">
+      <div class="coinBadge">⭐ <span id="favCount">0</span> favoriter</div>
+      <button class="pill" onclick="openProfileModal()">👤 Profil</button>
+    </div>
+  </header>
+
+  <div id="sidebarOverlay" class="sidebar-overlay" onclick="closeSidebar()"></div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sideHead">
+      <h3>Meny</h3>
+      <button class="closeBtn" onclick="closeSidebar()">✕</button>
+    </div>
+    <div class="sideNavList">
+      <button class="sideNavBtn" onclick="goHome()"><span class="sideNavIcon">🏠</span>Hem</button>
+      <button class="sideNavBtn" onclick="showFavorites()"><span class="sideNavIcon">⭐</span>Favoriter</button>
+      <button class="sideNavBtn" onclick="showRecent()"><span class="sideNavIcon">⏱</span>Senaste</button>
+      <button class="sideNavBtn" onclick="showUpdates()"><span class="sideNavIcon">📢</span>Uppdateringar</button>
+      <button class="sideNavBtn" onclick="openIframe('https://alv3333.github.io/Coola-Mattespel-Soundboard.github.io/')"><span class="sideNavIcon">🔊</span>Soundboard</button>
+      <button class="sideNavBtn" onclick="openIframe('https://studio.pickaxe.co/STUDIOGX4LHRY55GYHQ15/295XP68K97')"><span class="sideNavIcon">🤖</span>AI</button>
+      <button class="sideNavBtn" onclick="openIframe('https://app.supersigmamatteeducation.xo.je')"><span class="sideNavIcon">🌐</span>Browser</button>
+      <button class="sideNavBtn" onclick="openThemePopup()"><span class="sideNavIcon">🎨</span>Tema</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <section class="hero">
+      <h1>Coola Mattespel V4</h1>
+      <p class="subtitle">Cool sida med coola mattespel. Sprid denna sidan till alla ni känner.</p>
+      <div class="hintRow">
+        <div class="hintPill">🎮 90+ spel (reducerad lista)</div>
+        <div class="hintPill">⭐ Favoriter</div>
+        <div class="hintPill">🔎 Supersnabb sök</div>
+      </div>
+      <div id="activePlayers" class="activePlayers">Aktiva spelare: ...</div>
+    </section>
+
+    <div class="filterBar">
+      <button class="filterBtn active" data-filter="all" onclick="setQuickFilter('all')">Alla spel</button>
+      <button class="filterBtn" data-filter="favorites" onclick="setQuickFilter('favorites')">Favoriter</button>
+      <button class="filterBtn" data-filter="recent" onclick="setQuickFilter('recent')">Senaste</button>
+    </div>
+
+    <div class="searchWrap">
+      <input id="searchInput" placeholder="Sök spel snabbt..." oninput="filterGames()" />
+    </div>
+    <div id="searchMeta" class="searchMeta">Visar alla spel</div>
+
+    <section id="playArea" class="hidden">
+      <div id="embedContainer">
+        <div id="iframeLoader" class="iframeLoader hidden">Laddar...</div>
+        <iframe id="gameFrame" src="about:blank"></iframe>
+        <button class="fullscreen-btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+      </div>
+      <div id="questTrackerPanel">
+        <b>🎯 Spelinfo</b><br />
+        Senast öppnat spel visas här.
+      </div>
+    </section>
+
+    <section id="gamesSection" class="sectionWrap">
+      <h2 class="sectionTitle">✨ Rekommenderade spel</h2>
+      <div id="recommendedRow" class="recommended-row"></div>
+      <div id="gamesGrid" class="gamesGrid"></div>
+    </section>
+
+    <section id="updatesPage" class="panel hidden">
+      <h2>⬆ Uppdateringar</h2>
+      <ul id="updatesList"></ul>
+    </section>
+  </main>
 
   <div id="themePopup" onclick="if(event.target===this)closeThemePopup()">
     <div class="theme-box">
       <div class="theme-presets">
-        <button class="theme-btn" data-theme="blue" onclick="setTheme('blue')">BLUE</button>
-        <button class="theme-btn" data-theme="red" onclick="setTheme('red')">RED</button>
-        <button class="theme-btn" data-theme="green" onclick="setTheme('green')">GREEN</button>
-        <button class="theme-btn" data-theme="yellow" onclick="setTheme('yellow')">YELLOW</button>
-        <button class="theme-btn" data-theme="orange" onclick="setTheme('orange')">ORANGE</button>
-        <button class="theme-btn" data-theme="gray" onclick="setTheme('gray')">GRAY</button>
         <button class="theme-btn" data-theme="purple" onclick="setTheme('purple')">PURPLE</button>
-        <button class="theme-btn" data-theme="pink" onclick="setTheme('pink')">PINK</button>
-        <button class="theme-btn" data-theme="cyan" onclick="setTheme('cyan')">CYAN</button>
-        <button class="theme-btn" data-theme="sunset" onclick="setTheme('sunset')">SUNSET</button>
         <button class="theme-btn" data-theme="neon" onclick="setTheme('neon')">NEON</button>
-        <button class="theme-btn" data-theme="ocean" onclick="setTheme('ocean')">OCEAN</button>
-        <button class="theme-btn" data-theme="lava" onclick="setTheme('lava')">LAVA</button>
-        <button class="theme-btn" data-theme="forest" onclick="setTheme('forest')">FOREST</button>
-        <button class="theme-btn" data-theme="midnight" onclick="setTheme('midnight')">MIDNIGHT</button>
-        <button class="theme-btn" data-theme="candy" onclick="setTheme('candy')">CANDY</button>
         <button class="theme-btn" data-theme="gold" onclick="setTheme('gold')">GOLD</button>
-        <button class="theme-btn" data-theme="arctic" onclick="setTheme('arctic')">ARCTIC</button>
-        <button class="theme-btn" data-theme="emerald" onclick="setTheme('emerald')">EMERALD</button>
-        <button class="theme-btn" data-theme="rose" onclick="setTheme('rose')">ROSE</button>
-        <button class="theme-btn" data-theme="storm" onclick="setTheme('storm')">STORM</button>
-        <button class="theme-btn" data-theme="cyber" onclick="setTheme('cyber')">CYBER</button>
-        <button class="theme-btn" data-theme="dusk" onclick="setTheme('dusk')">DUSK</button>
+        <button class="theme-btn" data-theme="red" onclick="setTheme('red')">RED</button>
+        <button class="theme-btn" data-theme="blue" onclick="setTheme('blue')">BLUE</button>
+        <button class="theme-btn" data-theme="pink" onclick="setTheme('pink')">PINK</button>
       </div>
     </div>
   </div>
 
-  <div id="introOverlay" class="intro-overlay">
-    <div class="intro-box intro-loader-box">
-      <div class="loader-title">Laddar Coola Mattespel V4</div>
-      <div class="loader-track">
-        <div id="introLoaderFill" class="loader-fill"></div>
-      </div>
-      <div id="introLoaderMessage" class="loader-message"></div>
-    </div>
-  </div>
-
-  <div id="profileModal" class="modal" onclick="closeModalOnBackdrop(event, 'profileModal')">
-    <div class="modal-box wide profile-modal-box">
-      <div class="profile-modal-header">
-        <h3 class="profile-modal-title">👤 Min Profil</h3>
-        <p class="profile-modal-subtitle">Hantera konto, vänner och din personliga stil.</p>
-      </div>
-      <div class="profile-grid">
-        <div class="profile-section">
-          <h4>🔐 Inloggning</h4>
-          <input id="authEmail" class="auth-input" type="email" placeholder="Mail" />
-          <input id="authUsername" class="auth-input" maxlength="20" placeholder="Username (vid registrering)" />
-          <input id="authPassword" class="auth-input" type="password" placeholder="Lösenord" />
-          <div class="profile-actions">
-            <button class="chat-send" onclick="registerAccount()">Registrera</button>
-            <button class="chat-send" onclick="loginAccount()">Logga in</button>
-            <button class="chat-send" onclick="logoutAccount()">Logga ut</button>
-          </div>
-          <div id="profileInfo" class="info-card"></div>
-          <div id="profileStylePreview" class="info-card"></div>
-        </div>
-        <div class="profile-section">
-          <h4>🤝 Kompisar</h4>
-          <div class="chat-row">
-            <input id="friendInput" class="chat-input" placeholder="Lägg till vän via username" />
-            <button class="chat-send" onclick="sendFriendRequest()">Lägg till</button>
-          </div>
-          <div id="friendRequests" class="info-card"></div>
-          <div id="friendsList" class="info-card"></div>
-          <div id="privateChat" class="info-card" style="display:none;"></div>
-          <div class="chat-row" style="margin-top:8px;">
-            <input id="viewProfileInput" class="chat-input" placeholder="Visa profil via username" />
-            <button class="chat-send" onclick="viewPublicProfile()">Visa profil</button>
-          </div>
-          <div id="publicProfileView" class="info-card"></div>
-          <h4 style="margin-top:12px;">🔎 Browsa profiler</h4>
-          <div class="chat-row"><input id="profileBrowseInput" class="chat-input" placeholder="Sök username..." oninput="renderProfileBrowser()" /></div>
-          <div id="profileBrowseList" class="info-card"></div>
-        </div>
-      </div>
-      <div class="profile-actions" style="margin-top:10px;">
-        <button class="chat-send" onclick="closeProfileModal()">Stäng</button>
-      </div>
-    </div>
-  </div>
-
-  </div>
-
-  <div id="adminModal" class="modal" onclick="closeModalOnBackdrop(event, 'adminModal')">
-    <div class="modal-box wide admin-modal-box">
-      <div class="admin-modal-head">
-        <h3>🛡️ Admin Panel</h3>
-        <div id="chatToggleStatus" class="admin-badge">Chat: Aktiv</div>
-      </div>
-      <div class="admin-grid">
-        <input id="adminPassword" class="auth-input" type="password" placeholder="Admin-lösenord" />
-        <input id="adminTarget" class="auth-input" placeholder="Mål (username)" />
-        <input id="adminCoins" class="auth-input" type="number" placeholder="Coins att ge" />
-        <input id="adminXp" class="auth-input" type="number" placeholder="XP att ge" />
-      </div>
-      <div class="admin-actions">
-        <button class="chat-send" onclick="adminAction('kick')">Kick</button>
-        <button class="chat-send" onclick="adminAction('timeout')">Timeout 5 min</button>
-        <button class="chat-send" onclick="adminAction('ban')">Ban</button>
-        <button class="chat-send" onclick="adminAction('coins')">Ge coins</button>
-        <button class="chat-send" onclick="adminAction('verify')">Verifera ✔️</button>
-        <button class="chat-send" onclick="adminAction('xp')">Ge XP</button>
-        <button class="chat-send" onclick="adminAction('clearInventory')">Clear inventory</button>
-        <button class="chat-send" onclick="adminAction('clearAccounts')">Clear accounts</button>
-        <button class="chat-send" onclick="adminAction('resetQuests')">Reset quests</button>
-      </div>
-      <button class="chat-send" onclick="closeAdminPanel()">Stäng</button>
-    </div>
-  </div>
-
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+  <div id="uiToast" class="toast"></div>
 
   <script>
-    const files = [
-     'clblooketHACK', 'clamongUsMULTIPLAYER','clgartic1234','clgarticPhone', 'clsummerRider3D', 'clNautilusOS', 'climposter','clworldguessr','clroblox','cl1', 'cl1', 'cl10bullets', 'cl10minutestildawn', 'cl12minibattles', 'cl1on1soccer', 'cl1v1lol', 'cl1v1tennis', 'cl2048', 'cl2048cupcakes', 'cl2doom', 'cl2Dshooting', 'cl3dash', 'cl3pandas', 'cl3pandasbrazil', 'cl3pandasfantasy', 'cl3pandasjapan', 'cl3pandasnight', 'cl3slices2', 'cl40xescape', 'cl4thandgoal', 'cl500calibercontractz', 'cl60secondsburgerrun', 'cl60secondssantarun', 'cl8ballclassic', 'cl8ballpool', 'cl9007199254740992', 'cl99balls', 'cl99nightsitf', 'clabandoned3', 'clabsolutemadness', 'clacecombat2', 'clacecombat3', 'clacegangstertaxi', 'clachievementunlocked', 'clachievmentunlocked', 'clachievmentunlocked2', 'clachievmentunlocked3', 'clachillies', 'clachillies2', 'clADarkRoom', 'cladayintheoffice', 'clADOFAI', 'cladvancewars', 'cladvancewars2', 'cladventneon', 'clAdventureCapatalist', 'cladventurecapitalist', 'clagariolite', 'clageofwar', 'clageofwar2', 'clagesofconflict', 'clahoysurvival', 'clai', 'clakoopasrevenge', 'clakoopasrevenge2', 'clakumanorgaiden', 'clalienhominid', 'clalienhominidgba', 'clalienskyinvasion', 'clalientransporter', 'clalienvspredator', 'clallbossesin1', 'clallocation', 'clamaze', 'clamidstthesky', 'clamigopancho', 'clamigopancho2', 'clamigopancho3', 'clamigopancho4', 'clamigopancho5', 'clamigopancho6', 'clamigopancho7', 'clamongus', 'clamorphous', 'clancientsins', 'clangry-birdsspace', 'clangrybirds-space', 'clangrybirds', 'clangrybirdsshowdown', 'clangrybirdsspace', 'clanimalcrossingwildworld', 'clanotherworld', 'clapotris', 'clappleshooter', 'clappleworm', 'claquaparkio', 'clarceuslegend', 'clarcheryworldtour', 'clarena', 'clarmormayhem2', 'clarsonate', 'clascent', 'clasmallworldcup', 'classesmentexaminationque', 'clasteroids', 'clasteroidsALT', 'clattackhole', 'clavalanche', 'claviamasters', 'claviamastersbuggy', 'clAwesomePirates', 'clawesomeplanes', 'clawesometanks', 'clawesometanks2', 'clB3313', 'clbabeltower', 'clbabychiccoadventure', 'clbabykaizo', 'clbabysniperinvietnam', 'clbackrooms', 'clbackrooms2D', 'clbackyardbaseball', 'clbackyardbaseball09', 'clbackyardbaseball10', 'clbackyardsoccer', 'clbaconmaydie', 'clbadbodyguards', 'clbadicecream', 'clbadmondaysimulator', 'clbadparenting', 'clbadpiggies', 'clbadtimesim', 'clbadtimesimulator', 'clbaldidecomp', 'clbaldisbasics', 'clbaldisbasicsremaster', 'clbaldisfunnewschoolultimate', 'clballblast', 'clballsandbricks', 'clballsandbricksgood', 'clbananasimulator', 'clbanditgunslingers', 'clbanjokazooie', 'clbanjotooie', 'clbankbreakout2', 'clbankrobbery2', 'clbarryhasasecret', 'clbas', 'clbaseballbros', 'clbasketballfrvr', 'clbasketballlegends', 'clbasketballstars', 'clbasketbattle', 'clbasketbros', 'clbasketrandom', 'clbasketrandomgood', 'clbasketslamdunk2', 'clbatterup', 'clbattlekarts', 'clbattles', 'clbattlesim', 'clbattlezone', 'clbazookaboy', 'clbballlegend', 'clbeachboxingsim', 'clbeamrider', 'clbearbarians', 'clbearsus', 'clben10alienforce', 'clben10omniverse', 'clben10protector', 'clben10racing', 'clben10ultimatealien', 'clbergentruck201x', 'clbfdia5b', 'clbigicetowertinysquare', 'clbigneontowertinysquare', 'clbigshotboxing2', 'clbigtowertinysquare', 'clbigtowertinysquare2', 'clbigtowertinysquare2good', 'clBig_Time_Butter_Baron', 'clbindingofisaccsheeptime', 'clbioevil4', 'clbitlife', 'clbitlifeencrypted', 'clbitplanes', 'clblackjack', 'clblackjackbattle', 'clblackjackhhhh', 'clblacksmithlab', 'clblastronaut', 'clblazedrifter', 'clbleachvsnaruto', 'clblightborne', 'clblobsstory2', 'clblockblast', 'clblockcraftparkour', 'clblockcraftshooter', 'clblockpost', 'clblockthepig', 'clblockydemolitionderby', 'clblockysnakes', 'clbloodmoney', 'clbloodtournament', 'clbloons', 'clbloons2', 'clbloonspp1', 'clbloonspp2', 'clbloonspp3', 'clbloonspp4', 'clbloonspp5', 'clbloonsTD1', 'clbloonsTD2', 'clbloonsTD3', 'clbloonsTD4', 'clbloonsTD5', 'clbloonsTD6scratch', 'clbloxorz', 'clblumgiracers', 'clBMX2', 'clbntts', 'clbobtherobber', 'clbobtherobber2', 'clbobtherobber5', 'clbollybeat', 'clbomberman', 'clbomberman2', 'clbombermanhero', 'clboomslingers', 'clbottlecracks', 'clbottleflip3d', 'clbounceback', 'clbouncemasters', 'clbouncymotors', 'clBountyOfOne', 'clbowlalt', 'clboxhead2playrooms', 'clboxheadnightmare', 'clboxinglive-2', 'clboxinglive2', 'clboxingrandom', 'clbrainrot', 'clbridgerace', 'clBTD1', 'clbtd5', 'clbtts', 'clbtts2', 'clbubbleshooter', 'clbubbleshooterpirate', 'clbubbletanks', 'clbubbletanks2', 'clbubbletanks3', 'clbubbletanksarenas', 'clbubbletankstd', 'clbubsy', 'clbuckshotroulette', 'clbuildnowgg', 'clbunnyland', 'clburgerandfrights', 'clburritobison', 'clburritobison2', 'clburritobisonlaunchalibre', 'clburritobisonrevenge', 'clbushidoblade', 'clcactusmccoy', 'clcactusmccoy2', 'clcannonballs3d', 'clcannonfodder', 'clcapybaraclicker', 'clcarcrash3', 'clcardrawing', 'clcareatscar2deluxe', 'clcarkingarena', 'clcarmods', 'clcarstuntsdriving', 'clCartoonNetworkTableTennisUltimateTournament', 'clcastlebloodline', 'clcastlecircleofmoon', 'clcastlevania', 'clcastlevania2', 'clcastlevania3', 'clcastlevaniaariaofsorrow', 'clcastlevaniadawnofsorrow', 'clcastlevanianes', 'clcastlewarsmodern', 'clcatmario', 'clcatmariogood', 'clcatslovecake2', 'clcavestory', 'clceleste', 'clceleste2', 'clcellardoor', 'clchaosfaction2', 'clcheckers', 'clcheesechompers3d', 'clcheshireinachatroom', 'clchess', 'clchessclassic', 'clchibiknight', 'clchickenscream', 'clchickenwar', 'clchipschallenge', 'clchoppyorc', 'clchronotrigger', 'clchuzzle', 'clCircloO2', 'clciviballs', 'clciviballs2', 'clclashofvikings', 'clclassof09', 'clcleanupio', 'clclearvision', 'clclearvision2', 'clclearvision3', 'clclearvision4', 'clclearvision5', 'clclmadnessambulation', 'clclubbytheseal', 'clclusterrush', 'clcoalllcdemo', 'clcod4', 'clcodblackopp', 'clcoddefiance', 'clcodenamegordon', 'clcodmodernwarfare', 'clcodworldatwar', 'clcoffeemaker', 'clcolorburst3d', 'clcolormatch', 'clcolorwatersort3d', 'clcombopool', 'clcommanderkeen4', 'clcommanderkeen5', 'clcommanderkeen6', 'clconkersbadfurday', 'clcontra', 'clcontra3', 'clcookie-clicker', 'clcookieclicker', 'clcookieclickercool', 'clcookieclickergood', 'clcookingmama', 'clcookingmama2', 'clcookingmama3', 'clcoreball', 'clcotlk', 'clcountmastersstickmangames', 'clcoverorange', 'clcoverorange2', 'clcoverorangejourneygangsters', 'clcoverorangejourneyknights', 'clcoverorangejourneypirates', 'clcoverorangejourneyspace', 'clcoverorangeplayerspack', 'clcoverorangeplayerspack2', 'clcoverorangeplayerspack3', 'clcrankit!', 'clcrashbandicoot', 'clcrashbandicoot2', 'clcrashteamracing', 'clcrazycars', 'clcrazycattle3d', 'clcrazychicken3D', 'clcrazyfrogracer', 'clcrazymotorcycle', 'clcreeperworld2', 'clcrossyroad', 'clcrunchball3000', 'clcs1.6', 'clcsds', 'clcsgoclicker', 'clctgpnitro', 'clcurveball', 'clcuttherope', 'clcuttheropetimetravel', 'clcyberbungracing', 'clcybersensation', 'cldadgame', 'cldadnme', 'cldaggerfall', 'cldanktomb', 'cldborigins', 'cldborigins2', 'cldbsniper', 'cldbzattacksaiyans', 'cldbzdevolution', 'cldbzsuperwarriorssonic', 'cldeadestate', 'cldeadlydescent', 'cldeadplate', 'cldeadzed', 'cldeadzed2', 'cldeathchase', 'cldeblob2', 'cldecision', 'cldecision2', 'cldecision3', 'cldecisionmedieval', 'cldeepersleep', 'cldeepestsword', 'cldeepsleep', 'cldefendyourcastle', 'cldefendyournuts', 'cldefendyournuts2', 'cldeltarune', 'cldeltatraveler', 'cldementium', 'cldemolitionderbycrashracing', 'cldiablo', 'cldiamondhollow', 'cldiamondhollow2', 'cldiddykong-racing', 'cldieinthedungeon', 'cldigdeep', 'cldigdug', 'cldigdug2', 'cldigdug26', 'cldigtochina', 'cldinodudes', 'cldiredecks', 'cldoblox', 'cldogeminer', 'cldogeminer2', 'cldokidokiliteratureclub', 'cldonkeykong', 'cldonkeykong64', 'cldonkeykongcountry', 'cldonkeykongcountry2', 'cldonkeykongcountry3', 'cldonkeykongnes', 'cldontescape', 'cldontescape2', 'cldontescape3', 'cldoodlejump', 'cldoodlejumpgoober', 'cldoom', 'cldoom2', 'cldoom2d', 'cldoom2dDOS', 'cldoom3pack', 'cldoom64', 'cldoomdos', 'cldoomemscripten', 'cldoomps', 'cldoompsalt', 'cldoomzio', 'cldouchebaglife', 'cldouchebagworkout', 'cldownthemountain', 'cldragonballadvance', 'clDragonBallZTheLegacyofGoku', 'clDragonQuestIX', 'cldrawclimber', 'cldrawtheline', 'cldreader', 'cldreadheadparkour', 'cldriftboss', 'cldrifthuntersmerge', 'cldrivemady', 'cldrivenwild', 'cldrmario', 'cldrweedgaster', 'cldubstep', 'clduckhunt', 'clducklfe5', 'clducklife', 'clducklife2', 'clducklife3', 'clducklife4', 'clducklifebattle', 'clducklifespace', 'clducklingsio', 'clducktales', 'cldud', 'cldukenukem3d', 'cldumpling', 'cldungeondeck', 'cldungeonraid', 'cldungeonsanddegenerategamblers', 'cldunkshot', 'clduskchild', 'cldyingdreams', 'cldynamiteheaddy', 'cleagleride', 'clearntodie', 'clearntodie2', 'clearthbound', 'clearthbound3', 'clearthboundsnes', 'clearthtaken', 'clearthtaken2', 'clearthtaken3', 'clearthwormjim', 'clearthwormjim2', 'cledelweiss', 'cledyscarsimulator', 'cleffinghail', 'cleffingmachines', 'cleffingworms', 'cleffingzombies', 'clegg', 'cleggycar', 'clelasticface', 'clelectricman2', 'clemujs', 'clenchain', 'clendlesswar4', 'clendlesswar5', 'clendlesswar5wow', 'clendlesswar7', 'clenduro', 'clepicbattlefantasy5', 'clescalatingduel', 'clescaperoad-2', 'clescaperoad', 'clet', 'cletrianoddyssey', 'clevilglitch', 'clevolution', 'clexcitebike64', 'clextremerun3d', 'clfactoryballs', 'clfactoryballs2', 'clfactoryballs3', 'clfactoryballs4', 'clfairytalevsonepiece', 'clfallout', 'clfamidash', 'clfancypantsadventure', 'clfancypantsadventure2', 'clfancypantsadventure3', 'clfancysnowboarding', 'clfashionbattle', 'clfattygenius', 'clfearstofathomhomealone', 'clfeedus', 'clfeedus2', 'clfeedus3', 'clfeedus4', 'clfeedus5', 'clFF3', 'clff6', 'clffmysticquest', 'clFFsonic1', 'clFFsonic2', 'clFFsonic3', 'clFFsonic4', 'clFFsonic5', 'clFFsonic61', 'clFFsonic62', 'clFIFA07', 'clFIFA10', 'clFIFA11', 'clFIFA2000(1)', 'clfifa2000', 'clFIFA99', 'clFIFAinternationalsoccer', 'clFIFAroadtoworldcup98', 'clFIFAsoccer06', 'clFIFAsoccer95', 'clFIFAsoccer96', 'clFIFAsoccer97', 'clFIFAstreet2', 'clfinalearth2', 'clfinalfantasy', 'clfinalfantasyII', 'clfinalfantasytactics', 'clfinalfantasyVI', 'clfinalfantasyVII', 'clfinalfantasyVIId2', 'clfinalfantasyVIId3', 'clfinalfantasyVIItheothertetrr', 'clfinalninja', 'clfireblob', 'clfireboyandwatergirl', 'clfireboyandwatergirl2', 'clfireboyandwatergirl3', 'clfireboyandwatergirl5', 'clfireboyandwatergirl6', 'clfireemblem', 'clfisheatgettingbig', 'clfisquarium', 'clfivenightsatbaldisredone', 'clfivenightsatshrekshotel', 'clflashsonic', 'clfloodrunner', 'clfloodrunner2', 'clfloodrunner4', 'clfluidism', 'clfnac1', 'clfnac2', 'clFNAF', 'clFNAF2', 'clFNAF3', 'clFNAF4', 'clfnaf4halloween', 'clfnafanimatronics', 'clfnafps', 'clfnafsl', 'clfnafucn', 'clfnafworldd', 'clfnfagoti', 'clfnfbfdi26', 'clfnfblackbetrayal', 'clfnfbside', 'clfnfcamelliarudeblaster', 'clfnfcrunchin', 'clfnfdesolation', 'clmathgamev3', 'clfnfdokitakeoverplus', 'clfnfdropandroll', 'clfnfdustin', 'clfnffleetway', 'clfnffnaf3', 'clfnfgamebreakerbundle', 'clfnfgoldenapple', 'clfnfhex', 'clfnfholiday', 'clfnfhorkglorpgloop', 'clfnfhypnoslullaby', 'clfnfimposterv4', 'clfnfindiecross', 'clfnfmadnesspoop', 'clfnfmariomadnessdside', 'clfnfmidfight', 'clfnfmiku', 'clfnfmobmod', 'clfnfneo', 'clfnfpiggyfield', 'clfnfpokepastaperdition', 'clfnfqt', 'clfnfrevmixed', 'clfnfrewrite', 'clfnfselfpaced', 'clfnfshaggy4keys', 'clfnfshaggyxmatt', 'clfnfshucks-v2', 'clfnfshucksv2', 'clfnfsky', 'clfnfsoft', 'clfnfsonicexe', 'clfnfsonicexe4', 'clfnftailsgetstrolled', 'clfnftricky', 'clfnfwednesday-infedility', 'clfnfwhitty', 'clfnfzardy', 'clfocus', 'clfolderdungeon', 'clfootballbros', 'clfootballlegends', 'clforknsausage', 'clfortzone', 'clfpa4p1', 'clfpa4p2', 'clfreegemas', 'clfreerider', 'clfreerider2', 'clfreerider3', 'clfridaynightfunkin', 'clfromrusttoash', 'clfruitninja', 'clfunnybattle', 'clfunnybattle2', 'clfunnymadracing', 'clfunnyshooter2', 'clfunnyshooter22', 'clfzero', 'clfzerox', 'clgalaga', 'clgameandwatchcollection', 'clgangstabean', 'clgangstabean2', 'clgangsterbros', 'clgarcello', 'clgeometrydash', 'clgdlite', 'clgdsubzero', 'clgeneralchaos', 'clgenericfightermaybe', 'clgeometrydashscratch', 'clgeometryvibes', 'clgeorgeandtheprinter', 'clgetawayshootout', 'clgetontop', 'clGettothetopalthoughthereisnotop', 'clgetyoked', 'clghosttrick', 'clgimmietheairpod', 'clgladdihoppers', 'clgloryhunters', 'clglover', 'clgoalsouthafrica', 'clgobble', 'clgoingballs', 'clgolddiggerfrvr', 'clgoldeneye007', 'clgoldensun', 'clgoldensunnds', 'clGoldenSunTheLostAge', 'clgoldminer', 'clgolforbit', 'clgolfsunday', 'clgoodbigtowertinysquare', 'clgoodbigtowertinysquare2', 'clgoodboygalaxy', 'clgoodmonkeymart', 'clgooglebaseball', 'clgoogledino', 'clgorescriptclassic', 'clgrandactionsimulator-ny', 'clgranddad', 'clgrandtheftautoadvance', 'clgranny', 'clgranny2', 'clgranny22', 'clgranny3', 'clgranturismo', 'clgranturismo2', 'clgrassmowing', 'clgravity', 'clgravitymod', 'clgrey-box-testing', 'clgrimacebirthday', 'clgrindcraft', 'clgrn', 'clgrowagarden', 'clgrowdenio', 'clgrowyourgarden', 'clgta', 'clgta2', 'clgta22', 'clgta2alt', 'clgtaalt', 'clgtaalty', 'clgtachina', 'clguesstheiranswer', 'clgun-spin', 'clgunblood', 'clguncho', 'clgunknight', 'clgunmayhem', 'clgunmayhem2', 'clgunmayhem2goof', 'clgunmayhemredux', 'clgunnight', 'clgunsmoke', 'clgymstack', 'clhacx', 'clhajimeippo', 'clhalflife', 'clhalocombatdevolved', 'clhandshakes', 'clhandsofwar (1)', 'clhandsofwar(1)', 'clhandsofwar(2)', 'clhandsofwar', 'clhandulum', 'clhanger2', 'clhappyroom', 'clhappywheels', 'clhardwaretycoon', 'clHaroldsbadday', 'clharvestio', 'clharvestmoon', 'clharvestmoon64', 'clhauntthehouse', 'clheartandsoul', 'clhei$t', 'clhelixjump', 'clhellron', 'clhelpnobrakes', 'clhero3flyingrobot', 'clhextris', 'clhighstakes', 'clhighwayracer2', 'clhighwaytraffic3d', 'clhillclimbracinglite', 'clHiNoHomo', 'clhipsterkickball', 'clhit8ox', 'clhitsinglereal', 'clhl2doom', 'clhobo', 'clhobo2', 'clhobo3', 'clhobo4', 'clhobo5', 'clhobo6', 'clhobo7', 'clhobovszombies', 'clholeio', 'clhollowknight', 'clhouseofhazards', 'clhoverracerdrive', 'clhumanexpenditureprogram', 'clhungryknight', 'clhungrylamu', 'clhyppersandbox', 'clicantbelievegoogleflaggedmeforthenameofthefilelol', 'clice age baby', 'clicedodo', 'clicypurplehead', 'clidlebreakout', 'clidledice', 'clidleidlegamedev', 'clidleminertycoon', 'clidleminorzamnshes12', 'climpossiblequiz (1)', 'climpossiblequiz', 'climpossiblequiz2', 'clinclementemerald', 'clindiantrucksimiulator', 'clinfinitecraft', 'clinkgame', 'clinnkeeper', 'clinsidestory', 'clinteractivebuddy', 'clintoruins', 'clintospace', 'clintospace2', 'clintospace3', 'clintothedeepweb', 'clintrusion', 'cliqball', 'clironsnout', 'clironsoldier', 'cliwbtg', 'cljacksmith', 'cljacksmithencryptedorsmthn', 'cljailbreakobbbobob', 'cljefflings', 'cljellydadhero', 'cljellydrift', 'cljellytruck', 'cljellytruckgood', 'cljetforcegemini', 'cljetpackjoyride', 'cljetrush', 'cljetskiracing', 'cljohnnytrigger', 'cljohnnyupgrade', 'cljourneydownhill', 'cljsvecx', 'clJUMP', 'cljumpingshell', 'cljustfalllol', 'cljusthitthebutton', 'cljustoneboss', 'clkaizomarioworld', 'clkalikan', 'clkapi', 'clkaratebros', 'clkarlson', 'clkartbros', 'clKenGriffeyJrPresentsMajorLeagueBaseball', 'clkillerinstinct', 'clkillover', 'clkilltheiceagebabyadventure', 'clkingdomheartsdays', 'clkingdomheartsrecoded', 'clkingdomheartsrecodedalt', 'clkirby64', 'clkirbyandtheamzingmirror', 'clkirbysadventure', 'clkirbysdreamland', 'clkirbysdreamland3', 'clkirbysqueaksquad', 'clkirbysuperstar', 'clkirbysuperstarultra', 'clkittencannon', 'clklifur', 'clknifehit', 'clknightmaretower', 'clkonkrio', 'clkoopasrevenge', 'clkourio', 'cllaceysflashgames', 'cllastfirered', 'cllasthorizon', 'cllaststand', 'cllaststand2', 'clleaderstrike', 'cllearntofly', 'cllearntofly2', 'cllearntofly3', 'cllearntoflyidle', 'cllegobatman', 'cllegobatman2superheroes', 'cllegoindianajones', 'cllegoindianajones2', 'cllegoninjago', 'cllegostarwars', 'cllemmings', 'clleveldevil', 'clleverwarriors', 'cllightitup', 'cllilrunmo', 'cllinerider', 'cllinktothepast', 'cllittlerunmo', 'cllockthedoor', 'clloderunner', 'cllonewolf', 'cllosangelesshark', 'cllowknight', 'clloz1', 'cllozlinkawakening', 'cllozminishcap', 'cllozoracleofseasons', 'cllozspirittracks', 'clluckyblocks', 'clmadalinstuntcars', 'clmadalinstuntcarsgood', 'clmadalinstuntcarsmultiplayerfixed', 'clmadden93', 'clmadden94', 'clmadden95', 'clmadden96', 'clmadden99', 'clmaddenfootball', 'clmaddenfootball64', 'clmaddennfl', 'clmaddennfl2000', 'clmaddennfl2001', 'clmaddennfl2002', 'clmaddy98', 'clmadness-retaliation', 'clmadnessaccelerant', 'clmadnesscombatdefense', 'clmadnesscombatnexus', 'clmadnessgemini', 'clmadnesshydraulic', 'clmadnessinteractive', 'clmadnessoffcolor', 'clmadnesspremediation', 'clmadnessretaliation', 'clmadnesss2010', 'clmadnessstand', 'clmadskillsmotocross2', 'clmadstick', 'clmadstuntcars2', 'clmagictiles3', 'clmajorasmask', 'clmakesureitsclosed', 'clmanagod', 'clmario3', 'clmarioandluigisuperstarsaga', 'clmariocombat', 'clmariogolf', 'clMarioisMissingDoneRight', 'clmariokart64', 'clmariokartds', 'clmariokartsupercircuit', 'clmariomadness', 'clmariominusrabbids', 'clmariopaint', 'clmarioparty', 'clmarioparty2', 'clmarioparty3', 'clmariopartyds', 'clmariosmysterymeat', 'clmariotennis', 'clmaskedforcesunlimited', 'clmastermindworldconquerer', 'clmatrixrampage', 'clmattv2', 'clmcfpsfbhd', 'clmcraerally', 'clmeatboy', 'clmeatboyflash', 'clmedalofhonor', 'clmedievalshark', 'clmedievil', 'clmegachess', 'clmegaman', 'clmegaman2', 'clmegaman2gba', 'clmegaman3', 'clmegaman4', 'clmegaman5', 'clmegaman6', 'clmegaman7', 'clmegaman8', 'clmegamanlegends', 'clmegamanlegends2', 'clmegamanx', 'clmegamanx2', 'clmegamanx3', 'clmegamanx4', 'clmegamanzero', 'clmegamanzx', 'clmegaminer', 'clmelonplayground', 'clmeowuwu', 'clmergeroundracers', 'clmetalgear', 'clmetalgearsolid', 'clmetalgearsolidps', 'clmetalslugadvance', 'clmetalslugmission1', 'clmetalslugmission2', 'clMetalSonicHyperdrive', 'clmetroid', 'clmetroid2', 'clmetroidfusion', 'clmetroidzeromission', 'clmiamishark', 'clmicromages', 'clmightyknight', 'clmightyknight2', 'clmimic', 'clmindscape', 'clminecraft1-8-8', 'clminecraftshooter', 'clmineshooter', 'clminesweeperplus', 'clminhero', 'clminicrossword', 'clminimart', 'clminishooters', 'clminitooth', 'clmiraginewar', 'clmisslecommand', 'clmk4ampedup', 'clmmwilywars', 'clmobcontrolhtml5', 'clmobiusrevolution', 'clmoneyrush', 'clmonkeymart', 'clmonkeymartenc', 'clmonstertracks', 'clmonstertruckportstunt', 'clmortalkombat', 'clmortalkombat2', 'clmortalkombat3', 'clmortalkombatadvance', 'clmortkom4', 'clmotherload', 'clmotoroadrash', 'clmotox3m2', 'clmotox3m3', 'clmotox3mm', 'clmotox3mpoolparty', 'clmotox3mspookyland', 'clmotox3mwinter', 'clmountainbikeracer', 'clmrracer', 'clmspacman', 'clmultitask', 'clmutilate-a-doll', 'clmxoffroadmaster', 'clmyfriendpedro', 'clmyfriendpedroarena', 'clmyteardrop', 'cln', 'clnarc', 'clnaturalselection', 'clNBAhangtime', 'clNBAjam', 'clnbajamTE', 'clneonblaster', 'clneonrider', 'clnesworldchampion', 'clnetattack', 'clneverendinglegacy', 'clnewgroundsrumble', 'clnewsupermariobros', 'clNewSuperMarioWorld2AroundtheWorld', 'clnewyorkshark', 'clnextdoor', 'clnflblitz', 'clnfscarbonowncity', 'clnfsmostwanted', 'clnfsporcheunleashed', 'clnfsunderground', 'clnfsunderground2', 'clngon', 'clnhl2002', 'clnhlhitz2003', 'clnickelodeonsuperbrawl2', 'clNicktoonsFreezeFrameFrenzy', 'clnightclubshowdown', 'clnightfire', 'clnightshade', 'clnimrods', 'clninjabrawl', 'clnintendogslab', 'clnintendoworldcup', 'clnitromemustdie', 'clnomoregameasdsadfagfggdfs', 'clnoobminer', 'clnotyourpawn', 'clnplus', 'clnubbysnumberfactory', 'clnullkevin', 'clNutsandBoltsScrewingPuzzle', 'clnzp', 'clobby-99-will-lose', 'clobbyonlyup', 'clobeythegame', 'clocarinaoftime', 'clofflineparadise', 'clomeganuggetclicker', 'clonebitadventure', 'clonenightasfreddy', 'clonepiece', 'clonepiecefighting', 'clonlyup', 'cloperius', 'cloppositeday', 'clopposumcountry', 'clorbofcreation', 'clordinarysonicromhack', 'cloregontrail', 'clormmimastickwithclsoitcanberememberedoyeahclalienhominid', 'closu', 'clourpleguy', 'clovo', 'clovo2', 'clovodimensions', 'clovofixed', 'clpacman', 'clpacmansuperfast', 'clpapabakeria', 'clpapadonut', 'clpapalouienighthunt2', 'clpapalouiewhenburgersattack', 'clpapalouiewhenpizzasattack', 'clpapalouiewhensundaesattack', 'clpapapizzagood', 'clpapapizzagoody', 'clpapapizzamamamia', 'clpapasburgerIIIAAAAA', 'clpapascheeseria', 'clpapascupcakeria', 'clpapasfreezeria', 'clpapashotdoggeria', 'clpapaspancakeria', 'clpapaspastaria', 'clpapasscooperia', 'clpapassushiria', 'clpapastacomia', 'clpapaswingeria', 'clpaperio', 'clpaperio3d', 'clpaperiomania', 'clpapermario', 'clpapermariopromode', 'clpapermariottyd', 'clparappatherapper', 'clparappatherapperalt', 'clparkingfury', 'clparkingfury2', 'clparkingfury3', 'clparkingrush', 'clpartnersintime', 'clpeacekeeper', 'clpeggle', 'clpenaltykicks', 'clpenguindiner', 'clpenguinpass', 'clpepsiman', 'clpepsimanalt', 'clpereelous', 'clperfectdark', 'clperfecthotel', 'clpersona', 'clpersona2', 'clpersona2alt', 'clpersonaalt', 'clphasma', 'clpheonixjusticeforall', 'clpheonixrightaceattorny', 'clpheonixtrialsandyear', 'clpheonixtrialsandyeartrhfasd', 'clpibbyapocalypse', 'clpico8', 'clpico8edu', 'clpicodriller', 'clpicohot', 'clpicolife', 'clpiconightpunkin', 'clpicosschool', 'clpicovsbeardx', 'clpiecesofcake', 'clpikwip', 'clpingpongchaos', 'clpinkbike', 'clpitfall', 'clpitof100trials', 'clpixelbattlegroundsio', 'clpixelcombat2', 'clpixelquestlostidols', 'clpixelshooter', 'clpixelspeedrun', 'clpixelwarfare', 'clpizzapapa', 'clpizzatower', 'clplangman', 'clplantsvszombies', 'clplazmaburst', 'clplinko', 'clplonky', 'clpogo3D', 'clpokebattlefact', 'clpokeblack', 'clpokeblack2', 'clpokeblack2alt', 'clpokeblackalt', 'clpokeblazeblack2redux', 'clpokeblue', 'clpokeclassic', 'clpokecrown', 'clpokecrystalclear', 'clpokediamond', 'clpokedreamstone', 'clpokeeliteredux', 'clpokeelysiuma', 'clpokeelysiumb', 'clpokeemeraldenhanced', 'clpokeemeraldexceeded', 'clpokeemeraldhorizons', 'clpokeemeraldrandom', 'clpokefiregold', 'clpokeflora', 'clpokegaia', 'clpokegschronicles', 'clpokeheartgold', 'clpokelightplatinum', 'clpokeliquidcrysta', 'clpokemegamoemon', 'clpokemonamnesia', 'clpokemonclover', 'clpokemoncrystal', 'clpokemonemerald', 'clpokemonemeraldcrest', 'clpokemonemeraldimperium', 'clpokemonemeraldkaizo', 'clpokemonemeraldmini', 'clPokemonemeraldrouge', 'clpokemonemeraldseaglass', 'clpokemonenergizedemerald', 'clpokemonevolvedsfdgsdfs', 'clpokemonfirered', 'clpokemonfireredandleafgreenplusedition', 'clpokemonfireredrandomized', 'clpokemongold', 'clpokemonkaizoironfirered', 'clpokemonlazarus', 'clpokemonleafgreen', 'clpokemonmodernemerald', 'clpokemonmysterydungeon', 'clpokemonquetzal', 'clpokemonroaringred', 'clPokemonrocketedition', 'clpokemonruby', 'clpokemonsapphire', 'clpokemonshinsigma', 'clpokemonsilver', 'clpokemonsnap', 'clpokemonstadium', 'clpokemontowerdefense', 'clpokemonultimatefusion', 'clpokemonunbound', 'clpokemysteryexplorersofsky', 'clpokeodyssey', 'clpokepearl', 'clpokeperfectfirered', 'clpokepisces', 'clpokeplatinum', 'clpokeplatinumrandomized', 'clpokerechargedpink', 'clpokerechargedyellow', 'clpokerecordkeepers', 'clpokered', 'clpokerocketedition', 'clpokerowe', 'clpokeruby', 'clpokerunandbun', 'clpokescorchedsilver', 'clpokesoulsilver', 'clpokethepit', 'clpoketourmaline', 'clpokeultraviolet', 'clpokeunovaemerald', 'clpokevega', 'clpokevoltwhite2redux', 'clpokevoyager', 'clpokewhite', 'clpokewhite2', 'clpokewhite2alt', 'clpokeyellow', 'clPok monstunningsteel', 'clpolicepursuit2', 'clpolishedcrystal', 'clpoorbunny', 'clpopeyepapi', 'clporklike', 'clportal', 'clportal2d', 'clportaldefendersfastbreak', 'clportaldefendersTD', 'clportalflash', 'clporter', 'clpossessquest', 'clpostal', 'clpotatomanseeksthetroof', 'clpou', 'clpraxisfighterx', 'clprebronzeage', 'clprecivilationbronzeage', 'clprehistoricshark', 'clprimary', 'clpullfrog', 'clpunchout', 'clpunchthedrump', 'clpunchthetrump', 'clpuppethockey', 'clpushyourluck', 'clpuyopuyofever', 'clpvz', 'clpvz2', 'clpvz2gardenless', 'clpyrotoad', 'clqbert', 'clquake2', 'clquake3', 'clquake64', 'clquickieworld', 'clqwop', 'clracemaster3d', 'clracingarena', 'clradicalred', 'clradracer', 'clraftwars', 'clraftwars2', 'clragdoll-io', 'clragdollarchers', 'clragdollhit', 'clragdollrunners', 'clragdollsoccer', 'clragollhit', 'clrainbowsix', 'clrainbowsixalt', 'clray1', 'clray2', 'clrayman', 'clraze', 'clraze2', 'clraze3', 'clre3', 'clreachthecore', 'clrealflightsim', 'clrebuild', 'clrebuild2', 'clrecoil', 'clredball', 'clredball2', 'clredball3', 'clredball4', 'clredball4vol2', 'clredball4vol3', 'clredhanded', 'clredtierunner', 'clredvsblue2', 'clredvsbluewar', 'clreignofcentipede', 'clrenegades', 'clresidentevil', 'clresidentevil2', 'clresizer', 'clresortempire', 'clretrobowl', 'clretrobowlcollege', 'clretrohighway', 'clretropingpong', 'clreturnman', 'clreturnman2', 'clreturntoriddleschool', 'clrevolutionidle', 'clrhythmheaven', 'clrhythymymheaven', 'clricochetkills2', 'clriddlemiddleschool', 'clriddleschool', 'clriddleschool2', 'clriddleschool3', 'clriddleschool445544444$$444$444', 'clriddletransfer', 'clriddletransfer2', 'clridgeracer', 'clroadfighter', 'clroadoffury', 'clroadofthedead', 'clroadofthedead2', 'clrocketjump', 'clrocketknightadventures', 'clrocketleague', 'clrocketpult', 'clrocketsoccerderby', 'clrodha', 'clroguesoul', 'clroguesoul2', 'clrollerballer', 'clrollingsky', 'clrollyvortex', 'clrolypolymonster', 'clrooftopsnipers', 'clrooftopsnipers2', 'clroomclicker', 'clrotate', 'clrouletteknight', 'clruffle', 'clrun-2', 'clrun', 'clrun2', 'clrun3', 'clrussiancardriver', 'clsandboxcity', 'clsandboxels', 'clsandsofthecoliseum', 'clsandtris', 'clsantarun', 'clsaszombieassault2', 'clsaulgoodmanrun', 'clscarletshift', 'clscarymazegame', 'clscrapmetal3', 'clscrapyarddog', 'clscribblenauts', 'clscubabear', 'clseamongrel', 'clsecretofmana', 'clsega2gg', 'clsentryfortress', 'clserenitrove', 'clservingupmadness', 'clsfk', 'clsfk2', 'clsfklaststand', 'clsfkleague', 'clshaggy', 'clshc1', 'clshc2', 'clshc3', 'clshift', 'clshift2', 'clshift3', 'clshinmegamitenseidevilsurvivor', 'clshortlife', 'clshredmill', 'clshrek-2', 'clshrubnaut', 'clshwultimatem', 'clsideeffects', 'clsidepocket', 'clsierra7', 'clsilenthill', 'clsilenthillalt', 'clsilk', 'clsiloshowdow', 'clSINGLEFILE', 'clsixwaystodie', 'clskateit', 'clskibididibidygyattohiorizzingallovertheplacestillwatermangotheoryfemboydrool', 'clskibidiinthebackrooms', 'clskibidishooter', 'clskong', 'clskyrace-3d', 'clsliceitall', 'clslideinthewoods', 'clslimelabratory', 'clslipways', 'clslitherio', 'clslope', 'clslope2player', 'clslope3', 'clslopeplus', 'clslotornot', 'clslowroads', 'clsm63redux', 'clsmadvance2', 'clsmadvance3', 'clsmashkarts', 'clsmashkartsworking', 'clsmashremix', 'clsmbc', 'clsmbcrossover', 'clsmbgameover', 'clsnailbob', 'clsnailbob2', 'clsnailbob3', 'clsnailbob4space', 'clsnailbob5lovestory', 'clsnakeis', 'clsnakelike', 'clsnipershot', 'clsniperv2', 'clsnowballio', 'clsnowrid', 'clsnowrideee', 'clsnowrider', 'clsnowridergoodygumdrops', 'clsnowriderrrr', 'clsnowroad', 'clsoccerbros', 'clsoccerrandom', 'clsoccerrandomgood', 'clsolarsandbox', 'clsolarsmash', 'clsolitaire', 'clsonic1contemporary', 'clSonic1ScoreRush', 'clSonic2ScoreRush', 'clsonic3andknuckles', 'clsonic3complete', 'clsonic3dblastdx', 'clsonicadvance', 'clsonicadvance2', 'clsonicadvance2sp', 'clsonicadvance3', 'clsonicandashuro', 'clsonicandknuckles', 'clsonicbattle', 'clsoniccd', 'clsonicclassiccollection', 'clsonicclassicheroes', 'clsoniccolors', 'clsonicdeltaorigins', 'clsoniceexeog', 'clsonicerazor', 'clsonicgg', 'clSonicHellfireSaga', 'clsonicjam', 'clsonicmegamix', 'clsonicr', 'clsonicralt', 'clsonicrevert', 'clsonicrush', 'clsonicrushadventure', 'clsonicspinball', 'clsonicthehedgehog', 'clsonicthehedgehog2', 'clsonicthehedgehog3', 'clsonny2', 'clsouljumper', 'clspacebarclicker', 'clspacecompany', 'clspaceinvaders', 'clspaceiskey', 'clspaceiskey2', 'clspaceiskeyxmas', 'clspacewarsbattleground', 'clspacewaves', 'clspeedperclick', 'clspeedstars', 'clspewer', 'clspiralroll', 'clsprunked', 'clsprunki', 'clsprunkiclicker', 'clsquidplayground', 'clstackballio', 'clstacktris', 'clstackydash', 'clstarfox', 'clstarfox64', 'clstarraiders', 'clstateio', 'clstation141', 'clstationmeltdown', 'clstationsaturn', 'clsteakandjake', 'clstealbrainrotonline', 'clstealthassassin', 'clstealthmaster', 'clsteelempire', 'clsteelsurge', 'clstickarchersbattle', 'clstickfighter', 'clstickjetchallenge', 'clstickmanandguns', 'clstickmanclash', 'clstickmanduel', 'clstickmangtacity', 'clstickmanhook', 'clStickmanKingdomclash', 'clstickmankombat2d', 'clstickmanstealingdiamond', 'clstickmerge', 'clstickminairship', 'clstickminbreakingbank', 'clstickminescapingprison', 'clstickminfleecomplex', 'clstickrpgcomplete', 'clstickslasher', 'clstickwar', 'clstickwar2', 'clstormthehouse', 'clstormthehouse3', 'clstrangejournet', 'clstreangeropepolice', 'clstreetfighter2', 'clstreetfighter2turbo', 'clstreetfighteralpha3', 'clstreetfighterumuhsomething', 'clstreetofrage', 'clstreetofrage2', 'clstreetofrage3', 'clstrikeforceheroes', 'clstrikeforceheroes2', 'clstrikeforceheroes3', 'clstrikerdummies', 'clstylesavvy', 'clsubwaysurfersbarcelona', 'clsubwaysurfersbeijing', 'clsubwaysurfersberlin', 'clsubwaysurfersbuenosaires', 'clsubwaysurfershavana', 'clsubwaysurfershouston', 'clsubwaysurfersiceland', 'clsubwaysurferslondon', 'clsubwaysurfersmexico', 'clsubwaysurfersmiami', 'clsubwaysurfersmonaco', 'clsubwaysurfersneworeleans', 'clsubwaysurfersneworleans', 'clsubwaysurferssanfrancisco (1)', 'clsubwaysurferssanfrancisco(1)', 'clsubwaysurferssanfrancisco', 'clsubwaysurfersstpetersburg', 'clsubwaysurferswinterholiday', 'clsubwaysurferszurich', 'clsugarsugar', 'clsuika', 'clsuikapico', 'clsunandmoon', 'clsuperbomberman', 'clsuperbomberman2', 'clsuperbomberman3', 'clsuperbomberman4', 'clsuperbomberman5', 'clsupercarrush', 'clsupercastlevaniaVI', 'clsuperchibiknight', 'clsupercold', 'clsuperdarkdeception', 'clsuperdiagonalmario2', 'clsuperfighters', 'clsuperhot', 'clsuperhotlinemiami', 'clsuperhouseofdeadninjas', 'clsuperislandadventure', 'clsuperkidadventure', 'clsuperliquidsoccer', 'clsupermario', 'clsupermario63', 'clsupermario64', 'clsupermario64ds', 'clsupermarioallstars', 'clsupermariobros', 'clsupermariobros2', 'clsupermariobros2us', 'clsupermariobros3', 'clsupermariobros3real', 'clsupermariokart', 'clsupermarioland', 'clsupermarioland2', 'clsupermariomon', 'clsupermariorpg', 'clsupermarioworld', 'clsupermarioworld2', 'clBBB', 'clSuperMarioWorldThe SecretOfThe7GoldenStatues', 'clsupermetroid', 'clsupermonkeyballjr', 'clsupernoahsark3D', 'clsuperoliverworld', 'clsuperpickleballadventure', 'clsuperpunchout', 'clsuperpuzzlefighter2turbo', 'clsuperpuzzlefighter2turboalt', 'clsuperscribblenauts', 'clsupersmashbros', 'clsupersmashflash', 'clsupersmashflash2', 'clsupersmashflash2butdifversion', 'clsupertiltbros', 'clsupitdept', 'clsupremeduelist', 'clsurvevio', 'clsurvivalracev2', 'clsushicat', 'clsushicat2', 'clsushiunroll', 'clswerve', 'clswitchblade', 'clswordandshieldultimateplus', 'clswordfight', 'clswordplay', 'clswordsandsandals', 'clswordsandsandals2', 'clswordsandsouls', 'clsydneyshark', 'cltabletanks', 'cltabletennisworldtour', 'cltag-', 'cltagc3', 'clTaikonoTatsujin', 'cltaisei', 'cltakeover', 'cltallmanrun', 'cltankmayhem', 'cltankpixel', 'cltanukisunset', 'cltanukisunsetuhhhhhhhh', 'cltapper', 'cltaproad', 'cltastyplanet', 'cltboilambeternal', 'cltecmobowl', 'cltelephonetrouble', 'cltelocation', 'cltempest2000', 'cltempleofboom', 'cltemplerun2', 'cltempoverdose', 'clterra', 'clterritorialio', 'clterritorywar', 'cltetris', 'cltetrisattack', 'cltetrisgba', 'clthanksforremindingmeihadtofixthis', 'cltheclassroom', 'cltheclassroom2', 'cltheclassroom3', 'clthedeadseat', 'clthedeepestsleep', 'cltheenchantedcave2', 'cltheimpossiblegame', 'cltheincrediblemachine', 'clthelaststand', 'clthelaststandunioncity (1)', 'clthelaststandunioncity', 'clthemaninthewindow', 'clthemepark', 'clthepit', 'clthereisnofile', 'clthermomorph', 'clthisistheonlylevel', 'clthisistheonlylevel2', 'clthisistheonlyleveltoo', 'clthreegoblets', 'clthrowapotato', 'clthrowapotatoagain', 'clthwack', 'cltimeshooter2', 'cltimeshooter3', 'cltimewarriors', 'cltinyfishing', 'cltmnt', 'cltoastarling', 'cltoasterball', 'cltombofthemass', 'cltommorowandyesterday', 'cltomodachicollection', 'cltonyhawkskater2', 'cltonyhawkskater4', 'cltonyhawksunderground', 'cltoomanytypes', 'cltopspeedracing3d', 'cltosstheturtle', 'cltotm', 'cltowerblocks', 'cltowercrash3d', 'cltownscraper', 'cltrace', 'cltrafficjam3d', 'cltrapthecat', 'cltrechoroustrials', 'cltrechoroustrialspart2', 'clmathgame', 'cltriachnid', 'cltripleplay2000', 'cltriviacrack', 'cltrollfacequest1', 'cltrollfacequest10', 'cltrollfacequest11', 'cltrollfacequest12', 'cltrollfacequest13', 'cltrollfacequest2', 'cltrollfacequest3', 'cltrollfacequest4', 'cltrollfacequest5', 'cltrollfacequest6', 'cltrollfacequest7', 'cltrollfacequest8', 'cltrollfacequest9', 'cltrucksim', 'cltubejumpers', 'cltunnelrush', 'cltunnelrushbetter', 'clturbostars', 'clturokdinosaurhunter', 'cltwinshot (1)', 'cltwinshot(1)', 'cltwinshot', 'cltwistedmetal', 'cltwistedmetal2', 'cltwoball3d', 'clucds', 'cluckyblockobbyEUOPHRATESRIVER', 'clufoswampoddysey', 'clultimateassassian2', 'clultimateassassian3', 'clUltimatecardrivingsimulator', 'clultimatemortalkombat', 'clultimatemortalkombat3', 'clultrakill', 'clumstickmangameidkiforgor', 'cluncannycatgolf', 'clunderneath', 'clundertaler', 'clundertaleyellow', 'clunfairmario', 'clunfairmarioworkquestionmark', 'clunfairundyne', 'clunicyclehero', 'cluno', 'cluntime', 'clupgradecomplete', 'clupgradecomplete2', 'clupslash', 'clUZG', 'clvampiresurvivors', 'clvanguard', 'clvaportrails', 'clvex', 'clvex2', 'clvex3', 'clvex3xmas', 'clvex4', 'clvex5', 'clvex6', 'clvex7', 'clvex8', 'clvexchallenges', 'clvexx3m', 'clvexx3m2', 'clvillager', 'clvincentmansionofthedead', 'clvisitor', 'clvolleyrandom', 'clvollyballchallenge', 'clvvvvvv', 'clwaluigitacostand', 'clwarfare1944', 'clwarioland4', 'clwariowarediy', 'clwariowareinc', 'clwartheknight', 'clwaterpoolio', 'clwavedash', 'clwaverace64', 'clwaverun', 'clwebecomewhatwebehold', 'clwebfishing', 'clweltling', 'clwermhole', 'clwhackthetheif', 'clwhackyourboss', 'clwhackyourcomputer', 'clwheeliebike', 'clwheely', 'clwheely2', 'clwheely3', 'clwheely4', 'clwheely5', 'clwheely6', 'clwheely7', 'clwheely8', 'clwindowsdoors', 'clwinterfalling', 'clwipeout2097', 'clwipeout2097alt', 'clwitchcrafttd', 'clwolfenstein', 'clwolfenstein3d', 'clwoodworm', 'clwordle', 'clworldcup98', 'clworldshardestgame', 'clworldshardestgame2', 'clworldshardestgame3', 'clworldshardestgame4', 'clwrassling', 'clwrestlebros', 'clXevious', 'clyanderesimulator', 'clyarsrevenge', 'clyellow', 'clYoshisStrangeQuest', 'clyouarelucky', 'clyouvs100skibidi(1)', 'clyouvs100skibidi', 'clyumenikki', 'clzelda2thelegendoflink', 'clzeldaminishcap', 'clzenword', 'clzombieexploder', 'clzombieroad', 'clzombierush', 'clzombiesatemyneighboors', 'clzombopaclypse2', 'clzombotron', 'clzombotron2', 'clzombotronreboot', 'clzrist', 'clzuma', 'clzumashooter', 'cl oo', 'cl?', 'codeorg', 'Dragonxclient', 'Eaglercraft-Alpha-1.2.6-Offline', 'Eaglercraft-Beta-1.3-Offline', 'Eaglercraft-Indev-Offline (1)', 'Eaglercraft-Indev-Offline', 'eaglercraft.1.5.2', 'EaglercraftL_1.9_v0_7_0_Offline_Signed', 'EaglercraftX 1.8.8(u29)', 'EaglercraftZ_1.11.2', 'filenames.txt', 'Helios-Offline (1)', 'marbleracer', 'mariobuilder64', 'Minceraft-I-NotMine_V6', 'mortalkombat4', 'clalgebra', 'polytrackbutnotflagged', 'clmathgamev2', 'rocketknight2', 'sandstone', 'sdf', 'snowbros', 'superdromebugs', 'vvvvvv', 'wilywars'
+    const updates = [
+      "Designen är omgjord för att likna Jakobs Spel mycket mer.",
+      "Kraftigt minskad files-lista för snabbare laddning och enklare underhåll.",
+      "Ny topbar, ny sidebar, ny game-card layout och bättre sök.",
+      "Favoriter + senaste spel sparas lokalt i din browser.",
+      "Tips: Lägg till fler spel i files-listan när allt känns stabilt."
+    ];
 
+    /* REDUCERAD FILES-LISTA */
+    const files = [
+      "climposter","clworldguessr","clamongUsMULTIPLAYER","clsummerRider3D",
+      "clretrobowl","clretrobowlcollege","cltinyfishing","clslope","clslope3","clrun3",
+      "clsubwaysurferssanfrancisco","cltemplerun2","cldriftboss","clbasketballstars","clbasketrandom",
+      "clbasketbros","clfootballbros","clsoccerbros","clvolleyrandom","clwrestlebros",
+      "clsmashkarts","clhouseofhazards","clgetawayshootout","clrooftopsnipers","clrooftopsnipers2",
+      "clcrossyroad","cltunnelrush","clstickmanhook","clgeometrydash","clgdlite",
+      "clpapasfreezeria","clpapassushiria","clpapaspancakeria","clmotox3m2","clmotox3mspookyland",
+      "clmotox3mwinter","cldrivemady","cleggycar","cl8ballpool","clchess",
+      "clwordle","clblockblast","clbloxorz","clfireboyandwatergirl","clfireboyandwatergirl2",
+      "clducklife","clducklife2","clducklife3","clducklife4","clbitlife",
+      "clcookieclicker","clidlebreakout","clhappywheels","clmariokart64","clmarioparty",
+      "clmarioparty2","clmarioparty3","clsupermario64","clsupermarioworld","clpokemonemerald",
+      "clpokemonfirered","clpokemonsapphire","clnfsunderground2","clgranturismo2","clquake3",
+      "cldoom","cldoom2","clminecraft1-8-8","clportal","clfancypantsadventure",
+      "clfancypantsadventure2","clburritobison","clburritobison2","clraftwars","clraftwars2",
+      "cllearntofly","cllearntofly2","cllearntofly3","clvex","clvex2",
+      "clvex3","clvex4","clvex5","clvex6","clvex7","clvex8"
     ];
 
     const recommendedGames = [
       "climposter",
       "clworldguessr",
       "clamongUsMULTIPLAYER",
-      "clUltimatecardrivingsimulator",
-      "clsummerRider3D"
+      "clsummerRider3D",
+      "clretrobowl"
     ];
 
-    files.sort((a, b) => a.localeCompare(b, "sv", { sensitivity: "base" }));
+    const themes = {
+      purple: { "--p0": "#7b2cff", "--p1": "#b56cff", "--p2": "#3a00b7", "--bg0": "#050008", "--bg1": "#0b0014", "--bg2": "#120022" },
+      neon:   { "--p0": "#00ffcc", "--p1": "#00e5ff", "--p2": "#007a5e", "--bg0": "#000a08", "--bg1": "#00150f", "--bg2": "#001a10" },
+      gold:   { "--p0": "#ffaa00", "--p1": "#ffd166", "--p2": "#a06800", "--bg0": "#0a0600", "--bg1": "#130900", "--bg2": "#1a0d00" },
+      red:    { "--p0": "#ff2d55", "--p1": "#ff6b6b", "--p2": "#8b0000", "--bg0": "#080003", "--bg1": "#100008", "--bg2": "#160005" },
+      blue:   { "--p0": "#2979ff", "--p1": "#82b1ff", "--p2": "#0040ca", "--bg0": "#000510", "--bg1": "#000a1f", "--bg2": "#000e2b" },
+      pink:   { "--p0": "#e91e8c", "--p1": "#ff80c8", "--p2": "#9c006a", "--bg0": "#08000a", "--bg1": "#120010", "--bg2": "#180015" }
+    };
+
+    files.sort((a, b) => a.localeCompare(b, "sv", { sensitivity: "base", numeric: true }));
 
     let recentGames = JSON.parse(localStorage.getItem("recentGames") || "[]");
     let favoriteGames = [...new Set(JSON.parse(localStorage.getItem("favoriteGames") || "[]"))];
+    let currentFilter = "all";
 
     const gamesGrid = document.getElementById("gamesGrid");
-    const playArea = document.getElementById("playArea");
-const embedContainer = document.getElementById("embedContainer");
-    const gameFrame = document.getElementById("gameFrame");
-    const recommendedSection = document.getElementById("recommendedSection");
     const recommendedRow = document.getElementById("recommendedRow");
+    const playArea = document.getElementById("playArea");
+    const gameFrame = document.getElementById("gameFrame");
+    const iframeLoader = document.getElementById("iframeLoader");
+    const searchInput = document.getElementById("searchInput");
+    const searchMeta = document.getElementById("searchMeta");
+    const updatesPage = document.getElementById("updatesPage");
+    const updatesList = document.getElementById("updatesList");
+    const gamesSection = document.getElementById("gamesSection");
     const sidebar = document.getElementById("sidebar");
     const sidebarOverlay = document.getElementById("sidebarOverlay");
-    const menuToggle = document.getElementById("menuToggle");
-    const iframeLoader = document.getElementById("iframeLoader");
-    const loaderFill = document.getElementById("loaderFill");
-    const loaderMessage = document.getElementById("loaderMessage");
-    const introLoaderFill = document.getElementById("introLoaderFill");
-    const introLoaderMessage = document.getElementById("introLoaderMessage");
-    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+    const favCount = document.getElementById("favCount");
+    const activePlayers = document.getElementById("activePlayers");
+    const questTrackerPanel = document.getElementById("questTrackerPanel");
 
-    const chatMessagesEl = document.getElementById("chatMessages");
-    const chatInputEl = document.getElementById("chatInput");
-    const chatSendEl = document.getElementById("chatSend");
-    const chatStatusEl = document.getElementById("chatStatus");
-    const privateStatusEl = document.getElementById("privateStatus");
-    const privateInputEl = document.getElementById("privateInput");
-    const privateSendEl = document.getElementById("privateSend");
-    const privateMessagesEl = document.getElementById("privateMessages");
-    const privateFriendsListEl = document.getElementById("privateFriendsList");
-    const activePlayersEl = document.getElementById("activePlayers");
-    const profileInfoEl = document.getElementById("profileInfo");
-    const friendRequestsEl = document.getElementById("friendRequests");
-    const friendsListEl = document.getElementById("friendsList");
-    const privateChatEl = document.getElementById("privateChat");
-    const updates = [
-      "Här kommer uppdateringar synas, varje uppdatering kommer ungefär varje söndag. 👍",
-      "Nästa uppdatering (SÖN 14/3) --> V4.1 ⬆",
-      "KANSKE en discord server (om fler vill ha en)",
-      "Quest och shop system där man kan göra quests ex: spela snowrider 3d 15 min. Så får man ex 10 coins som man kan spendera i shoppen på ex nåt till sin profil",
-      "Profil/kompis system där man kan logga in och göra sin egna profil. Man ska även kunna lägga till kompisar och ha privata chattar med de",
-      "Chatt-förbättringar jag ska lägga till bättre filter och göra chatten snyggare, man måste även vara inloggad för att kunna chatta",
-      "Admin-panel där JAG kan timeouta, banna och kicka folk från chatten. Kanske nåt mer????",
-      "SKICKA FÖRSLAG!!!"
-
-];
- const firebaseConfig = {
-      apiKey: "AIzaSyAZAaNITSnkwfCEkYI5NGUyEWiuSEGhfp4",
-      authDomain: "project-4243346869068615583.firebaseapp.com",
-      databaseURL: "https://project-4243346869068615583-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "project-4243346869068615583",
-      appId: "1:40272837740:web:3f908e419e625a3077ac49"
-    };
-
-
-    let chatRef = null;
-    let db = null;
-    let currentUser = null;
-    let userRef = null;
-    let chatCooldownUntil = 0;
-    let selectedFriend = null;
-    let activeGame = null;
-    let activeGameLastTick = null;
-    let gameTrackerInterval = null;
-    const ADMIN_PASSWORD = "SigmaAdmin1234!";
-    const USER_BANNED_WORDS = ["admin", "mod", "owner", "support"];
-    const ALLOWED_EMAIL_SUFFIXES = ["@edu.lomma.se", "@gmail.com", "@icloud.com"];
-    let adminUnlocked = false;
-    let activeChatTab = "global";
-    let privateListenerRef = null;
-    const SESSION_KEY = "v4AuthSession";
-    const CHAT_ENABLED_KEY = "v4ChatEnabled";
-    let chatEnabled = localStorage.getItem(CHAT_ENABLED_KEY) !== "0";
-    const preferredQuestGames = [
-      "clsummerRider3D", "climposter", "clworldguessr", "clslopeplus", "clretrobowl", "cltemplerun2",
-      "clsubwaysurfers", "clvex", "clpaperio", "cltinyfishing", "clbasketrandom", "clbasketballstars",
-      "cl8ballpool", "cldriftboss", "cldrivemad", "cleggycar", "cltunnelrush", "clcrossyroad",
-      "clsmashkarts", "clwrestlebros", "clvolleyrandom", "clmotoX3M", "clmotoX3M2", "clmotoX3Mspookyland",
-      "clgetawayshootout", "clrun3", "clstickmanhook", "clgeometrydash", "clsnowrider", "clbloonsTD5",
-      "clbitlife", "clchess", "clwordle", "clducklife", "clducklife2", "clducklife3"
-    ];
-
-    function buildQuestsFromFiles() {
-      const availableSet = new Set(files);
-      const selectedGames = [];
-      const questDisplayName = (file) => {
-        const raw = file.replace(/^cl/i, "").trim();
-        return raw.replace(/^([^A-Za-zÅÄÖåäö]*)([a-zåäö])/, (_, prefix, letter) => prefix + letter.toUpperCase());
-      };
-
-      preferredQuestGames.forEach((game) => {
-        if (availableSet.has(game) && !selectedGames.includes(game)) selectedGames.push(game);
-      });
-
-      files.forEach((file) => {
-        const looksLikeGame = /^cl[\w-]+$/i.test(file);
-        if (!looksLikeGame || selectedGames.includes(file)) return;
-        if (selectedGames.length >= 40) return;
-        selectedGames.push(file);
-      });
-
-      return selectedGames.slice(0, 40).map((game, idx) => {
-        const minutes = 6 + (idx % 10);
-        const rewardXp = Math.max(8, Math.round(minutes * 1.8));
-        return {
-          id: `quest_${idx + 1}_${game.replace(/[^a-z0-9]/gi, "").toLowerCase().slice(0, 18)}`,
-          game,
-          label: `Spela ${questDisplayName(game)} i ${minutes} min`,
-          targetMs: minutes * 60 * 1000,
-          rewardXp
-        };
-      });
+    function showToast(message) {
+      const toast = document.getElementById("uiToast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => toast.classList.remove("show"), 1400);
     }
 
-    const questsConfig = buildQuestsFromFiles();
-    const shopItems = [
-      { id: "profileFrame", title: "🖼️ Profilram", price: 20, desc: "Visar en glödande ram i din profil.", effect: "frame" },
-      { id: "profileNeon", title: "🌈 Neon-namn", price: 28, desc: "Ger neon-effekt på namnet i profilen.", effect: "neon" },
-      { id: "profileVip", title: "👑 VIP-tag", price: 24, desc: "Visar VIP-tag i din profil.", effect: "vip" },
-      { id: "profileFire", title: "🔥 Fire-badge", price: 22, desc: "Visar fire-badge i din profil.", effect: "fire" },
-      { id: "profileGalaxy", title: "🌌 Galaxy-kort", price: 34, desc: "Galaxybakgrund på profilkortet.", effect: "galaxy" },
-      { id: "profileGold", title: "🥇 Guld-namn", price: 26, desc: "Guldig namntext i profil.", effect: "gold" },
-      { id: "profileShadow", title: "🕶️ Shadow-kort", price: 18, desc: "Mörk kontrast-stil i profil.", effect: "shadow" },
-      { id: "profilePulse", title: "💓 Pulse-effekt", price: 30, desc: "Pulserande accent runt profilkort.", effect: "pulse" },
-      { id: "profileCrystal", title: "💎 Crystal-tag", price: 27, desc: "Kristall-badge i profil.", effect: "crystal" },
-      { id: "profileRetro", title: "🕹️ Retro-tema", price: 21, desc: "Retro-färgtema i profil.", effect: "retro" },
-      { id: "profileWave", title: "🌊 Wave-overlay", price: 19, desc: "Våg-mönster i profilkort.", effect: "wave" },
-      { id: "profileAura", title: "✨ Aura-glow", price: 25, desc: "Auralys runt profilkort.", effect: "aura" },
-      { id: "profileFrost", title: "❄️ Frostram", price: 23, desc: "Isblå frostkant runt profilkortet.", effect: "frost" },
-      { id: "profileVolt", title: "⚡ Volttext", price: 29, desc: "Elektrisk glow runt namnet.", effect: "volt" },
-      { id: "profileMeteor", title: "☄️ Meteorstänk", price: 31, desc: "Meteor-partiklar i profilkort.", effect: "meteor" },
-      { id: "profileRuby", title: "🔴 Ruby-badge", price: 24, desc: "Röd premium-badge.", effect: "ruby" },
-      { id: "profileEmerald", title: "🟢 Emerald-badge", price: 24, desc: "Grön premium-badge.", effect: "emerald" },
-      { id: "profileSapphire", title: "🔵 Sapphire-badge", price: 24, desc: "Blå premium-badge.", effect: "sapphire" },
-      { id: "profileVortex", title: "🌀 Vortex-kort", price: 33, desc: "Virvel-bakgrund med djup.", effect: "vortex" },
-      { id: "profileCarbon", title: "🧩 Carbon-mönster", price: 20, desc: "Mörkt mönster i kortet.", effect: "carbon" },
-      { id: "profileHolo", title: "🪩 Holo-shine", price: 34, desc: "Holografisk reflex i kortet.", effect: "holo" },
-      { id: "profileComet", title: "🌠 Comet trail", price: 32, desc: "Rörlig ljussvans över profilkortet.", effect: "comet" },
-      { id: "profilePixel", title: "🧱 Pixelstil", price: 19, desc: "8-bit profilkänsla.", effect: "pixel" },
-      { id: "profileRose", title: "🌹 Rose glow", price: 21, desc: "Mjuk rosafärgad glöd.", effect: "rose" },
-      { id: "profileLime", title: "🍀 Lime boost", price: 21, desc: "Fräsch limefärgad accent.", effect: "lime" },
-      { id: "profileSun", title: "☀️ Sun flare", price: 27, desc: "Varmt solljus över kortet.", effect: "sun" },
-      { id: "profileMoon", title: "🌙 Moon aura", price: 27, desc: "Nattlig glow med stjärnton.", effect: "moon" },
-      { id: "profileGlitch", title: "👾 Glitch-overlay", price: 30, desc: "Digital glitch-effekt i profil.", effect: "glitch" },
-      { id: "profileInk", title: "🖋️ Ink fade", price: 18, desc: "Tusch-liknande skuggövergång.", effect: "ink" },
-      { id: "profilePlasma", title: "🔮 Plasma-ring", price: 35, desc: "Högenergi-ring runt namnet.", effect: "plasma" },
-      { id: "profileCrown", title: "🏆 Champion crown", price: 38, desc: "Champion-markering i profilen.", effect: "crown" },
-      { id: "profileGoldBorder", title: "💠 Premium kant", price: 26, desc: "Tjock premium-kant i guld.", effect: "goldborder" }
-    ];
-
-    const loadingMessages = [
-      "Laddar laddningen som laddar laddningen",
-      "Ingen vet vem jag är förutom de som vet vem jag är",
-      ":(",
-      "Detta är helt värdelöst",
-      "Laddar kanske något",
-      "RIP V2",
-      "Coola Mattespel är bästa spelsidan",
-      "Sprid denna sidan till alla ni känner!!!!!!!!!",
-      "Just nu är det 01:67 på natten",
-      "Laddar absolut inget",
-      "Jag heter Bengt",
-      "Five nights at freddis",
-      "Hej alla gooners!",
-      "Willem var här",
-      "(¤_¤)",
-      "David var här"
-    ];
-
-    let fakeLoadTimeout = null;
-    let fakeLoadRaf = null;
-    let currentLoadId = 0;
-
-    const xpForLevel = (lvl) => Math.floor(120 + (lvl - 1) * 32 + Math.pow(lvl - 1, 1.55) * 6);
-    function getLevelFromXp(xp = 0) {
-      let level = 1;
-      let remaining = xp;
-      while (remaining >= xpForLevel(level) && level < 200) {
-        remaining -= xpForLevel(level);
-        level++;
-      }
-      return { level, progressXp: remaining, neededXp: xpForLevel(level) };
+    function hashHue(str) {
+      let h = 0;
+      for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) % 360;
+      return h;
     }
 
-
-    function getCoinsForLevel(level) {
-      return 10 + (level % 21);
-    }
-
-    async function ensureLevelCoinRewards() {
-      if (!currentUser || !db) return;
-      const levelNow = getLevelFromXp(currentUser.xp || 0).level;
-      const rewardedLevel = Number(currentUser.rewardedLevel || 1);
-      if (levelNow <= rewardedLevel) return;
-      let bonus = 0;
-      for (let l = rewardedLevel + 1; l <= levelNow; l++) bonus += getCoinsForLevel(l);
-      await db.ref(`accounts/${currentUser.id}`).update({
-        coins: (currentUser.coins || 0) + bonus,
-        rewardedLevel: levelNow
-      });
-    }
-
-    function getTodayKey() {
-      const d = new Date();
-      const mm = String(d.getMonth() + 1).padStart(2, "0");
-      const dd = String(d.getDate()).padStart(2, "0");
-      return `${d.getFullYear()}-${mm}-${dd}`;
-    }
-
-    const displayName = (f) => {
-      const raw = f.replace(/^cl/i, "").trim();
-      return raw.replace(/^([^A-Za-zÅÄÖåäö]*)([a-zåäö])/, (_, prefix, letter) => {
-        return prefix + letter.toUpperCase();
-      });
-    };
-
-    function createGameThumb(file) {
-      const wrap = document.createElement("div");
-
-      const preview = document.createElement("div");
-      preview.className = "game-preview";
-
-      const title = document.createElement("div");
-      title.className = "game-title";
-      title.textContent = displayName(file);
-
-      wrap.append(preview, title);
-      return wrap;
+    function displayName(file) {
+      return file
+        .replace(/^cl/i, "")
+        .replace(/[-_]+/g, " ")
+        .replace(/([a-zåäö])([A-ZÅÄÖ])/g, "$1 $2")
+        .replace(/\s+/g, " ")
+        .trim()
+        .replace(/\b\w/g, (m) => m.toUpperCase());
     }
 
     function saveFavorites() {
       localStorage.setItem("favoriteGames", JSON.stringify(favoriteGames));
-      if (favoritesLabel) favoritesLabel.textContent = `Favoriter (${favoriteGames.length})`;
+      favCount.textContent = favoriteGames.length;
     }
 
     function isFavorite(file) {
       return favoriteGames.includes(file);
     }
 
-    function showToast(message) {
-      let toast = document.getElementById("uiToast");
-      if (!toast) {
-        toast = document.createElement("div");
-        toast.id = "uiToast";
-        toast.className = "toast";
-        document.body.appendChild(toast);
-      }
-      toast.textContent = message;
-      toast.classList.add("show");
-      clearTimeout(showToast._t);
-      showToast._t = setTimeout(() => toast.classList.remove("show"), 1500);
-    }
-
-    function toggleFavorite(file, { quiet = false } = {}) {
+    function toggleFavorite(file, quiet = false) {
       if (isFavorite(file)) {
-        favoriteGames = favoriteGames.filter((g) => g !== file);
+        favoriteGames = favoriteGames.filter((f) => f !== file);
         if (!quiet) showToast(`Tog bort ${displayName(file)} från favoriter`);
       } else {
         favoriteGames.unshift(file);
@@ -1770,477 +993,65 @@ const embedContainer = document.getElementById("embedContainer");
         if (!quiet) showToast(`La till ${displayName(file)} i favoriter`);
       }
       saveFavorites();
+      runSearch();
     }
 
-    function openSidebar() {
-      sidebar.classList.add("open");
-      sidebarOverlay.classList.add("show");
-      menuToggle.textContent = "✕";
-      menuToggle.setAttribute("aria-expanded", "true");
-      menuToggle.setAttribute("aria-label", "Stäng meny");
-    }
+    function createCard(file, compact = false) {
+      const card = document.createElement("div");
+      card.className = "gameCard";
+      card.onclick = () => openGame(file);
 
-    function closeSidebar() {
-      sidebar.classList.remove("open");
-      sidebarOverlay.classList.remove("show");
-      menuToggle.textContent = "☰";
-      menuToggle.setAttribute("aria-expanded", "false");
-      menuToggle.setAttribute("aria-label", "Öppna meny");
-    }
+      const thumb = document.createElement("div");
+      thumb.className = "gameThumb";
+      const hue = hashHue(file);
+      thumb.style.background =
+        `linear-gradient(135deg, hsl(${hue} 88% 55%), hsl(${(hue + 45) % 360} 85% 34%))`;
 
-    function toggleSidebar() {
-      if (sidebar.classList.contains("open")) closeSidebar();
-      else openSidebar();
-    }
+      const letter = document.createElement("div");
+      letter.className = "gameThumbLetter";
+      letter.textContent = (displayName(file)[0] || "?").toUpperCase();
 
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") closeSidebar();
-    });
-    function showUpdates(){
+      const info = document.createElement("div");
+      info.className = "gameInfo";
 
-  hidePages();
-  const page=document.getElementById("updatesPage");
-  const list=document.getElementById("updatesList");
+      const name = document.createElement("div");
+      name.className = "gameName";
+      name.textContent = displayName(file);
 
-  page.style.display="block";
-
-  list.innerHTML="";
-
-  updates.forEach(u=>{
-    const item=document.createElement("div");
-    item.style.marginBottom="8px";
-    item.textContent="• "+u;
-    list.appendChild(item);
-  });
-
-}
-
-    function stopFakeLoaderTimers() {
-      clearTimeout(fakeLoadTimeout);
-      if (fakeLoadRaf !== null) {
-        cancelAnimationFrame(fakeLoadRaf);
-        fakeLoadRaf = null;
-      }
-    }
-
-    function startFakeLoader() {
-      currentLoadId += 1;
-      const loadId = currentLoadId;
-
-      stopFakeLoaderTimers();
-
-      const randomDuration = Math.floor(Math.random() * 6000) + 3000;
-      const slowDownStart = Math.floor(randomDuration * 0.82);
-
-      loaderFill.style.transform = "scaleX(0)";
-      loaderMessage.textContent = loadingMessages[Math.floor(Math.random() * loadingMessages.length)];
-      iframeLoader.classList.add("show");
-
-      let startTs = null;
-
-      const animate = (ts) => {
-        if (loadId !== currentLoadId) return;
-        if (startTs === null) startTs = ts;
-
-        const elapsed = ts - startTs;
-        let progress;
-
-        if (elapsed < slowDownStart) {
-          const t = elapsed / slowDownStart;
-          progress = 95 * (1 - Math.pow(1 - t, 3));
-        } else if (elapsed < randomDuration) {
-          const t = (elapsed - slowDownStart) / (randomDuration - slowDownStart);
-          progress = 95 + 3 * (1 - Math.pow(1 - t, 2));
-        } else {
-          finishFakeLoader(loadId);
-          return;
-        }
-
-        loaderFill.style.transform = `scaleX(${Math.min(progress, 98) / 100})`;
-        fakeLoadRaf = requestAnimationFrame(animate);
+      const fav = document.createElement("button");
+      fav.className = "favBtn" + (isFavorite(file) ? " active" : "");
+      fav.textContent = "★";
+      fav.title = isFavorite(file) ? "Ta bort favorit" : "Lägg till favorit";
+      fav.onclick = (e) => {
+        e.stopPropagation();
+        toggleFavorite(file);
       };
 
-      fakeLoadRaf = requestAnimationFrame(animate);
-      fakeLoadTimeout = setTimeout(() => finishFakeLoader(loadId), randomDuration + 1200);
+      if (compact) {
+        name.style.fontSize = "11px";
+      }
 
-      return loadId;
+      thumb.appendChild(letter);
+      info.appendChild(name);
+      info.appendChild(fav);
+
+      card.appendChild(thumb);
+      card.appendChild(info);
+      return card;
     }
-
-    function finishFakeLoader(loadId) {
-      if (loadId !== currentLoadId) return;
-
-      stopFakeLoaderTimers();
-      loaderFill.style.transform = "scaleX(1)";
-
-      setTimeout(() => {
-        if (loadId !== currentLoadId) return;
-        iframeLoader.classList.remove("show");
-        loaderFill.style.transform = "scaleX(0)";
-      }, 260);
-    }
-
-    function sanitizeName(v) {
-      const s = (v || "").replace(/[^a-zA-Z0-9åäöÅÄÖ _-]/g, "").trim().slice(0, 20);
-      return s || "Gäst";
-    }
-
-    function sanitizeText(v) {
-      return (v || "").replace(/\s+/g, " ").trim().slice(0, 200);
-    }
-const bannedWords = [
-  "nigger",
-  "hitler",
-  "alve",
-  "bernflo", 
-  "epsteien",
-  "fitta", 
-  "neger", 
-  "hor",
-  "fuck",
-  "horunge",
-  "goon",
-  "sperm",
-  "runk",
-  "dö",
-  "snopp",
-  "kuk",
-  "penis",
-  "nigga",
-  "k4k",
-  "dih",
-  "dräng",
-  "snippa",
-  "niger",
-  "nazist",
-  "nazism",
-  "heil",
-  "kkk",
-  "isis",
-  "terrorist",
-  "självmord",
-  "suicide",
-  "kill yourself",
-  "kys",
-  "cp",
-  "mongo",
-  "retard",
-  "retarded",
-  "bitch",
-  "asshole",
-  "motherfucker",
-  "mf",
-  "slampa",
-  "hora",
-  "porr",
-  "porn",
-  "xxx",
-  "rape",
-  "rapist",
-  "våldta",
-  "våldt",
-  "pedo",
-  "pedofil",
-  "groom",
-  "groomer",
-  "knulla",
-  "knull",
-  "jävla",
-  "helvete",
-  "idiot",
-  "dumbass",
-  "fucking",
-  "shit",
-  "bullshit",
-  "cunt",
-  "whore",
-  "fag",
-  "faggot",
-  "tranny",
-  "wetback",
-  "chink",
-  "paki",
-  "spic",
-  "beaner",
-  "n1gger",
-  "n!gger",
-  "n igger"
-];
-
-function containsBannedWord(text) {
-  const lower = text.toLowerCase();
-  return bannedWords.some(word => lower.includes(word));
-}
-
-function hasDisallowedUsernameChars(username) {
-  return /[^a-zA-Z0-9åäöÅÄÖ _-]/.test(username || "");
-}
-
-function validateUsernameInput(rawUsername) {
-  const trimmed = (rawUsername || "").trim();
-  if (!trimmed) return "Du måste skriva ett username.";
-  if (hasDisallowedUsernameChars(trimmed)) return "Du kan inte ha emojis eller specialtecken i ditt username.";
-  if (containsBannedWord(trimmed) || USER_BANNED_WORDS.some((w) => trimmed.toLowerCase().includes(w))) {
-    return "Username innehåller förbjudet ord.";
-  }
-  return "";
-}
-    function addChatMessage(msg) {
-      const box = document.createElement("div");
-      box.className = "chat-msg";
-      applyChatMessageVisuals(box, msg);
-
-      const meta = document.createElement("div");
-      meta.className = "chat-meta";
-      renderChatMeta(meta, msg, "name");
-
-      const text = document.createElement("div");
-      text.className = "chat-text";
-      text.textContent = (msg.text || "").slice(0, 200);
-
-      box.append(meta, text);
-      chatMessagesEl.appendChild(box);
-      chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
-    }
-
-    function addSystemChatMessage(text) {
-      addChatMessage({ name: "System", text, ts: Date.now() });
-    }
-
-function getDisplayUsername() {
-  if (!currentUser) return "Gäst";
-  return `${currentUser.username}${currentUser.verified ? " ✔️" : ""}`;
-}
-
-function isChatBlocked() {
-  const now = Date.now();
-  if (!currentUser) return "Du måste vara inloggad för att chatta.";
-  if (currentUser.banned) return "Du är bannad från chatten.";
-  if (currentUser.timeoutUntil && currentUser.timeoutUntil > now) {
-    return `Du har timeout i ${Math.ceil((currentUser.timeoutUntil - now) / 1000)} sek.`;
-  }
-  if (chatCooldownUntil > now) return `Cooldown: ${((chatCooldownUntil - now) / 1000).toFixed(1)}s`;
-  return "";
-}
-
-function refreshChatStatus() {
-  if (!chatEnabled) {
-    chatStatusEl.textContent = "Chatten har blivit stoppad.";
-    privateStatusEl.textContent = "Chatten har blivit stoppad.";
-    chatInputEl.disabled = true;
-    chatSendEl.disabled = true;
-    privateInputEl.disabled = true;
-    privateSendEl.disabled = true;
-    return;
-  }
-
-  const msg = isChatBlocked();
-  chatStatusEl.textContent = msg || `Inloggad som ${getDisplayUsername()}`;
-  privateStatusEl.textContent = selectedFriend ? `Privat chatt med ${selectedFriend.name}` : "Välj en vän för privat chatt.";
-  chatInputEl.disabled = !!msg;
-  chatSendEl.disabled = !!msg;
-  privateInputEl.disabled = !currentUser || !selectedFriend;
-  privateSendEl.disabled = !currentUser || !selectedFriend;
-}
-
-function getCurrentUserChatStyle() {
-  const inv = currentUser?.inventory || {};
-  const equipped = currentUser?.equipped || inv;
-  return {
-    sparkle: !!(inv.sparkle && equipped.sparkle),
-    vip: !!(inv.vip && equipped.vip),
-    rainbow: !!(inv.rainbow && equipped.rainbow),
-    glow: !!(inv.glow && equipped.glow),
-    avatarFrame: !!(inv.avatarFrame && equipped.avatarFrame),
-    chatBubble: !!(inv.chatBubble && equipped.chatBubble),
-    titleLegend: !!(inv.titleLegend && equipped.titleLegend),
-    nameFire: !!(inv.nameFire && equipped.nameFire),
-    iconStar: !!(inv.iconStar && equipped.iconStar),
-    bgNebula: !!(inv.bgNebula && equipped.bgNebula),
-    fireBadge: !!((inv.nameFire && equipped.nameFire) || (inv.rainbow && equipped.rainbow)),
-    neonName: !!((inv.glow && equipped.glow) || (inv.chatBubble && equipped.chatBubble) || (inv.rainbow && equipped.rainbow))
-  };
-}
-
-function buildStyledChatIdentity(baseName, style) {
-  let name = baseName || "Gäst";
-  if (style.vip) name = `👑 ${name}`;
-  if (style.titleLegend) name = `${name} [Legend]`;
-  if (style.iconStar) name = `${name} ⭐`;
-  return name;
-}
-
-function renderChatMeta(metaEl, msg, fallbackNameKey = "name") {
-  const t = new Date(msg.ts || Date.now()).toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit" });
-  const baseName = (msg[fallbackNameKey] || "Gäst").slice(0, 28);
-  const identity = buildStyledChatIdentity(baseName, msg);
-  metaEl.textContent = `${identity} • ${t}`;
-  if (msg.fireBadge) metaEl.textContent += " 🔥";
-  if (msg.sparkle) metaEl.textContent += " ✨";
-  if (msg.avatarFrame) metaEl.textContent = `[◈ ${metaEl.textContent} ◈]`;
-  if (msg.neonName || msg.glow || msg.rainbow) metaEl.classList.add("neon");
-}
-
-function applyChatMessageVisuals(box, msg) {
-  if (msg.chatBubble) box.classList.add("style-chatBubble");
-  if (msg.bgNebula) box.classList.add("style-bgNebula");
-}
-
-function sendChatMessage() {
-  const text = sanitizeText(chatInputEl.value);
-  if (!text || !chatRef) return;
-  if (!chatEnabled) {
-    alert("Chatten har blivit stoppad.");
-    return;
-  }
-  const blockedMsg = isChatBlocked();
-  if (blockedMsg) {
-    alert(blockedMsg);
-    return;
-  }
-  if (containsBannedWord(text)) {
-    alert("Ditt meddelande innehåller ord som inte är tillåtna.");
-    return;
-  }
-
-  const chatStyle = getCurrentUserChatStyle();
-  chatRef.push({ uid: currentUser.id, name: getDisplayUsername(), text, ts: Date.now(), ...chatStyle });
-  chatCooldownUntil = Date.now() + 3000;
-  chatInputEl.value = "";
-  refreshChatStatus();
-  setTimeout(refreshChatStatus, 3100);
-}
-
-function hidePages() {
-  gamesGrid.style.display = "none";
-  recommendedSection.style.display = "none";
-  playArea.style.display = "none";
-  embedContainer.style.display = "none";
-  gameFrame.src = "about:blank";
-  activeGame = null;
-  activeGameLastTick = null;
-  document.getElementById("updatesPage").style.display = "none";
-  document.getElementById("questsPage").style.display = "none";
-  document.getElementById("shopPage").style.display = "none";
-  document.getElementById("inventoryPage").style.display = "none";
-  document.getElementById("roadmapPage").style.display = "none";
-}
-
-function showQuests() {
-  hidePages();
-  document.getElementById("questsPage").style.display = "block";
-  renderQuest();
-}
-
-function showShop() {
-  hidePages();
-  document.getElementById("shopPage").style.display = "block";
-  renderShop();
-}
-
-function showInventory() {
-  hidePages();
-  document.getElementById("inventoryPage").style.display = "block";
-  renderInventory();
-}
 
     function renderRecommended() {
       recommendedRow.innerHTML = "";
-      const picks = recommendedGames.filter(g => files.includes(g)).slice(0, 5);
-
-      picks.forEach((file) => {
-        const btn = document.createElement("button");
-        btn.className = "game-btn recommended-btn";
-        btn.append(createGameThumb(file));
-        btn.onclick = () => openGame(file);
-        recommendedRow.appendChild(btn);
+      recommendedGames.filter((g) => files.includes(g)).forEach((file) => {
+        recommendedRow.appendChild(createCard(file, true));
       });
     }
 
-    function getGroupLabel(file) {
-      const name = displayName(file).trim();
-      const first = (name[0] || "").toUpperCase();
-      return /^[A-Z]$/.test(first) ? first : "#";
+    function getBaseListByFilter() {
+      if (currentFilter === "favorites") return favoriteGames;
+      if (currentFilter === "recent") return recentGames;
+      return files;
     }
-
-    function renderGames(list) {
-      gamesGrid.innerHTML = "";
-      gamesGrid.style.display = "grid";
-      recommendedSection.style.display = "block";
-
-      const sortedList = [...list].sort((a, b) => {
-        const favDelta = Number(isFavorite(b)) - Number(isFavorite(a));
-        if (favDelta !== 0) return favDelta;
-        return displayName(a).localeCompare(displayName(b), "sv", { sensitivity: "base", numeric: true });
-      });
-
-      const groups = { "#": [] };
-      alphabet.forEach((letter) => (groups[letter] = []));
-      sortedList.forEach((file) => groups[getGroupLabel(file)].push(file));
-
-      const order = ["#", ...alphabet];
-      order.forEach((groupKey) => {
-        const groupItems = groups[groupKey];
-        if (!groupItems.length) return;
-
-        const header = document.createElement("div");
-        header.className = "group-header";
-        header.textContent = groupKey;
-        gamesGrid.appendChild(header);
-
-        groupItems.forEach((file) => {
-          const c = document.createElement("div");
-          c.className = "game-card";
-
-          const b = document.createElement("button");
-          b.className = "game-btn";
-          b.append(createGameThumb(file));
-          b.onclick = () => openGame(file);
-
-          const f = document.createElement("button");
-          f.type = "button";
-          f.className = `favorite${isFavorite(file) ? " active" : ""}`;
-          f.textContent = "★";
-          f.title = isFavorite(file) ? "Ta bort favorit" : "Lägg till favorit";
-          f.setAttribute("aria-label", f.title);
-          f.setAttribute("aria-pressed", String(isFavorite(file)));
-
-          f.onclick = (e) => {
-            e.stopPropagation();
-            toggleFavorite(file);
-            f.classList.toggle("active", isFavorite(file));
-            f.title = isFavorite(file) ? "Ta bort favorit" : "Lägg till favorit";
-            f.setAttribute("aria-label", f.title);
-            f.setAttribute("aria-pressed", String(isFavorite(file)));
-          };
-
-          c.append(b, f);
-          gamesGrid.appendChild(c);
-        });
-      });
-    }
-
-    function openGame(game) {
-      startFakeLoader();
-      activeGame = game;
-      activeGameLastTick = Date.now();
-
-      playArea.style.display = "grid";
-      embedContainer.style.display = "block";
-      gameFrame.onload = null;
-      gameFrame.src = `UGS-Files/${game}.html`;
-
-      requestAnimationFrame(() => {
-        embedContainer.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
-
-      if (!recentGames.includes(game)) {
-        recentGames.unshift(game);
-        recentGames = recentGames.slice(0, 10);
-        localStorage.setItem("recentGames", JSON.stringify(recentGames));
-      }
-    }
-
-    let searchDebounce = null;
 
     function normalizeSearchText(value) {
       return (value || "")
@@ -2251,920 +1062,246 @@ function showInventory() {
     }
 
     function scoreGameMatch(file, query) {
-      const raw = displayName(file);
-      const name = normalizeSearchText(raw);
-      if (!query) return { score: 1, ok: true };
-      if (name.startsWith(query)) return { score: 1000 - name.length, ok: true };
+      const name = normalizeSearchText(displayName(file));
+      if (!query) return { ok: true, score: 1 };
+      if (name.startsWith(query)) return { ok: true, score: 1000 - name.length };
       const idx = name.indexOf(query);
-      if (idx !== -1) return { score: 700 - idx, ok: true };
+      if (idx !== -1) return { ok: true, score: 700 - idx };
 
       let qi = 0;
       for (let i = 0; i < name.length && qi < query.length; i++) {
         if (name[i] === query[qi]) qi++;
       }
-      if (qi === query.length) return { score: 300 - Math.max(0, name.length - query.length), ok: true };
-      return { score: -1, ok: false };
+      if (qi === query.length) return { ok: true, score: 300 - Math.max(0, name.length - query.length) };
+      return { ok: false, score: -1 };
     }
 
-    function runGameSearch() {
-      const q = normalizeSearchText(searchInput.value);
-      if (!q) {
-        searchMeta.textContent = "Visar alla spel";
-        renderGames(files);
+    function renderGames(list) {
+      gamesGrid.innerHTML = "";
+      if (!list.length) {
+        const box = document.createElement("div");
+        box.style.gridColumn = "1 / -1";
+        box.style.padding = "14px";
+        box.style.border = "1px dashed var(--line)";
+        box.style.borderRadius = "12px";
+        box.style.color = "var(--d)";
+        box.textContent = "Inga spel hittades.";
+        gamesGrid.appendChild(box);
         return;
       }
 
-      const ranked = files
-        .map((file) => ({ file, ...scoreGameMatch(file, q) }))
-        .filter((r) => r.ok)
-        .sort((a, b) => b.score - a.score || displayName(a.file).localeCompare(displayName(b.file), "sv", { sensitivity: "base" }));
+      const sorted = [...list].sort((a, b) => {
+        const favDelta = Number(isFavorite(b)) - Number(isFavorite(a));
+        if (favDelta !== 0) return favDelta;
+        return displayName(a).localeCompare(displayName(b), "sv", { sensitivity: "base", numeric: true });
+      });
 
-      searchMeta.textContent = `${ranked.length} träffar för "${searchInput.value.trim()}"`;
-      renderGames(ranked.map((r) => r.file));
-    }
-
-    function filterGames() {
-      if (searchDebounce) clearTimeout(searchDebounce);
-      searchDebounce = setTimeout(runGameSearch, 90);
-    }
-
-    function goHome() {
-      hidePages();
-      gamesGrid.style.display = "grid";
-      recommendedSection.style.display = "block";
-      searchMeta.textContent = "Visar alla spel";
-      renderGames(files);
-    }
-
-    function showFavorites() {
-      if (!favoriteGames.length) {
-        searchMeta.textContent = "Inga favoriter än. Klicka på ★ för att lägga till.";
-      } else {
-        searchMeta.textContent = `Visar ${favoriteGames.length} favoriter`;
-      }
-      renderGames(favoriteGames);
-    }
-
-    function showRecent() {
-      renderGames(recentGames);
-    }
-
-    function openIframe(url) {
-      startFakeLoader();
-      activeGame = null;
-      activeGameLastTick = null;
-
-      playArea.style.display = "grid";
-      embedContainer.style.display = "block";
-      gameFrame.onload = null;
-      gameFrame.src = url;
-
-      gamesGrid.style.display = "none";
-      recommendedSection.style.display = "none";
-      document.getElementById("updatesPage").style.display = "none";
-      document.getElementById("questsPage").style.display = "none";
-      document.getElementById("shopPage").style.display = "none";
-      document.getElementById("inventoryPage").style.display = "none";
-  document.getElementById("roadmapPage").style.display = "none";
-    }
-
-    function toggleFullscreen() {
-      if (!document.fullscreenElement) {
-        embedContainer.requestFullscreen();
-      } else {
-        document.exitFullscreen();
-      }
-    }
-
-
-    const themeUnlockLevels = { blue: 1, red: 1, green: 1, yellow: 2, orange: 3, gray: 4, purple: 5, pink: 6, cyan: 7, sunset: 9, neon: 11, ocean: 14, lava: 18, forest: 22, midnight: 30, candy: 40, gold: 55, arctic: 62, emerald: 70, rose: 78, storm: 86, cyber: 92, dusk: 98 };
-    const roadmapRewards = Array.from({ length: 100 }, (_, i) => {
-      const level = i + 1;
-      const coins = 10 + (level % 21);
-      const base = { level, label: `+${coins} coins` };
-      const themeByLevel = { 2:"yellow",3:"orange",4:"gray",5:"purple",6:"pink",7:"cyan",9:"sunset",11:"neon",14:"ocean",18:"lava",22:"forest",30:"midnight",40:"candy",55:"gold",62:"arctic",70:"emerald",78:"rose",86:"storm",92:"cyber",98:"dusk" };
-      if (themeByLevel[level]) base.label = `Lås upp tema: ${themeByLevel[level].toUpperCase()} + ${coins} coins`;
-      if ([10,20,35,50,65,80,100].includes(level)) base.label += " • Bonus reward";
-      return base;
-    });
-
-    function getThemeRequiredLevel(theme) {
-      return themeUnlockLevels[theme] || 999;
-    }
-
-    function isThemeUnlocked(theme, user = currentUser) {
-      const req = getThemeRequiredLevel(theme);
-      if (req <= 1) return true;
-      const level = getLevelFromXp(user?.xp || 0).level;
-      return level >= req;
-    }
-
-    function refreshThemeButtons() {
-      const level = getLevelFromXp(currentUser?.xp || 0).level;
-      document.querySelectorAll('.theme-btn[data-theme]').forEach((btn) => {
-        const theme = btn.dataset.theme;
-        const req = getThemeRequiredLevel(theme);
-        const unlocked = req <= level;
-        btn.classList.toggle('locked', !unlocked);
-        const base = theme.toUpperCase();
-        btn.innerHTML = unlocked || req <= 1 ? base : `${base}<span class="req">LÅST • LVL ${req}</span>`;
+      sorted.forEach((file) => {
+        gamesGrid.appendChild(createCard(file));
       });
     }
 
-    function setTheme(t) {
-      if (!isThemeUnlocked(t)) {
-        const req = getThemeRequiredLevel(t);
-        return alert(`Det temat är låst. Nå level ${req} i roadmapen först.`);
+    function runSearch() {
+      const q = normalizeSearchText(searchInput.value);
+      const base = getBaseListByFilter();
+
+      if (!q) {
+        renderGames(base);
+        if (currentFilter === "all") searchMeta.textContent = `Visar alla spel (${base.length})`;
+        if (currentFilter === "favorites") searchMeta.textContent = `Visar favoriter (${base.length})`;
+        if (currentFilter === "recent") searchMeta.textContent = `Visar senaste (${base.length})`;
+        return;
       }
-      document.body.className = t;
-      document.documentElement.classList.remove("theme-blue","theme-red","theme-green","theme-yellow","theme-orange","theme-gray","theme-purple","theme-pink","theme-cyan","theme-sunset","theme-neon","theme-ocean","theme-lava","theme-forest","theme-midnight","theme-candy","theme-gold","theme-arctic","theme-emerald","theme-rose","theme-storm","theme-cyber","theme-dusk");
-      document.documentElement.classList.add(`theme-${t}`);
-      localStorage.setItem("theme", t);
-      closeThemePopup();
+
+      const ranked = base
+        .map((file) => ({ file, ...scoreGameMatch(file, q) }))
+        .filter((x) => x.ok)
+        .sort((a, b) => b.score - a.score);
+
+      renderGames(ranked.map((r) => r.file));
+      searchMeta.textContent = `${ranked.length} träffar för "${searchInput.value.trim()}"`;
+    }
+
+    let searchDebounce = null;
+    function filterGames() {
+      clearTimeout(searchDebounce);
+      searchDebounce = setTimeout(runSearch, 90);
+    }
+
+    function setQuickFilter(filter) {
+      currentFilter = filter;
+      document.querySelectorAll(".filterBtn").forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.filter === filter);
+      });
+      runSearch();
+    }
+
+    function openGame(game) {
+      updatesPage.classList.add("hidden");
+      gamesSection.classList.remove("hidden");
+      playArea.classList.remove("hidden");
+
+      iframeLoader.classList.remove("hidden");
+      gameFrame.src = `UGS-Files/${game}.html`;
+
+      questTrackerPanel.innerHTML =
+        `<b>🎯 Nu spelar du:</b><br>${displayName(game)}<br><span style="color:var(--d)">Fil: UGS-Files/${game}.html</span>`;
+
+      if (!recentGames.includes(game)) {
+        recentGames.unshift(game);
+        recentGames = recentGames.slice(0, 12);
+        localStorage.setItem("recentGames", JSON.stringify(recentGames));
+      }
+
+      gameFrame.onload = () => {
+        iframeLoader.classList.add("hidden");
+      };
+
+      setTimeout(() => {
+        iframeLoader.classList.add("hidden");
+      }, 2500);
+
+      requestAnimationFrame(() => {
+        playArea.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+
+    function openIframe(url) {
+      updatesPage.classList.add("hidden");
+      gamesSection.classList.remove("hidden");
+      playArea.classList.remove("hidden");
+
+      iframeLoader.classList.remove("hidden");
+      gameFrame.src = url;
+      questTrackerPanel.innerHTML =
+        `<b>🌐 Extern sida öppnad</b><br><span style="color:var(--d)">${url}</span>`;
+
+      gameFrame.onload = () => iframeLoader.classList.add("hidden");
+      setTimeout(() => iframeLoader.classList.add("hidden"), 2500);
+      closeSidebar();
+      playArea.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function toggleFullscreen() {
+      const box = document.getElementById("embedContainer");
+      if (!document.fullscreenElement) box.requestFullscreen();
+      else document.exitFullscreen();
+    }
+
+    function goHome() {
+      updatesPage.classList.add("hidden");
+      gamesSection.classList.remove("hidden");
+      setQuickFilter("all");
+      closeSidebar();
+    }
+
+    function showFavorites() {
+      updatesPage.classList.add("hidden");
+      gamesSection.classList.remove("hidden");
+      setQuickFilter("favorites");
+      closeSidebar();
+    }
+
+    function showRecent() {
+      updatesPage.classList.add("hidden");
+      gamesSection.classList.remove("hidden");
+      setQuickFilter("recent");
+      closeSidebar();
+    }
+
+    function showUpdates() {
+      gamesSection.classList.add("hidden");
+      playArea.classList.add("hidden");
+      updatesPage.classList.remove("hidden");
+      closeSidebar();
+    }
+
+    function renderUpdates() {
+      updatesList.innerHTML = "";
+      updates.forEach((u) => {
+        const li = document.createElement("li");
+        li.textContent = u;
+        updatesList.appendChild(li);
+      });
+    }
+
+    function openSidebar() {
+      sidebar.classList.add("open");
+      sidebarOverlay.classList.add("show");
+    }
+
+    function closeSidebar() {
+      sidebar.classList.remove("open");
+      sidebarOverlay.classList.remove("show");
+    }
+
+    function toggleSidebar() {
+      if (sidebar.classList.contains("open")) closeSidebar();
+      else openSidebar();
+    }
+
+    function openProfileModal() {
+      showToast("Profil kommer snart i denna version.");
     }
 
     function openThemePopup() {
-      refreshThemeButtons();
       document.getElementById("themePopup").style.display = "flex";
-      setPopupOpen(true);
-    }
-
-
-    function setPopupOpen(open) {
-      document.body.classList.toggle("popup-open", !!open);
+      updateThemeButtons();
+      closeSidebar();
     }
 
     function closeThemePopup() {
       document.getElementById("themePopup").style.display = "none";
-      setPopupOpen(false);
     }
 
-    function updateChatToggleUI() {
-      const badge = document.getElementById("chatToggleStatus");
-      if (!badge) return;
-      badge.textContent = chatEnabled ? "Chat: Aktiv" : "Chat: Stoppad";
-      badge.classList.toggle("offline", !chatEnabled);
+    function applyTheme(name, save = true) {
+      const theme = themes[name] || themes.purple;
+      Object.entries(theme).forEach(([key, value]) => {
+        document.documentElement.style.setProperty(key, value);
+      });
+      document.documentElement.dataset.theme = name;
+      if (save) localStorage.setItem("theme", name);
+      updateThemeButtons();
     }
 
-    function toggleChatState() {
-      chatEnabled = !chatEnabled;
-      localStorage.setItem(CHAT_ENABLED_KEY, chatEnabled ? "1" : "0");
-      updateChatToggleUI();
-      refreshChatStatus();
-      if (!chatEnabled) addSystemChatMessage("Chatten har blivit stoppad.");
-      else addSystemChatMessage("Chatten är startad igen.");
+    function setTheme(name) {
+      applyTheme(name, true);
+      closeThemePopup();
+      showToast(`Tema bytt till ${name.toUpperCase()}`);
     }
 
-    function closeModalOnBackdrop(event, id) {
-      if (event.target.id === id) {
-        document.getElementById(id).style.display = "none";
-        setPopupOpen(false);
-      }
-    }
-
-    function setChatTab(tab) {
-      activeChatTab = tab;
-      const isGlobal = tab === "global";
-      document.getElementById("globalChatView").style.display = isGlobal ? "flex" : "none";
-      document.getElementById("privateChatView").style.display = isGlobal ? "none" : "flex";
-      document.getElementById("globalTabBtn").classList.toggle("active", isGlobal);
-      document.getElementById("privateTabBtn").classList.toggle("active", !isGlobal);
-      renderPrivateFriendsBar();
-    }
-
-    function openProfileModal() { document.getElementById("profileModal").style.display = "flex"; setPopupOpen(true); renderProfile(); }
-    function closeProfileModal() { document.getElementById("profileModal").style.display = "none"; setPopupOpen(false); }
-    function openAdminGate() {
-      const entered = prompt("Skriv admin-lösenord för att öppna panelen:") || "";
-      if (entered !== ADMIN_PASSWORD) return alert("Fel admin-lösenord.");
-      adminUnlocked = true;
-      document.getElementById("adminPassword").value = "";
-      openAdminPanel();
-    }
-    function openAdminPanel() {
-      if (!adminUnlocked) return alert("Du måste verifiera admin-lösenord först.");
-      document.getElementById("adminModal").style.display = "flex";
-      setPopupOpen(true);
-      updateChatToggleUI();
-    }
-    function closeAdminPanel() { document.getElementById("adminModal").style.display = "none"; setPopupOpen(false); }
-
-    async function registerAccount() {
-      if (!db) return;
-      const email = (document.getElementById("authEmail").value || "").trim().toLowerCase();
-      const rawUsername = document.getElementById("authUsername").value || "";
-      const usernameError = validateUsernameInput(rawUsername);
-      if (usernameError) return alert(usernameError);
-      const username = sanitizeName(rawUsername);
-      const password = (document.getElementById("authPassword").value || "").trim();
-      if (!email || !username || !password) return alert("Fyll i mail, username och lösenord.");
-      if (!ALLOWED_EMAIL_SUFFIXES.some((suffix) => email.endsWith(suffix))) return alert("Mail måste sluta med @edu.lomma.se, @gmail.com eller @icloud.com.");
-      const existing = await db.ref("accounts").orderByChild("usernameLower").equalTo(username.toLowerCase()).once("value");
-      if (existing.exists()) return alert("Det username är upptaget.");
-      const emailExists = await db.ref("accounts").orderByChild("email").equalTo(email).once("value");
-      if (emailExists.exists()) return alert("Mail används redan.");
-      const ref = db.ref("accounts").push();
-      const quests = {};
-      questsConfig.forEach((q) => { quests[q.id] = { progressMs: 0, claimed: false }; });
-      await ref.set({ email, username, usernameLower: username.toLowerCase(), password, coins: 0, xp: 0, verified: false, banned: false, timeoutUntil: 0, createdAt: Date.now(), lastQuestReset: getTodayKey(), quests, inventory: {}, equipped: {}, rewardedLevel: 1 });
-      alert("Konto skapat! Logga in nu.");
-    }
-
-    async function loginAccount() {
-      if (!db) return;
-      const email = (document.getElementById("authEmail").value || "").trim().toLowerCase();
-      const password = (document.getElementById("authPassword").value || "").trim();
-      const snap = await db.ref("accounts").orderByChild("email").equalTo(email).once("value");
-      if (!snap.exists()) return alert("Kontot hittades inte.");
-      let found = null;
-      snap.forEach((c) => { if (!found) found = { id: c.key, ...c.val() }; });
-      if (!found || found.password !== password) return alert("Fel lösenord.");
-      if (found.banned) return alert("Detta konto är bannat.");
-
-      // Tillåt flera enheter och håll session permanent.
-      await db.ref(`accounts/${found.id}`).update({ lastSeen: Date.now(), forcedLogout: false });
-      localStorage.setItem(SESSION_KEY, JSON.stringify({ accountId: found.id }));
-
-      currentUser = { ...found };
-      userRef = db.ref(`accounts/${found.id}`);
-      watchCurrentUser();
-      renderProfile();
-      refreshChatStatus();
-      setChatTab(activeChatTab);
-      alert("Inloggad!");
-    }
-
-    async function logoutAccount() {
-      if (!currentUser) return;
-      localStorage.removeItem(SESSION_KEY);
-      if (userRef) userRef.off();
-      if (privateListenerRef) privateListenerRef.off();
-      currentUser = null;
-      selectedFriend = null;
-      privateMessagesEl.innerHTML = "";
-      renderProfile();
-      refreshChatStatus();
-      renderPrivateFriendsBar();
-    }
-
-    function watchCurrentUser() {
-      if (!userRef) return;
-      userRef.off();
-      userRef.on("value", (snap) => {
-        const data = snap.val();
-        if (!data) return;
-        currentUser = { id: snap.key, ...data };
-        renderProfile();
-        refreshChatStatus();
-        renderPrivateFriendsBar();
-        renderQuest();
-        renderShop();
-        renderInventory();
+    function updateThemeButtons() {
+      const current = document.documentElement.dataset.theme || "purple";
+      document.querySelectorAll(".theme-btn").forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.theme === current);
       });
     }
 
-    async function sendFriendRequest() {
-      if (!currentUser || !db) return alert("Logga in först.");
-      const targetName = sanitizeName(document.getElementById("friendInput").value);
-      const snap = await db.ref("accounts").orderByChild("usernameLower").equalTo(targetName.toLowerCase()).once("value");
-      if (!snap.exists()) return alert("Användaren finns inte.");
-      let target = null;
-      snap.forEach((c) => { if (!target) target = { id: c.key, ...c.val() }; });
-      if (target.id === currentUser.id) return alert("Du kan inte adda dig själv.");
-      const alreadyFriends = await db.ref(`friends/${currentUser.id}/${target.id}`).once("value");
-      if (alreadyFriends.exists()) return alert("Ni är redan vänner.");
-      await db.ref(`friend-requests/${target.id}/${currentUser.id}`).set({ fromUsername: currentUser.username, ts: Date.now() });
-      alert("Förfrågan skickad.");
-    }
-
-    async function respondFriendRequest(uid, accept) {
-      if (!currentUser || !db) return;
-      if (accept) {
-        await db.ref(`friends/${currentUser.id}/${uid}`).set(true);
-        await db.ref(`friends/${uid}/${currentUser.id}`).set(true);
-      }
-      await db.ref(`friend-requests/${currentUser.id}/${uid}`).remove();
-      renderPrivateFriendsBar();
-    }
-
-    function getPrivateChatId(a, b) { return [a, b].sort().join("__"); }
-
-    function openPrivateChat(friendId, friendName) {
-      selectedFriend = { id: friendId, name: friendName };
-      privateChatEl.style.display = "block";
-      privateChatEl.innerHTML = `<h4>Vald vän: ${friendName}</h4><div>Gå till chatten och öppna fliken <b>Privat</b>.</div>`;
-      setChatTab("private");
-      renderPrivateFriendsBar();
-      subscribePrivateChat();
-    }
-
-    function subscribePrivateChat() {
-      privateMessagesEl.innerHTML = "";
-      if (!selectedFriend || !currentUser) {
-        privateStatusEl.textContent = "Välj en vän för privat chatt.";
-        return;
-      }
-      privateStatusEl.textContent = `Privat chatt med ${selectedFriend.name}`;
-      const cid = getPrivateChatId(currentUser.id, selectedFriend.id);
-      if (privateListenerRef) privateListenerRef.off();
-      privateListenerRef = db.ref(`private-chats/${cid}/messages`).limitToLast(120);
-      privateListenerRef.on("child_added", (snap) => {
-        const msg = snap.val() || {};
-        const row = document.createElement("div");
-        row.className = "chat-msg";
-        applyChatMessageVisuals(row, msg);
-        const meta = document.createElement("div");
-        meta.className = "chat-meta";
-        renderChatMeta(meta, msg, "fromName");
-        const text = document.createElement("div");
-        text.className = "chat-text";
-        text.textContent = (msg.text || "").slice(0, 200);
-        row.append(meta, text);
-        privateMessagesEl.appendChild(row);
-        privateMessagesEl.scrollTop = privateMessagesEl.scrollHeight;
-      });
-    }
-
-    async function renderPrivateFriendsBar() {
-      privateFriendsListEl.innerHTML = "";
-      if (!currentUser || !db) return;
-      const snap = await db.ref(`friends/${currentUser.id}`).once("value");
-      if (!snap.exists()) {
-        privateFriendsListEl.innerHTML = `<div class="chat-status">Inga vänner ännu.</div>`;
-        return;
-      }
-      const ids = Object.keys(snap.val());
-      for (const fid of ids) {
-        const fs = await db.ref(`accounts/${fid}`).once("value");
-        const f = fs.val();
-        if (!f) continue;
-        const btn = document.createElement("button");
-        btn.className = "private-friend-btn" + (selectedFriend && selectedFriend.id === fid ? " active" : "");
-        btn.textContent = f.username;
-        btn.onclick = () => {
-          selectedFriend = { id: fid, name: f.username };
-          renderPrivateFriendsBar();
-          subscribePrivateChat();
-        };
-        privateFriendsListEl.appendChild(btn);
-      }
-    }
-
-    function sendPrivateMessage() {
-      if (!chatEnabled) return alert("Chatten har blivit stoppad.");
-      if (!selectedFriend || !currentUser) return alert("Välj en vän först.");
-      const text = sanitizeText(privateInputEl.value);
-      if (!text) return;
-      if (containsBannedWord(text)) return alert("Ditt meddelande innehåller ord som inte är tillåtna.");
-      const cid = getPrivateChatId(currentUser.id, selectedFriend.id);
-      const chatStyle = getCurrentUserChatStyle();
-      db.ref(`private-chats/${cid}/messages`).push({ from: currentUser.id, fromName: getDisplayUsername(), text, ts: Date.now(), ...chatStyle });
-      privateInputEl.value = "";
-    }
-
-    function getOwnedShopEffects(inv, equipped = {}) {
-      if (!inv) return [];
-      const owned = shopItems.filter((item) => inv[item.id]);
-      return owned.map((item) => `${item.title}${equipped[item.id] ? " (på)" : " (av)"}`);
-    }
-
-    function renderProfile() {
-      const profileStylePreview = document.getElementById("profileStylePreview");
-      if (!currentUser) {
-        profileInfoEl.innerHTML = "Inte inloggad.";
-        if (profileStylePreview) profileStylePreview.textContent = "Ingen profil att visa.";
-        friendRequestsEl.innerHTML = "";
-        friendsListEl.innerHTML = "";
-        privateChatEl.style.display = "none";
-        const browseList = document.getElementById("profileBrowseList");
-        if (browseList) browseList.innerHTML = "";
-        return;
-      }
-      const ownedEffects = getOwnedShopEffects(currentUser.inventory || {}, currentUser.equipped || {});
-      const lv = getLevelFromXp(currentUser.xp || 0);
-      profileInfoEl.innerHTML = `Inloggad som <b>${getDisplayUsername()}</b><br>Mail: ${currentUser.email}<br>Coins: ${currentUser.coins || 0}<br>XP: ${currentUser.xp || 0}<br>Level: ${lv.level}<br>Shop-effekter i profil: ${ownedEffects.length ? ownedEffects.join(", ") : "Inga köpta ännu."}`;
-      if (profileStylePreview) profileStylePreview.innerHTML = buildProfileVisual(currentUser);
-      db.ref(`friend-requests/${currentUser.id}`).on("value", (snap) => {
-        friendRequestsEl.innerHTML = "<b>Vänförfrågningar (måste accepteras)</b><br>";
-        if (!snap.exists()) { friendRequestsEl.innerHTML += "Inga."; return; }
-        snap.forEach((c) => {
-          const d = c.val() || {};
-          friendRequestsEl.innerHTML += `${d.fromUsername} <button onclick="respondFriendRequest('${c.key}', true)">Acceptera</button> <button onclick="respondFriendRequest('${c.key}', false)">Neka</button><br>`;
-        });
-      });
-      db.ref(`friends/${currentUser.id}`).on("value", async (snap) => {
-        friendsListEl.innerHTML = "<b>Kompisar</b><br>";
-        if (!snap.exists()) { friendsListEl.innerHTML += "Inga ännu."; return; }
-        for (const fid of Object.keys(snap.val())) {
-          const fs = await db.ref(`accounts/${fid}`).once("value");
-          const f = fs.val();
-          if (!f) continue;
-          friendsListEl.innerHTML += `${f.username} <button onclick="openPrivateChat('${fid}','${f.username}')">Öppna privat chat</button><br>`;
-        }
-      });
-      renderProfileBrowser();
-    }
-
-    async function sendFriendRequestToUsername(name) {
-      const input = document.getElementById("friendInput");
-      if (input) input.value = name || "";
-      await sendFriendRequest();
-    }
-
-    async function renderProfileBrowser() {
-      const list = document.getElementById("profileBrowseList");
-      const query = (document.getElementById("profileBrowseInput")?.value || "").toLowerCase();
-      if (!list || !db || !currentUser) return;
-      const snap = await db.ref("accounts").limitToLast(120).once("value");
-      if (!snap.exists()) { list.textContent = "Inga profiler hittades."; return; }
-      const users = [];
-      snap.forEach((c) => users.push({ id: c.key, ...(c.val() || {}) }));
-      const rows = users
-        .filter((u) => u.id !== currentUser.id)
-        .filter((u) => !query || String(u.username || "").toLowerCase().includes(query))
-        .sort((a, b) => (b.xp || 0) - (a.xp || 0))
-        .slice(0, 40)
-        .map((u) => {
-          const rawName = String(u.username || "Okänd");
-          const safeName = rawName.replace(/["'<>]/g, "");
-          const lvl = getLevelFromXp(u.xp || 0).level;
-          return `<div style="margin-bottom:8px;"><b>${safeName}</b> • LVL ${lvl} <button onclick="document.getElementById('viewProfileInput').value='${safeName}'; viewPublicProfile();">Visa</button> <button onclick="sendFriendRequestToUsername('${safeName}')">Lägg till vän</button></div>`;
-        }).join("");
-      list.innerHTML = rows || "Inga profiler matchar sökningen.";
-    }
-
-    async function maybeResetDailyQuests() {
-      if (!currentUser || !db) return;
-      const today = getTodayKey();
-      if ((currentUser.lastQuestReset || "") === today) return;
-      const reset = {};
-      questsConfig.forEach((q) => { reset[q.id] = { progressMs: 0, claimed: false }; });
-      await db.ref(`accounts/${currentUser.id}`).update({ quests: reset, lastQuestReset: today });
-    }
-
-    function updateQuestResetTimer() {
-      const el = document.getElementById("questResetTimer");
-      if (!el) return;
-      const now = new Date();
-      const next = new Date(now);
-      next.setHours(24, 0, 0, 0);
-      const diff = Math.max(0, next - now);
-      const h = Math.floor(diff / 3600000);
-      const m = Math.floor((diff % 3600000) / 60000);
-      const s = Math.floor((diff % 60000) / 1000);
-      el.textContent = `Quests nollställs om ${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
-    }
-
-    function renderRoadmap() {
-      const card = document.getElementById("roadmapCard");
-      if (!card) return;
-      if (!currentUser) { card.textContent = "Logga in för att se roadmap."; return; }
-
-      const xp = currentUser.xp || 0;
-      const lv = getLevelFromXp(xp);
-      const pct = Math.max(0, Math.min(100, (lv.progressXp / lv.neededXp) * 100));
-
-      const rewardsHtml = roadmapRewards.map((m) => {
-        const unlocked = lv.level >= m.level;
-        return `<div class="roadmap-reward ${unlocked ? "unlocked" : ""}"><div class="quest-head"><div class="quest-title">Level ${m.level}</div><div class="quest-status ${unlocked ? "done" : "progress"}">${unlocked ? "Unlockad" : "Låst"}</div></div><div>${m.label}</div></div>`;
-      }).join("");
-
-      card.innerHTML = `<div class="roadmap-progress-wrap">
-          <div class="roadmap-progress-title">🚀 Din roadmap-progress</div>
-          <div class="roadmap-progress-track"><div class="roadmap-progress-fill" style="width:${pct}%"></div></div>
-          <div class="roadmap-progress-text">Level ${lv.level} • XP ${xp} • ${lv.progressXp}/${lv.neededXp} till nästa level</div>
-        </div>
-        <div class="roadmap-rewards">${rewardsHtml}</div>`;
-    }
-
-    function showRoadmap() {
-      hidePages();
-      document.getElementById("roadmapPage").style.display = "block";
-      renderRoadmap();
-    }
-
-    function hashEffectToHue(effect = "") {
-      let h = 0;
-      for (let i = 0; i < effect.length; i++) h = (h * 31 + effect.charCodeAt(i)) % 360;
-      return h;
-    }
-
-    function getEffectPerk(item) {
-      const effect = item?.effect || item?.id || "effect";
-      const hue = hashEffectToHue(effect);
-      return {
-        color: `hsl(${hue} 88% 64%)`,
-        label: `${item.title}: färgaccent + glow i profilkortet`
-      };
-    }
-
-    function buildProfileVisual(user) {
-      const inv = user?.inventory || {};
-      const equipped = user?.equipped || {};
-      const owned = shopItems.filter((it) => inv[it.id]);
-      const hasAnyEquipped = Object.values(equipped || {}).some(Boolean);
-      const active = hasAnyEquipped ? owned.filter((it) => equipped[it.id]) : owned;
-      const lv = getLevelFromXp(user?.xp || 0);
-
-      const badges = active.map((it) => {
-        const perk = getEffectPerk(it);
-        return `<span class="tag owned" style="border-color:${perk.color}; color:${perk.color}">${it.title}</span>`;
-      }).join("");
-
-      const perkList = active.map((it) => {
-        const perk = getEffectPerk(it);
-        return `<div class="profile-stat" style="border-color:${perk.color}; box-shadow: 0 0 0 1px ${perk.color}33 inset;">✨ ${perk.label}</div>`;
-      }).join("");
-
-      const glowLayers = active.slice(0, 8).map((it, idx) => {
-        const perk = getEffectPerk(it);
-        const alpha = idx < 2 ? 0.7 : 0.35;
-        return `0 0 ${14 + idx * 2}px hsl(${hashEffectToHue(it.effect || it.id || 'effect')} 88% 64% / ${alpha})`;
-      }).join(', ');
-
-      const dynamicStyle = glowLayers
-        ? `style="border-color: rgba(255,255,255,.32); box-shadow: ${glowLayers}, 0 14px 24px rgba(0,0,0,.35);"`
-        : "";
-
-      return `<div class="profile-visual-card" ${dynamicStyle}>
-        <div class="profile-visual-name">${user?.username || "Gäst"}${user?.verified ? " ✔️" : ""}</div>
-        <div class="profile-visual-stats">
-          <div class="profile-stat">🏅 Level <b>${lv.level}</b></div>
-          <div class="profile-stat">✨ XP <b>${user?.xp || 0}</b></div>
-          <div class="profile-stat">🪙 Coins <b>${user?.coins || 0}</b></div>
-          <div class="profile-stat">🎒 Items <b>${owned.length}</b></div>
-        </div>
-        <div class="profile-badges">${badges || '<span class="tag missing">Inga aktiva effekter</span>'}</div>
-        <div class="profile-visual-stats" style="margin-top:10px;">${perkList || '<div class="profile-stat">Aktivera items i inventory för profileffekter.</div>'}</div>
-      </div>`;
-    }
-
-    async function viewPublicProfile() {
-      if (!db) return;
-      const name = sanitizeName(document.getElementById("viewProfileInput").value || "");
-      const box = document.getElementById("publicProfileView");
-      if (!name) { box.textContent = "Skriv ett username."; return; }
-      const snap = await db.ref("accounts").orderByChild("usernameLower").equalTo(name.toLowerCase()).once("value");
-      if (!snap.exists()) { box.textContent = "Profil hittades inte."; return; }
-      let acc = null;
-      snap.forEach((c) => { if (!acc) acc = c.val(); });
-      box.innerHTML = buildProfileVisual(acc);
-    }
-
-    async function renderQuest() {
-      const card = document.getElementById("questCard");
-      updateQuestResetTimer();
-      if (!currentUser) { card.textContent = "Logga in för quests."; return; }
-      await maybeResetDailyQuests();
-      const questState = currentUser.quests || {};
-      card.innerHTML = "";
-      questsConfig.forEach((q) => {
-        const st = questState[q.id] || { progressMs: 0, claimed: false };
-        const done = st.progressMs >= q.targetMs;
-        const pct = Math.max(0, Math.min(100, (st.progressMs / q.targetMs) * 100));
-        const statusClass = st.claimed ? "claimed" : done ? "done" : "progress";
-        const statusText = st.claimed ? "Claimad" : done ? "Klar att claima" : "Pågår";
-        const row = document.createElement("div");
-        row.className = "quest-item";
-        row.innerHTML = `
-          <div class="quest-head">
-            <div class="quest-title">${q.label}</div>
-            <div class="quest-status ${statusClass}">${statusText}</div>
-          </div>
-          <div class="quest-reward">Reward: <b>${q.rewardXp} XP</b></div>
-          <div class="quest-progress">${(st.progressMs/60000).toFixed(1)} / ${(q.targetMs/60000).toFixed(0)} min</div>
-          <div class="quest-progress-track"><div class="quest-progress-fill" style="width:${pct.toFixed(1)}%"></div></div>
-          <div>${st.claimed ? "✅ Claimad" : done ? `<button class="chat-send" onclick="claimQuest('${q.id}')">Claim ${q.rewardXp}</button>` : "Spela mer för att låsa upp reward."}</div>
-          <div><button class="chat-send" onclick="openQuestGame('${q.game}')">▶ Spela detta quest-spel</button></div>
-        `;
-        card.appendChild(row);
-      });
-      renderQuestTrackerPanel();
-    }
-
-    function openQuestGame(game) {
-      hidePages();
-      openGame(game);
-      renderQuestTrackerPanel();
-    }
-
-    function renderQuestTrackerPanel() {
-      const panel = document.getElementById("questTrackerPanel");
-      if (!panel) return;
-      if (!activeGame) {
-        panel.innerHTML = `<div class="tracker-title">🎯 Quest progression</div><div class="tracker-empty">Starta ett spel med quest för att se progress här.</div>`;
-        return;
-      }
-      const matching = questsConfig.filter((q) => q.game === activeGame);
-      if (!matching.length || !currentUser) {
-        panel.innerHTML = `<div class="tracker-title">🎯 Quest progression</div><div class="tracker-empty">Inga quests för ${displayName(activeGame)} just nu.</div>`;
-        return;
-      }
-      const rows = matching.map((q) => {
-        const st = currentUser.quests?.[q.id] || { progressMs: 0, claimed: false };
-        const pct = Math.max(0, Math.min(100, (st.progressMs / q.targetMs) * 100));
-        return `<div class="quest-item"><div class="quest-title">${q.label}</div><div class="quest-progress">${(st.progressMs/60000).toFixed(1)} / ${(q.targetMs/60000).toFixed(0)} min</div><div class="quest-progress-track"><div class="quest-progress-fill" style="width:${pct.toFixed(1)}%"></div></div></div>`;
-      }).join("");
-      panel.innerHTML = `<div class="tracker-title">🎯 Quest progression: ${displayName(activeGame)}</div>${rows}`;
-    }
-
-    function isActivelyPlayingGame() {
-      return !!(
-        currentUser && db && activeGame &&
-        embedContainer.style.display !== "none" &&
-        !document.hidden &&
-        gameFrame.src && gameFrame.src.includes("UGS-Files/")
-      );
-    }
-
-    async function claimQuest(questId) {
-      if (!currentUser) return;
-      const q = questsConfig.find((x) => x.id === questId);
-      if (!q) return;
-      const state = currentUser.quests?.[questId] || { progressMs: 0, claimed: false };
-      if (state.claimed || state.progressMs < q.targetMs) return;
-      await db.ref(`accounts/${currentUser.id}/xp`).set((currentUser.xp || 0) + q.rewardXp);
-      await db.ref(`accounts/${currentUser.id}/quests/${questId}/claimed`).set(true);
-      setTimeout(ensureLevelCoinRewards, 200);
-    }
-
-    function renderShop() {
-      const list = document.getElementById("shopList");
-      if (!currentUser) { list.textContent = "Logga in för shoppen."; return; }
-      const inv = currentUser.inventory || {};
-      const rows = shopItems.map((item) => {
-        const owned = !!inv[item.id];
-        return `
-          <div class="shop-item ${owned ? "owned" : ""}">
-            <div class="shop-item-top">
-              <div class="shop-item-title">${item.title}</div>
-              <div class="tag ${owned ? "owned" : "missing"}">${owned ? "Köpt" : "Till salu"}</div>
-            </div>
-            <div class="shop-item-desc">${item.desc || "Kosmetisk effekt för chatt/profil."}</div>
-            <div class="shop-item-price">Pris: <b>${item.price} coins</b></div>
-            <div>${owned ? "✅ Redan i inventory" : `<button class="chat-send" onclick="buyItem('${item.id}', ${item.price})">Köp</button>`}</div>
-          </div>
-        `;
-      }).join("");
-      list.innerHTML = `<div class="shop-balance">🪙 Coins: ${currentUser.coins || 0}</div><div class="shop-grid">${rows}</div>`;
-    }
-
-    async function buyItem(item, price) {
-      if (!currentUser || (currentUser.coins || 0) < price) return alert("Inte tillräckligt med coins.");
-      const inv = currentUser.inventory || {};
-      const equipped = currentUser.equipped || {};
-      if (inv[item]) return alert("Du har redan denna item.");
-      inv[item] = true;
-      equipped[item] = true;
-      await db.ref(`accounts/${currentUser.id}`).update({ coins: (currentUser.coins || 0) - price, inventory: inv, equipped });
-    }
-
-    function renderInventory() {
-      const list = document.getElementById("inventoryList");
-      if (!currentUser) { list.textContent = "Logga in för inventory."; return; }
-      const inv = currentUser.inventory || {};
-      const equipped = currentUser.equipped || {};
-      const ownedItems = shopItems.filter((item) => inv[item.id]);
-      if (!ownedItems.length) {
-        list.innerHTML = `<div class="shop-balance">Du har inga items ännu.</div><div class="shop-item-desc">Köp saker i shoppen för att kunna aktivera dem här.</div>`;
-        return;
-      }
-      const rows = ownedItems.map((item) => {
-        const isOn = !!equipped[item.id];
-        return `
-          <div class="shop-item owned">
-            <div class="shop-item-top">
-              <div class="shop-item-title">${item.title}</div>
-              <div class="tag ${isOn ? "owned" : "missing"}">${isOn ? "På" : "Av"}</div>
-            </div>
-            <div class="shop-item-desc">${item.desc || "Kosmetisk effekt för chatt/profil."}</div>
-            <div><button class="chat-send" onclick="toggleEquipItem('${item.id}')">${isOn ? "Ta av" : "Sätt på"}</button></div>
-          </div>
-        `;
-      }).join("");
-      list.innerHTML = `<div class="shop-balance">🎒 Dina items (${ownedItems.length})</div><div class="shop-grid">${rows}</div>`;
-    }
-
-    async function toggleEquipItem(itemId) {
-      if (!currentUser) return;
-      const inv = currentUser.inventory || {};
-      if (!inv[itemId]) return alert("Du äger inte denna item.");
-      const equipped = { ...(currentUser.equipped || {}) };
-      equipped[itemId] = !equipped[itemId];
-      await db.ref(`accounts/${currentUser.id}/equipped`).set(equipped);
-    }
-
-    async function adminAction(action) {
-      if (!adminUnlocked) return alert("Adminpanelen är låst.");
-      if ((document.getElementById("adminPassword").value || "") !== ADMIN_PASSWORD) return alert("Skriv admin-lösenord igen för att bekräfta åtgärden.");
-
-      const globalActions = new Set(["clearAccounts"]);
-      let target = null;
-
-      if (!globalActions.has(action)) {
-        const username = sanitizeName(document.getElementById("adminTarget").value);
-        const snap = await db.ref("accounts").orderByChild("usernameLower").equalTo(username.toLowerCase()).once("value");
-        if (!snap.exists()) return alert("Mål hittades inte.");
-        snap.forEach((c) => { if (!target) target = { id: c.key, ...c.val() }; });
-      }
-      if (action === "kick") await db.ref(`accounts/${target.id}`).update({ forcedLogout: true, sessionActive: false });
-      if (action === "timeout") await db.ref(`accounts/${target.id}`).update({ timeoutUntil: Date.now() + 5 * 60 * 1000 });
-      if (action === "ban") await db.ref(`accounts/${target.id}`).update({ banned: true, forcedLogout: true });
-      if (action === "verify") await db.ref(`accounts/${target.id}`).update({ verified: true });
-      if (action === "coins") {
-        const amount = Number(document.getElementById("adminCoins").value || 0);
-        await db.ref(`accounts/${target.id}/coins`).set((target.coins || 0) + amount);
-      }
-      if (action === "xp") {
-        const amount = Number(document.getElementById("adminXp").value || 0);
-        await db.ref(`accounts/${target.id}/xp`).set((target.xp || 0) + amount);
-      }
-      if (action === "clearInventory") await db.ref(`accounts/${target.id}`).update({ inventory: {}, equipped: {}, rewardedLevel: 1 });
-      if (action === "resetQuests") {
-        const reset = {};
-        questsConfig.forEach((q) => { reset[q.id] = { progressMs: 0, claimed: false }; });
-        await db.ref(`accounts/${target.id}`).update({ quests: reset, lastQuestReset: getTodayKey() });
-      }
-      if (action === "clearAccounts") {
-        const ok = confirm("Är du säker? Detta raderar ALLA konton.");
-        if (ok) await db.ref("accounts").remove();
-      }
-      alert("Admin-åtgärd utförd.");
-    }
-
-    function startGameTracker() {
-      if (gameTrackerInterval) clearInterval(gameTrackerInterval);
-      gameTrackerInterval = setInterval(async () => {
-        if (!isActivelyPlayingGame()) {
-          activeGameLastTick = Date.now();
-          return;
-        }
-        const now = Date.now();
-        if (!activeGameLastTick) activeGameLastTick = now;
-        const delta = Math.max(0, Math.min(now - activeGameLastTick, 1500));
-        activeGameLastTick = now;
-        const matching = questsConfig.filter((q) => q.game === activeGame);
-        if (!matching.length) return;
-        for (const q of matching) {
-          const current = currentUser.quests?.[q.id] || { progressMs: 0, claimed: false };
-          const next = Math.min(current.progressMs + delta, q.targetMs);
-          if (next === current.progressMs) continue;
-          await db.ref(`accounts/${currentUser.id}/quests/${q.id}`).update({ progressMs: next, claimed: !!current.claimed });
-          renderQuestTrackerPanel();
-        }
-      }, 1000);
-    }
-
-    function startIntroLoader() {
-      const intro = document.getElementById("introOverlay");
-      if (!intro || !introLoaderFill || !introLoaderMessage) return;
-      const duration = Math.floor(Math.random() * 3000) + 3000; // 3-6s
-      const slowDownStart = Math.floor(duration * 0.82);
-      introLoaderFill.style.transform = "scaleX(0)";
-      introLoaderMessage.textContent = loadingMessages[Math.floor(Math.random() * loadingMessages.length)];
-      let startTs = null;
-
-      const animate = (ts) => {
-        if (startTs === null) startTs = ts;
-        const elapsed = ts - startTs;
-        let progress = 0;
-        if (elapsed < slowDownStart) {
-          const t = elapsed / slowDownStart;
-          progress = 95 * (1 - Math.pow(1 - t, 3));
-        } else if (elapsed < duration) {
-          const t = (elapsed - slowDownStart) / (duration - slowDownStart);
-          progress = 95 + 5 * (1 - Math.pow(1 - t, 2));
-        } else {
-          introLoaderFill.style.transform = "scaleX(1)";
-          setTimeout(() => {
-            intro.classList.add("fade-out");
-            setTimeout(() => intro.remove(), 560);
-          }, 180);
-          return;
-        }
-        introLoaderFill.style.transform = `scaleX(${Math.min(progress, 100) / 100})`;
-        requestAnimationFrame(animate);
-      };
-
-      requestAnimationFrame(animate);
-    }
-
-    async function restoreSessionFromStorage() {
-      if (!db) return;
-      const raw = localStorage.getItem(SESSION_KEY);
-      if (!raw) return;
-
-      let sess = null;
-      try {
-        sess = JSON.parse(raw);
-      } catch (e) {
-        addSystemChatMessage("Kunde inte läsa sparad session.");
-        return;
-      }
-
-      const accountId = sess?.accountId;
-      if (!accountId) {
-        addSystemChatMessage("Sparad session är ogiltig.");
-        return;
-      }
-
-      const snap = await db.ref(`accounts/${accountId}`).once("value");
-      if (!snap.exists()) {
-        addSystemChatMessage("Konto för sparad session hittades inte.");
-        return;
-      }
-
-      const acc = snap.val() || {};
-      if (acc.banned) {
-        addSystemChatMessage("Kontot är bannat.");
-        return;
-      }
-
-      await db.ref(`accounts/${accountId}`).update({ lastSeen: Date.now(), forcedLogout: false });
-
-      currentUser = { id: accountId, ...acc };
-      userRef = db.ref(`accounts/${accountId}`);
-      watchCurrentUser();
-      renderProfile();
-      refreshChatStatus();
-      setChatTab(activeChatTab);
+    function startFakeOnlineCounter() {
+      let count = 12 + Math.floor(Math.random() * 10);
+      activePlayers.textContent = `Aktiva spelare: ${count}`;
+      setInterval(() => {
+        count += [-1, 0, 1][Math.floor(Math.random() * 3)];
+        if (count < 5) count = 5;
+        if (count > 40) count = 40;
+        activePlayers.textContent = `Aktiva spelare: ${count}`;
+      }, 3500);
     }
 
     (function init() {
-      const saved = localStorage.getItem("theme");
-      if (saved) {
-        document.body.className = saved;
-        document.documentElement.classList.remove("theme-blue","theme-red","theme-green","theme-yellow","theme-orange","theme-gray","theme-purple","theme-pink","theme-cyan","theme-sunset","theme-neon","theme-ocean","theme-lava","theme-forest","theme-midnight","theme-candy","theme-gold","theme-arctic","theme-emerald","theme-rose","theme-storm","theme-cyber","theme-dusk");
-        document.documentElement.classList.add(`theme-${saved}`);
-      }
       saveFavorites();
+      renderUpdates();
       renderRecommended();
-      renderGames(files);
-      searchMeta.textContent = "Visar alla spel";
-      refreshThemeButtons();
-      startIntroLoader();
-      refreshChatStatus();
-
-      document.querySelectorAll(".sidebar .sidebar-btn").forEach((btn) => {
-        btn.addEventListener("click", closeSidebar);
-      });
-
-      updateQuestResetTimer();
-      setInterval(updateQuestResetTimer, 1000);
+      applyTheme(localStorage.getItem("theme") || "purple", false);
+      setQuickFilter("all");
+      startFakeOnlineCounter();
 
       document.addEventListener("keydown", (e) => {
-        if (e.ctrlKey && e.shiftKey && (e.key === "A" || e.key === "a")) {
-          e.preventDefault();
-          openAdminGate();
+        if (e.key === "Escape") {
+          closeSidebar();
+          closeThemePopup();
         }
       });
-
-      const notConfigured = (
-        !firebaseConfig.apiKey || firebaseConfig.apiKey.includes("DIN_") ||
-        !firebaseConfig.databaseURL || firebaseConfig.databaseURL.includes("DITT_PROJEKT")
-      );
-
-      if (notConfigured) {
-        activePlayersEl.textContent = "Aktiva spelare: --";
-        return;
-      }
-
-      try {
-        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-        db = firebase.database();
-
-        // NYTT: Aktiva spelare (presence)
-        const presenceRef = db.ref("presence");
-        const tabKey = "presenceTabId";
-        let tabId = sessionStorage.getItem(tabKey);
-        if (!tabId) {
-          tabId = `tab_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
-          sessionStorage.setItem(tabKey, tabId);
-        }
-
-        const myPresenceRef = presenceRef.child(tabId);
-
-        db.ref(".info/connected").on("value", (snap) => {
-          if (snap.val() === true) {
-            myPresenceRef.onDisconnect().remove();
-            myPresenceRef.set({
-              online: true,
-              ts: firebase.database.ServerValue.TIMESTAMP
-            });
-          }
-        });
-
-        presenceRef.on("value", (snap) => {
-          activePlayersEl.textContent = `Aktiva spelare: ${snap.numChildren()}`;
-        }, () => {
-          activePlayersEl.textContent = "Aktiva spelare: --";
-        });
-        startGameTracker();
-        restoreSessionFromStorage();
-      } catch (err) {
-        activePlayersEl.textContent = "Aktiva spelare: --";
-      }
-
     })();
   </script>
 </body>
