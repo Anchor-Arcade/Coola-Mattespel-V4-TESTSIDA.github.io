@@ -1,7 +1,0 @@
--- Firebase migration note for Coola Mattespel V5
--- This project now uses Firebase configuration in index.html.
--- Firestore does not use SQL schemas, so this file is kept only as a note.
--- Collections you can create in Firestore:
---   accounts (username, password_hash, is_admin, banned, created_at)
---   user_data (username, coins, xp, level, favorites, games_played, settings)
---   chat_messages (username, text, timestamp, is_admin)
