@@ -737,16 +737,16 @@ html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:var
    4. Fyll i en egen adapter om du vill ersätta localStorage-flödet fullt ut
    ======================================================= */
 var FIREBASE_CONFIG={
-  apiKey:"DIN_FIREBASE_API_KEY",
-  authDomain:"DIN_FIREBASE_AUTH_DOMAIN",
-  projectId:"DIN_FIREBASE_PROJECT_ID",
-  storageBucket:"DIN_FIREBASE_STORAGE_BUCKET",
-  messagingSenderId:"DIN_FIREBASE_SENDER_ID",
-  appId:"DIN_FIREBASE_APP_ID"
+  apiKey:"AIzaSyAVkdpk71Oe8wEQz-kzKSbaqhCA5xqUD28",
+  authDomain:"v5simga.firebaseapp.com",
+  projectId:"v5simga",
+  storageBucket:"v5simga.firebasestorage.app",
+  messagingSenderId:"611002035280",
+  appId:"1:611002035280:web:964ca0a72daa2a69e53555"
 };
 var _sb=null;
 try{
-  if(FIREBASE_CONFIG.projectId!=="DIN_FIREBASE_PROJECT_ID"){
+  if(FIREBASE_CONFIG.projectId!=="v5simga"){
     firebase.initializeApp(FIREBASE_CONFIG);
     var _firestore=firebase.firestore();
     console.log("Firebase ansluten!");
