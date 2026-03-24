@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <link rel="icon" href="logo.png" type="image/png">
-<title>Jakobs Spel 🎮</title>
+<title>Matte Plugg</title>
 <style>
 :root{
   --bg0:#050008;--bg1:#0b0014;--bg2:#120022;
@@ -438,24 +438,18 @@ html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:var
   <div class="sideHead"><h3>🎮 Meny</h3><button class="closeBtn" onclick="closeSidebar()">✕</button></div>
   <nav class="sideNavList">
     <button class="sideNavBtn active" data-tab="favoriter" onclick="openPanelOverlay('fav')"><span class="sideNavIcon">⭐</span><span class="sideNavLabel" data-i18n="nav_favs">Favorites</span></button>
-    <button class="sideNavBtn" onclick="closeSidebar();openPanelOverlay('links')"><span class="sideNavIcon">🔗</span><span class="sideNavLabel" data-i18n="nav_links">Jakob's Links</span></button>
     <button class="sideNavBtn" onclick="openProfileWindow()"><span class="sideNavIcon">👤</span><span class="sideNavLabel" data-i18n="nav_profile">Profile</span></button>
     <button class="sideNavBtn" onclick="openThemesWindow()"><span class="sideNavIcon">🎨</span><span class="sideNavLabel" data-i18n="nav_themes">Themes</span></button>
-    <button class="sideNavBtn" onclick="closeSidebar();openPanelOverlay('forslag')"><span class="sideNavIcon">💡</span><span class="sideNavLabel" data-i18n="nav_suggest">Suggest</span></button>
+    <button class="sideNavBtn" onclick="closeSidebar();openPanelOverlay('forslag')"><span class="sideNavIcon">💡</span><span class="sideNavLabel" data-i18n="nav_suggest">Förslag</span></button>
     <button class="sideNavBtn" onclick="closeSidebar();openPanelOverlay('quests')"><span class="sideNavIcon">📋</span><span class="sideNavLabel">Quests</span></button>
-    <button class="sideNavBtn" data-tab="butik" onclick="openPanelOverlay('butik')"><span class="sideNavIcon">🛒</span><span class="sideNavLabel">Mynt-butik</span></button>
+    <button class="sideNavBtn" data-tab="butik" onclick="openPanelOverlay('butik')"><span class="sideNavIcon">🛒</span><span class="sideNavLabel">Shop</span></button>
     <button class="sideNavBtn" onclick="closeSidebar();openPanelOverlay('settings')"><span class="sideNavIcon">⚙️</span><span class="sideNavLabel" data-i18n="nav_settings">Settings</span></button>
     <button class="sideNavBtn" onclick="openSoundboardWindow()"><span class="sideNavIcon">🎵</span><span class="sideNavLabel">Soundboard</span></button>
     <button class="sideNavBtn" onclick="closeSidebar();openChat()"><span class="sideNavIcon">💬</span><span class="sideNavLabel" data-i18n="nav_chat">Chat</span></button>
-    <button class="sideNavBtn" onclick="closeSidebar();openPanelOverlay('leaderboard')"><span class="sideNavIcon">🏆</span><span class="sideNavLabel">Leaderboard</span></button>
     <button class="sideNavBtn" onclick="closeSidebar();openPanelOverlay('achievements')"><span class="sideNavIcon">🏅</span><span class="sideNavLabel">Achievements</span></button>
-    <button class="sideNavBtn" onclick="openRoadmapPage()"><span class="sideNavIcon">🗺️</span><span class="sideNavLabel">Roadmap</span></button>
-    <button class="sideNavBtn" data-tab="discord" onclick="openDiscord()"><span class="sideNavIcon">🟣</span><span class="sideNavLabel">Discord</span></button>
     <button class="sideNavBtn" onclick="openBrowser('browser')"><span class="sideNavIcon">🌐</span><span class="sideNavLabel">Browser</span></button>
-    <button class="sideNavBtn" onclick="openBrowser('ai')"><span class="sideNavIcon">🤖</span><span class="sideNavLabel">Jakob AI</span></button>
+    <button class="sideNavBtn" onclick="openBrowser('ai')"><span class="sideNavIcon">🤖</span><span class="sideNavLabel">AI</span></button>
     <button class="sideNavBtn" onclick="closeSidebar();openInventoryWindow()"><span class="sideNavIcon">🎒</span><span class="sideNavLabel">Inventory</span></button>
-    <button class="sideNavBtn" data-tab="updates" onclick="openUpdatesPage()"><span class="sideNavIcon">📢</span><span class="sideNavLabel">Updates</span></button>
-    <button class="sideNavBtn" id="adminNav" data-tab="admin" onclick="openPanelOverlay('admin')" style="display:none"><span class="sideNavIcon">🛡</span><span class="sideNavLabel" data-i18n="nav_admin">Admin</span></button>
   </nav>
   <div class="sideContent" id="sideContent">
     <div class="sidePanel active" id="panel_favoriter"></div>
