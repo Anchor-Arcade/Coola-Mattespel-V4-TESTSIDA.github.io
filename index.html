@@ -401,6 +401,21 @@
 
     .footer{text-align:center;padding:22px;font-size:12px;color:var(--d);}
 
+    .chatWrap{display:flex;flex-direction:column;height:100%;min-height:420px;}
+    .chatHeader{font-size:12px;color:var(--d);margin-bottom:10px;}
+    .chatLog{
+      flex:1;overflow:auto;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.03);
+      padding:10px;display:flex;flex-direction:column;gap:8px;min-height:220px;
+    }
+    .chatMsg{padding:8px 10px;border-radius:10px;background:var(--glass);border:1px solid var(--line);}
+    .chatMsgMeta{font-size:10px;color:var(--d);margin-bottom:3px;}
+    .chatMsgText{font-size:13px;color:var(--w);word-break:break-word;}
+    .chatComposer{display:flex;gap:8px;margin-top:10px;}
+    .chatComposer input{
+      flex:1;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:10px;padding:10px;color:var(--w);
+    }
+    .chatComposer input:focus{outline:none;border-color:var(--p0);}
+
     [data-theme="light"]{
       --bg0:#f4f0ff;--bg1:#ede6ff;--bg2:#e2d8ff;
       --w:#1a0040;--m:#4a2e8a;--d:#7b5fc0;
@@ -493,6 +508,9 @@
       </button>
       <button class="sideNavBtn" onclick="openProfileWindow()">
         <span class="sideNavIcon">👤</span><span>Profil</span>
+      </button>
+      <button class="sideNavBtn" onclick="openChatWindow()">
+        <span class="sideNavIcon">💬</span><span>Chatt</span>
       </button>
       <button class="sideNavBtn" onclick="openExternal('https://app.supersigmamatteeducation.xo.je','Browser')">
         <span class="sideNavIcon">🌐</span><span>Browser</span>
@@ -621,6 +639,26 @@
     </div>
   </div>
 
+  <!-- CHAT WINDOW -->
+  <div class="panelOverlay" id="chatOverlay" onclick="if(event.target===this)closeChatWindow()">
+    <div class="appWin" style="width:min(760px,96vw);max-height:90vh">
+      <div class="winBar">
+        <div class="winBarTitle">💬 Chatt</div>
+        <button class="winClose" onclick="closeChatWindow()">✕</button>
+      </div>
+      <div class="appBody">
+        <div class="chatWrap">
+          <div class="chatHeader" id="chatHeader">Logga in för att chatta med vänner och andra spelare.</div>
+          <div class="chatLog" id="chatLog"></div>
+          <div class="chatComposer">
+            <input id="chatInput" maxlength="220" placeholder="Skriv ett meddelande..." />
+            <button class="pill primary" onclick="sendChatMessage()">Skicka</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- PUBLIC PROFILE CARD -->
   <div class="viewProfileOverlay" id="viewProfileOverlay" onclick="if(event.target===this)closeViewProfile()">
     <div class="profileViewCard" id="profileViewCard"></div>
@@ -642,6 +680,21 @@
     let firebaseReady = false;
     let firebaseWarned = false;
     let gamesLoadedFromFirebase = false;
+    let chatUnsub = null;
+
+    const BULK_FILES_LIST_TEXT = `
+      clblooketHACK, clamongUsMULTIPLAYER, clgartic1234, clgarticPhone, clsummerRider3D, clNautilusOS, climposter, clworldguessr, clroblox,
+      cl1, cl10bullets, cl10minutestildawn, cl12minibattles, cl1on1soccer, cl1v1lol, cl1v1tennis, cl2048, cl2048cupcakes, cl2doom, cl2Dshooting,
+      cl3dash, cl3pandas, cl3pandasbrazil, cl3pandasfantasy, cl3pandasjapan, cl3pandasnight, cl3slices2, cl40xescape, cl4thandgoal, cl500calibercontractz,
+      cl60secondsburgerrun, cl60secondssantarun, cl8ballclassic, cl8ballpool, cl9007199254740992, cl99balls, cl99nightsitf, clabandoned3, clabsolutemadness,
+      clacecombat2, clacecombat3, clacegangstertaxi, clachievementunlocked, clachievmentunlocked, clachievmentunlocked2, clachievmentunlocked3, clachillies, clachillies2,
+      clADarkRoom, cladayintheoffice, clADOFAI, cladvancewars, cladvancewars2, cladventneon, clAdventureCapatalist, cladventurecapitalist, clagariolite, clageofwar, clageofwar2,
+      clagesofconflict, clahoysurvival, clai, clakoopasrevenge, clakoopasrevenge2, clakumanorgaiden, clalienhominid, clalienhominidgba, clalienskyinvasion, clalientransporter,
+      clalienvspredator, clallbossesin1, clallocation, clamaze, clamidstthesky, clamigopancho, clamigopancho2, clamigopancho3, clamigopancho4, clamigopancho5, clamigopancho6,
+      clamigopancho7, clamongus, clamorphous, clancientsins, clangry-birdsspace, clangrybirds-space, clangrybirds, clangrybirdsshowdown, clangrybirdsspace, clanimalcrossingwildworld,
+      clanotherworld, clapotris, clappleshooter, clappleworm, claquaparkio, clarceuslegend, clarcheryworldtour, clarena, clarmormayhem2, clarsonate, clascent, clasmallworldcup,
+      classesmentexaminationque, clasteroids, clasteroidsALT, clattackhole, clavalanche, claviamasters, claviamastersbuggy, clAwesomePirates, clawesomeplanes, clawesometanks, clawesometanks2
+    `;
 
     const RECOMMENDED = [
       { id: "clworldguessr", name: "WorldGuessr", emoji: "🌍", desc: "Gissa länder på Street View" },
@@ -821,7 +874,7 @@
       const fromWindow = window.CM_FILES_LIST || window.filesList || window.CM_FILES_LIST_TEXT || [];
       const rawExtra = Array.isArray(fromWindow)
         ? fromWindow
-        : String(fromWindow).split(",");
+        : String(fromWindow || BULK_FILES_LIST_TEXT).split(",");
       const fallbackIds = DEFAULT_GAMES.map(g => g.id);
       const merged = sanitizeFilesList([...fallbackIds, ...rawExtra]);
       if (merged.length) GAMES = merged;
@@ -859,8 +912,81 @@
       onlineRef.on("value", (snap) => {
         const count = snap.numChildren();
         const onlineEl = document.getElementById("onlineCount");
-        if (onlineEl) onlineEl.textContent = `${count || 1} aktiva spelare`;
+        if (onlineEl) onlineEl.textContent = `Aktiva spelare: ${Math.max(1, count || 0)}`;
       });
+    }
+
+    function normalizeRoomName(raw) {
+      return (raw || "global").trim().toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 40) || "global";
+    }
+
+    function getChatRoomKey() {
+      if (!state.user || !state.data) return "global";
+      const friends = [...(state.data.friends || []), state.user]
+        .map(x => sanitizeUsername(x).toLowerCase())
+        .filter(Boolean)
+        .sort();
+      if (!friends.length) return "global";
+      return `friends_${normalizeRoomName(friends.join("_"))}`;
+    }
+
+    function renderChatMessages(rows) {
+      const log = document.getElementById("chatLog");
+      if (!log) return;
+      if (!rows.length) {
+        log.innerHTML = `<div style="font-size:12px;color:var(--d);text-align:center;padding:10px">Inga meddelanden än.</div>`;
+        return;
+      }
+      log.innerHTML = rows.map(r => `
+        <div class="chatMsg">
+          <div class="chatMsgMeta">${r.user || "Okänd"} • ${new Date(r.ts || Date.now()).toLocaleString("sv-SE")}</div>
+          <div class="chatMsgText">${(r.text || "").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>
+        </div>
+      `).join("");
+      log.scrollTop = log.scrollHeight;
+    }
+
+    function subscribeChat() {
+      const header = document.getElementById("chatHeader");
+      if (!header) return;
+      if (!state.user || !state.data) {
+        header.textContent = "Logga in för att chatta med vänner och andra spelare.";
+        renderChatMessages([]);
+        return;
+      }
+      const roomKey = getChatRoomKey();
+      header.textContent = roomKey === "global"
+        ? "Global chatt (alla inloggade spelare)."
+        : "Vänchatt (du + dina vänner).";
+      if (!firebaseReady || !db) {
+        header.textContent += " Firebase saknas, chatt är avstängd.";
+        renderChatMessages([]);
+        return;
+      }
+      if (typeof chatUnsub === "function") chatUnsub();
+      const chatRef = db.ref(`chatRooms/${roomKey}/messages`).limitToLast(80);
+      const cb = (snap) => {
+        const val = snap.val() || {};
+        const rows = Object.values(val).sort((a, b) => (a.ts || 0) - (b.ts || 0));
+        renderChatMessages(rows);
+      };
+      chatRef.on("value", cb);
+      chatUnsub = () => chatRef.off("value", cb);
+    }
+
+    function sendChatMessage() {
+      if (!requireLogin("Logga in för att använda chatten.")) return;
+      if (!firebaseReady || !db) return toast("Firebase krävs för chatt.");
+      const input = document.getElementById("chatInput");
+      const text = (input?.value || "").trim().slice(0, 220);
+      if (!text) return;
+      const roomKey = getChatRoomKey();
+      db.ref(`chatRooms/${roomKey}/messages`).push({
+        user: state.user,
+        text,
+        ts: Date.now()
+      });
+      input.value = "";
     }
 
     async function readUserData(username) {
@@ -1442,6 +1568,7 @@
       applyDarkMode(localStorage.getItem("cm_dark_pref_v4") !== "0");
       closeProfileWindow();
       renderGames();
+      subscribeChat();
       toast("Utloggad.");
     }
 
@@ -1450,6 +1577,7 @@
       applyDarkMode(state.data?.settings?.darkMode !== false);
       renderGames();
       renderProfileWindow();
+      subscribeChat();
       toast(message);
     }
 
@@ -1463,6 +1591,17 @@
 
     function closeProfileWindow() {
       document.getElementById("profileOverlay").classList.remove("open");
+    }
+
+    function openChatWindow() {
+      document.getElementById("chatOverlay").classList.add("open");
+      subscribeChat();
+      closeSidebar();
+      setTimeout(() => document.getElementById("chatInput")?.focus(), 0);
+    }
+
+    function closeChatWindow() {
+      document.getElementById("chatOverlay").classList.remove("open");
     }
 
     function handleProfileAvatarUpload(input) {
@@ -1539,6 +1678,7 @@
       inp.value = "";
       toast("Vän tillagd.");
       renderProfileWindow();
+      subscribeChat();
     }
 
     function removeFriend(name) {
@@ -1546,6 +1686,7 @@
       state.data.friends = (state.data.friends || []).filter(f => f !== name);
       saveCurrentUser();
       renderProfileWindow();
+      subscribeChat();
       toast("Vän borttagen.");
     }
 
@@ -1590,6 +1731,7 @@
         state.data.friends.push(name);
         saveCurrentUser();
         renderProfileWindow();
+        subscribeChat();
         toast("Vän tillagd.");
       }
     }
@@ -1820,6 +1962,10 @@
       renderGames();
     });
 
+    document.getElementById("chatInput").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") sendChatMessage();
+    });
+
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
         closeSidebar();
@@ -1860,12 +2006,12 @@
         warnFirebaseMissingOnce();
         const onlineEl = document.getElementById("onlineCount");
         let online = 80 + Math.floor(Math.random() * 50);
-        onlineEl.textContent = `${online} online nu`;
+        onlineEl.textContent = `Aktiva spelare: ${online}`;
         setInterval(() => {
           online += Math.floor(Math.random() * 5) - 2;
           if (online < 40) online = 40;
           if (online > 180) online = 180;
-          onlineEl.textContent = `${online} online nu`;
+          onlineEl.textContent = `Aktiva spelare: ${online}`;
         }, 3500);
       }
 
