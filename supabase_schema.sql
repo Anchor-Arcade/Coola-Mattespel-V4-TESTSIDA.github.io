@@ -1,27 +1,7 @@
--- Supabase SQL-schema för Jakobs Spel
--- Kör detta i Supabase SQL Editor (https://supabase.com/dashboard)
-
-CREATE TABLE IF NOT EXISTS accounts (
-  username TEXT PRIMARY KEY,
-  password_hash TEXT NOT NULL,
-  is_admin BOOLEAN DEFAULT FALSE,
-  banned BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE TABLE IF NOT EXISTS user_data (
-  username TEXT PRIMARY KEY REFERENCES accounts(username) ON DELETE CASCADE,
-  coins INTEGER DEFAULT 0,
-  xp INTEGER DEFAULT 0,
-  level INTEGER DEFAULT 1,
-  favorites JSONB DEFAULT '[]',
-  games_played INTEGER DEFAULT 0,
-  settings JSONB DEFAULT '{}'
-);
-
--- Tillåt offentlig läsning/skrivning (för ett enkelt spelbibliotek)
-ALTER TABLE accounts ENABLE ROW LEVEL SECURITY;
-ALTER TABLE user_data ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "public_accounts" ON accounts FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "public_user_data" ON user_data FOR ALL USING (true) WITH CHECK (true);
+-- Firebase migration note for Coola Mattespel V5
+-- This project now uses Firebase configuration in index.html.
+-- Firestore does not use SQL schemas, so this file is kept only as a note.
+-- Collections you can create in Firestore:
+--   accounts (username, password_hash, is_admin, banned, created_at)
+--   user_data (username, coins, xp, level, favorites, games_played, settings)
+--   chat_messages (username, text, timestamp, is_admin)

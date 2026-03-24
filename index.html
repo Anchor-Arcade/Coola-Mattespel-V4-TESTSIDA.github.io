@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <link rel="icon" href="logo.png" type="image/png">
-<title>Matte Plugg</title>
+<title>Coola Mattespel V5</title>
 <style>
 :root{
   --bg0:#050008;--bg1:#0b0014;--bg2:#120022;
@@ -176,8 +176,6 @@ html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:var
 .favBtn{background:none;border:1px solid var(--line);border-radius:6px;cursor:pointer;font-size:13px;padding:3px 7px;transition:all .2s;color:var(--d);}
 .favBtn:hover{border-color:var(--p1);color:var(--p1);}
 .favBtn.active{background:rgba(123,44,255,.2);border-color:var(--p1);color:#ffd700;}
-.loadMoreBtn{display:block;margin:0 auto 40px;padding:13px 36px;border-radius:40px;background:linear-gradient(135deg,var(--p0),var(--p2));color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer;box-shadow:var(--shadow2);transition:all .2s;}
-.loadMoreBtn:hover{opacity:.9;transform:translateY(-2px);}
 .gameOverlay{position:fixed;inset:0;background:var(--bg0);z-index:900;display:none;flex-direction:column;}.gameOverlay.open{display:flex;}.gameBar{display:flex;align-items:center;gap:10px;padding:0 16px;height:56px;background:var(--glass);border-bottom:2px solid var(--p0);flex-shrink:0;backdrop-filter:blur(16px);}.gameBarLeft{display:flex;align-items:center;gap:8px;flex:1;min-width:0;}.gameBarCenter{position:absolute;left:50%;transform:translateX(-50%);text-align:center;pointer-events:none;}.gameBarTitle{font-size:22px;font-weight:900;color:var(--w);letter-spacing:-.02em;background:linear-gradient(135deg,var(--w),var(--p1));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;white-space:nowrap;}.gameBarRight{display:flex;align-items:center;gap:8px;flex:1;justify-content:flex-end;}.gameBarBtn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:30px;border:1px solid var(--line);background:var(--glass);color:var(--m);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap;backdrop-filter:blur(10px);}.gameBarBtn:hover{background:rgba(123,44,255,.2);border-color:var(--p0);color:var(--w);}.gameBarBtn.primary{background:linear-gradient(135deg,var(--p0),var(--p2));color:#fff;border-color:transparent;}.gameBarBtn.primary:hover{opacity:.9;}.gameMain{flex:1;display:flex;position:relative;overflow:hidden;}.gameQuestWidget{position:absolute;top:12px;right:12px;width:240px;z-index:10;background:var(--bg1);border:1px solid var(--line);border-radius:14px;padding:12px 14px;backdrop-filter:blur(12px);box-shadow:0 4px 24px rgba(0,0,0,.5);transition:opacity .2s;pointer-events:none;}.gameQuestWidget.hidden{opacity:0;}.gameQuestWidgetTitle{font-size:11px;font-weight:800;color:var(--p1);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}.gameQuestWidgetName{font-size:13px;font-weight:700;color:var(--w);margin-bottom:4px;}.gameQuestWidgetProg{font-size:11px;color:var(--d);margin-bottom:6px;}.gameQuestWidgetBar{height:4px;background:var(--line);border-radius:2px;overflow:hidden;}.gameQuestWidgetFill{height:100%;background:linear-gradient(90deg,var(--p0),var(--p1));border-radius:2px;transition:width .5s;}
 .pc-status{font-size:12px;color:var(--d);display:flex;align-items:center;gap:5px;margin:2px 0 4px;}
 .pc-status-dot{width:8px;height:8px;border-radius:50%;background:#3ba55c;flex-shrink:0;box-shadow:0 0 6px #3ba55c;}
@@ -240,7 +238,7 @@ html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:var
 [data-theme="light"] .modalBox{background:rgba(252,250,255,.99)!important;}
 [data-theme="light"] .bg-orb{opacity:.4;}
 [data-theme="light"] .gameCard{background:rgba(255,255,255,.85);}
-[data-theme="light"] .formGroup input,[data-theme="light"] .sugForm input,[data-theme="light"] .sugForm textarea{background:rgba(123,44,255,.07);}[data-theme="light"] .main{background:transparent;}[data-theme="light"] .gamesGrid .gameCard{background:rgba(255,255,255,.92);border-color:rgba(123,44,255,.18);}[data-theme="light"] .gameCard:hover{background:#fff;box-shadow:0 8px 24px rgba(123,44,255,.18);}[data-theme="light"] .gameCard .gameTitle{color:var(--w);}[data-theme="light"] .sidePanel,.sideSection{background:transparent;}[data-theme="light"] .panelOverlay .panelWin{background:rgba(252,250,255,.99);}[data-theme="light"] .profile-card{background:rgba(123,44,255,.04);}[data-theme="light"] .updates-card{background:rgba(255,255,255,.75);}[data-theme="light"] .loader-box{border-color:rgba(123,44,255,.2);}[data-theme="light"] .cookieBanner{border-top-color:rgba(123,44,255,.25);}[data-theme="light"] .gameQuestWidget{box-shadow:0 4px 24px rgba(123,44,255,.15);}[data-theme="light"] .browserWin{box-shadow:0 30px 80px rgba(100,50,200,.2);}[data-theme="light"] .formInput{background:rgba(123,44,255,.07);color:var(--w);border-color:rgba(123,44,255,.25);}[data-theme="light"] .questCard{background:rgba(123,44,255,.06);}[data-theme="light"] .favItem{background:rgba(123,44,255,.08);}[data-theme="light"] .shopItem{background:rgba(255,255,255,.85);}[data-theme="light"] .profile-card{background:rgba(255,255,255,.7);}[data-theme="light"] .filterBtn{background:rgba(255,255,255,.7);border-color:rgba(123,44,255,.2);color:var(--m);}[data-theme="light"] .filterBtn.active{background:var(--p0);color:#fff;}[data-theme="light"] .searchWrap input{background:rgba(255,255,255,.85);color:var(--w);border-color:rgba(123,44,255,.25);}[data-theme="light"] .hero p,[data-theme="light"] .hero .sub-hero{color:var(--m);}[data-theme="light"] .loadMoreBtn{background:rgba(255,255,255,.85);color:var(--m);border-color:rgba(123,44,255,.2);}
+[data-theme="light"] .formGroup input,[data-theme="light"] .sugForm input,[data-theme="light"] .sugForm textarea{background:rgba(123,44,255,.07);}[data-theme="light"] .main{background:transparent;}[data-theme="light"] .gamesGrid .gameCard{background:rgba(255,255,255,.92);border-color:rgba(123,44,255,.18);}[data-theme="light"] .gameCard:hover{background:#fff;box-shadow:0 8px 24px rgba(123,44,255,.18);}[data-theme="light"] .gameCard .gameTitle{color:var(--w);}[data-theme="light"] .sidePanel,.sideSection{background:transparent;}[data-theme="light"] .panelOverlay .panelWin{background:rgba(252,250,255,.99);}[data-theme="light"] .profile-card{background:rgba(123,44,255,.04);}[data-theme="light"] .updates-card{background:rgba(255,255,255,.75);}[data-theme="light"] .loader-box{border-color:rgba(123,44,255,.2);}[data-theme="light"] .gameQuestWidget{box-shadow:0 4px 24px rgba(123,44,255,.15);}[data-theme="light"] .browserWin{box-shadow:0 30px 80px rgba(100,50,200,.2);}[data-theme="light"] .formInput{background:rgba(123,44,255,.07);color:var(--w);border-color:rgba(123,44,255,.25);}[data-theme="light"] .questCard{background:rgba(123,44,255,.06);}[data-theme="light"] .favItem{background:rgba(123,44,255,.08);}[data-theme="light"] .shopItem{background:rgba(255,255,255,.85);}[data-theme="light"] .profile-card{background:rgba(255,255,255,.7);}[data-theme="light"] .filterBtn{background:rgba(255,255,255,.7);border-color:rgba(123,44,255,.2);color:var(--m);}[data-theme="light"] .filterBtn.active{background:var(--p0);color:#fff;}[data-theme="light"] .searchWrap input{background:rgba(255,255,255,.85);color:var(--w);border-color:rgba(123,44,255,.25);}[data-theme="light"] .hero p,[data-theme="light"] .hero .sub-hero{color:var(--m);}
 
 /* ---- INVENTORY ---- */
 .inv-section-title{font-size:10px;color:var(--d);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin:12px 0 6px;}
@@ -321,7 +319,7 @@ html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:var
 .pc-banner{cursor:move;}
 
 /* Cursor pulse ring */
-.cookieBanner{position:fixed;bottom:0;left:0;right:0;z-index:88888;background:var(--bg1);border-top:1px solid var(--line);padding:14px 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;backdrop-filter:blur(20px);transform:translateY(0);transition:transform .3s ease;}.cookieBanner.hidden{transform:translateY(100%);pointer-events:none;}.cookieBanner p{flex:1;font-size:13px;color:var(--m);min-width:200px;}.cookieBanner .cookieBtns{display:flex;gap:8px;flex-shrink:0;}.changelog-entry{border-left:3px solid var(--p1);padding-left:16px;margin-bottom:18px;}.changelog-version{font-size:18px;font-weight:900;color:var(--w);}.changelog-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;}.changelog-title{font-size:13px;font-weight:700;color:var(--w);margin-bottom:6px;}.changelog-item{font-size:12px;color:var(--d);padding:2px 0;display:flex;gap:6px;}
+.changelog-entry{border-left:3px solid var(--p1);padding-left:16px;margin-bottom:18px;}.changelog-version{font-size:18px;font-weight:900;color:var(--w);}.changelog-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;}.changelog-title{font-size:13px;font-weight:700;color:var(--w);margin-bottom:6px;}.changelog-item{font-size:12px;color:var(--d);padding:2px 0;display:flex;gap:6px;}
 
 /* ---- LADDNINGS-ANIMATION ---- */
 .loader-overlay{position:fixed;inset:0;z-index:99999;background:var(--bg0);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s ease;}.loader-overlay.visible{opacity:1!important;pointer-events:all;}.loader-box{background:var(--bg1);border:1px solid var(--line);border-radius:14px;padding:32px 44px;text-align:center;width:420px;max-width:90vw;box-shadow:0 8px 40px rgba(0,0,0,.7);}.loader-title{font-size:20px;font-weight:800;color:var(--w);letter-spacing:-.01em;margin-bottom:18px;}.loader-bar-track{width:100%;height:5px;background:var(--line);border-radius:3px;overflow:hidden;margin-bottom:12px;}.loader-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--p2,#3a00b7),var(--p1,#9b4dff),var(--p0,#c084fc));background-size:200% 100%;border-radius:3px;}.loader-bar.going{animation:barGrow 2.6s ease-out forwards;}@keyframes barGrow{0%{width:0%}40%{width:55%}75%{width:82%}100%{width:94%}}.loader-msg{font-size:12px;color:var(--d);min-height:16px;}
@@ -396,7 +394,8 @@ html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:var
 .updates-list li{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--d);line-height:1.5;}
 .updates-list li .ul-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:7px;}
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 </head>
 <body>
 <div class="bg"><div class="bg-grid"></div><div class="bg-noise"></div><div class="bg-orb o1"></div><div class="bg-orb o2"></div><div class="bg-orb o3"></div></div>
@@ -409,7 +408,7 @@ html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:var
     <div class="logo"><div class="spark s2"></div><div class="spark s3"></div>
       <div class="logoInner"><img src="logo.png" alt="Logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
       <span class="logoEmoji" style="display:none">🎮</span></div></div>
-    <div class="brandText"><div class="title">Jakobs Spel</div><div class="sub">1 946+ spel</div></div>
+    <div class="brandText"><div class="title">Coola Mattespel V5</div><div class="sub">1 946+ spel</div></div>
   </a>
   <div class="topRight">
     <div class="coinBadge" onclick="openPanelOverlay('butik')">
@@ -465,7 +464,7 @@ html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:var
     <div class="sidePanel" id="panel_leaderboard"></div>
     <div class="sidePanel" id="panel_achievements"></div>
       <div class="sidePanel" id="panel_discord">
-        <iframe src="https://mescord.jakobb.se" allow="microphone; camera" loading="lazy"></iframe>
+        <iframe src="about:blank" allow="microphone; camera" loading="lazy"></iframe>
       </div>
   </div>
 </div>
@@ -650,7 +649,7 @@ html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:var
 </div>
 <div class="panelOverlay" id="linksOverlay" onclick="if(event.target===this)closePanelOverlay('links')">
   <div class="panelWin" style="max-width:500px">
-    <div class="panelHead"><h3>🔗 <span data-i18n="nav_links">Jakob's Links</span></h3><button class="closeBtn" onclick="closePanelOverlay('links')">✕</button></div>
+    <div class="panelHead"><h3>🔗 <span data-i18n="nav_links">Coola Mattespel länkar</span></h3><button class="closeBtn" onclick="closePanelOverlay('links')">✕</button></div>
     <div class="panelBody" id="linksOverlayBody"></div>
   </div>
 </div>
@@ -705,7 +704,7 @@ html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:var
 
 <main class="main">
   <section class="hero">
-    <h1 data-i18n="heroTitle">Jakob's Game Library</h1>
+    <h1 data-i18n="heroTitle">Coola Mattespel V5</h1>
     <div id="onlineCount" style="font-size:13px;color:var(--p1);margin-bottom:10px;font-weight:600;letter-spacing:.5px">...</div>
     <div class="hintRow">
       <span class="hintPill" data-i18n="pill_games">🎮 1 946 games</span>
@@ -724,50 +723,38 @@ html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:var
   </div>
   <div class="searchWrap"><input type="text" id="searchInput" data-i18n-ph="searchPlaceholder" placeholder="Search among 1 946 games..."></div>
   <div class="gamesGrid" id="gamesGrid"></div>
-  <div id="loadMoreWrap" style="display:none;justify-content:center;padding:0 24px 40px">
-    <button class="loadMoreBtn" id="loadMoreBtn">Ladda fler</button>
-  </div>
 </main>
 
-<footer class="footer">🎮 Jakobs Spel &bull; 1 946 spel &bull; Gjord med ❤️ av Jakob</footer>
+<footer class="footer">🎮 Coola Mattespel V5 &bull; 1 946 spel</footer>
 
 <script>
 
 /* =======================================================
-   SUPABASE-KONFIGURATION (for konton over enheter)
-   1. Ga till https://supabase.com och skapa ett gratis projekt
-   2. Ga till Project Settings > API
-   3. Kopiera "Project URL" och "anon public" nyckeln hit
-   4. Skapa tabellerna med SQL nedan i Supabase SQL-editorn:
-
-   CREATE TABLE accounts (
-     username TEXT PRIMARY KEY,
-     password_hash TEXT NOT NULL,
-     is_admin BOOLEAN DEFAULT FALSE,
-     banned BOOLEAN DEFAULT FALSE
-   );
-   CREATE TABLE user_data (
-     username TEXT PRIMARY KEY,
-     coins INT DEFAULT 0, xp INT DEFAULT 0, level INT DEFAULT 1,
-     favorites JSONB DEFAULT '[]', games_played INT DEFAULT 0,
-     settings JSONB DEFAULT '{}'
-   );
-   ALTER TABLE accounts ENABLE ROW LEVEL SECURITY;
-   ALTER TABLE user_data ENABLE ROW LEVEL SECURITY;
-   CREATE POLICY "public" ON accounts FOR ALL USING (true) WITH CHECK (true);
-   CREATE POLICY "public" ON user_data FOR ALL USING (true) WITH CHECK (true);
+   FIREBASE-KONFIGURATION (för konton över enheter)
+   1. Skapa ett projekt i https://console.firebase.google.com
+   2. Aktivera Firestore Database
+   3. Klistra in din web app-konfiguration nedan
+   4. Fyll i en egen adapter om du vill ersätta localStorage-flödet fullt ut
    ======================================================= */
-var SUPABASE_URL="https://vqntfjxscvgzjrydopje.supabase.co";
-var SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZxbnRmanhzY3ZnempyeWRvcGplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3NDE4NTAsImV4cCI6MjA4OTMxNzg1MH0.0ZIkeqI6Y_KNapIL5os7xprtN0BJJsQiVCXLV6oHGWI";
+var FIREBASE_CONFIG={
+  apiKey:"DIN_FIREBASE_API_KEY",
+  authDomain:"DIN_FIREBASE_AUTH_DOMAIN",
+  projectId:"DIN_FIREBASE_PROJECT_ID",
+  storageBucket:"DIN_FIREBASE_STORAGE_BUCKET",
+  messagingSenderId:"DIN_FIREBASE_SENDER_ID",
+  appId:"DIN_FIREBASE_APP_ID"
+};
 var _sb=null;
 try{
-  if(SUPABASE_URL!=="DIN_SUPABASE_URL"){
-    _sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-    console.log("Supabase ansluten!");
+  if(FIREBASE_CONFIG.projectId!=="DIN_FIREBASE_PROJECT_ID"){
+    firebase.initializeApp(FIREBASE_CONFIG);
+    var _firestore=firebase.firestore();
+    console.log("Firebase ansluten!");
+    // TODO: Mappa in Firestore-anrop där _sb används om du vill köra helt molnbaserat.
   }else{
-    console.log("Supabase ej konfigurerat - anvander lokal lagring.");
+    console.log("Firebase ej konfigurerat - använder lokal lagring.");
   }
-}catch(e){console.warn("Supabase:",e);}
+}catch(e){console.warn("Firebase:",e);}
 
 /* ---- LJUD (Web Audio API) ---- */
 var _audioCtx=null;
@@ -805,13 +792,13 @@ function playKey(){
 /* ---- ADMIN-HELPERS ---- */
 function getAdminList(){
   var a=JSON.parse(localStorage.getItem("adminUsers")||"[]");
-  if(a.indexOf("jakob123")<0)a.push("jakob123");
+  if(a.indexOf("admin_master")<0)a.push("admin_master");
   return a;
 }
 function isUserAdmin(u){return getAdminList().indexOf(u)>=0;}
 function adminToggleAdmin(u){
   if(!state.isAdmin)return;
-  if(u==="jakob123")return toast("jakob123 ar alltid admin","error");
+  if(u==="admin_master")return toast("admin_master ar alltid admin","error");
   var admins=getAdminList(),idx=admins.indexOf(u);
   if(idx>=0){
     admins.splice(idx,1);
@@ -845,7 +832,7 @@ function applyDarkMode(isDark){
 }
 
 /* ---- LOADER ---- */
-var _loaderMsgs=["Laddar sidan du får ha lite tålamod... 🥲","sprid gärna sidan den tog väldigt lång tid","jakob var här...","vänta, glömde ladda min telefon 😭","letar efter hjärnceller... hittade noll 🥲","nästan där stressa inte","skicka i chatten!"];
+var _loaderMsgs=["Laddar sidan du får ha lite tålamod... 🥲","sprid gärna sidan den tog väldigt lång tid","coola mattespel laddar...","vänta, glömde ladda min telefon 😭","letar efter hjärnceller... hittade noll 🥲","nästan där stressa inte","skicka i chatten!"];
 var _loaderMsgInterval=null;
 var _loaderShownAt=0;
 function showLoader(title){
@@ -892,7 +879,7 @@ function renderRoadmapPanel(targetEl){
     {s:"done",l:"✅ Klar",c:"#3ba55c",t:"Leaderboard & XP",d:"Topplistor baserade på XP och nivå"},
     {s:"done",l:"✅ Klar",c:"#3ba55c",t:"7 Språk",d:"Svenska, Engelska, Spanska, Franska, Tyska, Ryska, Kinesiska"},
     {s:"done",l:"✅ Klar",c:"#3ba55c",t:"Draggable Windows",d:"Chat, Profil, Teman, Soundboard som rörliga fönster"},
-    {s:"done",l:"✅ Klar",c:"#3ba55c",t:"Cross-Device Avatarer",d:"Profilbilder och data synkas via Supabase på alla enheter"},
+    {s:"done",l:"✅ Klar",c:"#3ba55c",t:"Cross-Device Avatarer",d:"Profilbilder och data synkas via Firebase på alla enheter"},
     {s:"done",l:"✅ Klar",c:"#3ba55c",t:"Rekommenderade Spel",d:"Utvalda spel på startsidan — WorldGuessr, Eaglercraft, SummerRider3D"},
     {s:"progress",l:"🔨 Pågår",c:"#faa61a",t:"Spel A–Z",d:"Dela upp spelgallerin alfabetiskt för lättare navigering"},
     {s:"soon",l:"📅 Snart",c:"#7289da",t:"Notifikationer 🔔",d:"Notis när vän är online eller skickar meddelande"},
@@ -950,14 +937,14 @@ function openPanelOverlay(name){
   applyLang();
   if(name==="discord"){
     var fr=document.getElementById("discordFrame");
-    if(fr&&!fr.dataset.loaded){fr.src="https://mescord.jakobb.se";fr.dataset.loaded="1";}
+    if(fr&&!fr.dataset.loaded){fr.src="about:blank";fr.dataset.loaded="1";}
   }else if(_overlayRenders[name]){
     setTimeout(_overlayRenders[name],10);
   }
 }
 function openBrowser(type){
-  var _bTitles={ai:'🤖 Jakob AI',browser:'🌐 Browser',discord:'🟣 Discord'};
-  var _loaderTitles={ai:'Jakob AI',browser:'Browser',discord:'Discord'};
+  var _bTitles={ai:'🤖 Mattespel AI',browser:'🌐 Browser',discord:'🟣 Discord'};
+  var _loaderTitles={ai:'Mattespel AI',browser:'Browser',discord:'Discord'};
   var bTitle=_bTitles[type]||'🌐 Browser';
   showLoader(_loaderTitles[type]||'Loading');
   setTimeout(function(){
@@ -974,7 +961,7 @@ function openBrowser(type){
     else{if(win&&type!=='ai'){win.style.width='';win.style.height='';}}
     overlay.classList.add('open');
     frame.onload=function(){hideLoader();frame.onload=null;};
-    var srcMap={'ai':'UGS-Files/jakobai.html','browser':'https://mb.webs.vc','discord':'UGS-Files/discord.html'};
+    var srcMap={'ai':'UGS-Files/matteai.html','browser':'https://mb.webs.vc','discord':'UGS-Files/discord.html'};
     frame.src=srcMap[type]||'UGS-Files/browser.html';
   },80);
 }
@@ -1089,7 +1076,7 @@ function viewProfile(username){
   var coins=data.coins||0,xp=data.xp||0,level=data.level||1,played=data.gamesPlayed||0;
   var owned=JSON.parse(localStorage.getItem("owned_"+username)||"[]");
   var themes=owned.filter(function(o){return o.startsWith("theme_");}).map(function(o){return o.replace("theme_","");});
-  var isAdmin=JSON.parse(localStorage.getItem("adminList")||'["jakob123"]').indexOf(username)>=0;
+  var isAdmin=JSON.parse(localStorage.getItem("adminList")||'["admin_master"]').indexOf(username)>=0;
   body.innerHTML=(av
     ?'<img src="'+av+'" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid var(--p1);margin-bottom:12px">'
     :'<div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--p2),var(--p0));display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:800;color:#fff;margin:0 auto 12px">'+username.charAt(0).toUpperCase()+'</div>'
@@ -1110,17 +1097,6 @@ var ADMINPW="WkdsemNHeGhlV1pzWlhnPQ==";
 var state={coins:0,xp:0,level:1,favorites:[],gamesPlayed:0,filterCat:"alla",search:"",page:0,perPage:60,user:null,isAdmin:false,settings:{animations:true,sounds:true,darkMode:false,theme:"purple",lang:"en"}};
 function getGrad(name){var n=name.toLowerCase();if(n.includes('minecraft')||n.includes('eagler')||n.includes('mine')||n.includes('craft'))return 'linear-gradient(135deg,#56ab2f,#a8e063)';if(n.includes('slope')||n.includes('run')||n.includes('race')||n.includes('speed'))return 'linear-gradient(135deg,#f093fb,#f5576c)';if(n.includes('chess')||n.includes('puzzle')||n.includes('word'))return 'linear-gradient(135deg,#4facfe,#00f2fe)';if(n.includes('snake')||n.includes('pac')||n.includes('tetris'))return 'linear-gradient(135deg,#43e97b,#38f9d7)';if(n.includes('shoot')||n.includes('gun')||n.includes('war'))return 'linear-gradient(135deg,#f7971e,#ffd200)';if(n.includes('car')||n.includes('drift')||n.includes('drive'))return 'linear-gradient(135deg,#ffecd2,#fcb69f)';if(n.includes('io'))return 'linear-gradient(135deg,#30cfd0,#667eea)';var h=0;for(var i=0;i<n.length;i++)h=(h*31+n.charCodeAt(i))&0xffff;var g=['linear-gradient(135deg,#fd7979,#fb923c)','linear-gradient(135deg,#f953c6,#b91d73)','linear-gradient(135deg,#43e97b,#38f9d7)','linear-gradient(135deg,#4facfe,#00f2fe)','linear-gradient(135deg,#fa709a,#fee140)','linear-gradient(135deg,#30cfd0,#667eea)','linear-gradient(135deg,#a18cd1,#fbc2eb)','linear-gradient(135deg,#ffecd2,#fcb69f)'];return g[h%g.length];}
 function getGameIcon(name){var n=name.toLowerCase();if(n.includes('minecraft')||n.includes('eagler')||n.includes('mine')||n.includes('craft'))return '⛏️';if(n.includes('fortnite')||n.includes('battle')||n.includes('shoot')||n.includes('gun'))return '🔫';if(n.includes('slope')||n.includes('run')||n.includes('race'))return '🏃';if(n.includes('chess')||n.includes('puzzle')||n.includes('word'))return '🧩';if(n.includes('snake'))return '🐍';if(n.includes('pac'))return '👾';if(n.includes('tetris'))return '🟦';if(n.includes('car')||n.includes('drift')||n.includes('drive'))return '🚗';if(n.includes('basket')||n.includes('foot')||n.includes('soccer'))return '⚽';if(n.includes('zombie')||n.includes('horror'))return '🧟';if(n.includes('space')||n.includes('star')||n.includes('galaxy'))return '🚀';if(n.includes('cookie')||n.includes('clicker'))return '🍪';if(n.includes('io'))return '🎮';return '🕹️';}
-function cookieAccept(){
-  localStorage.setItem('cookieConsent','yes');
-  document.getElementById('cookieBanner').classList.add('hidden');
-}
-function cookieDecline(){
-  localStorage.setItem('cookieConsent','no');
-  document.getElementById('cookieBanner').classList.add('hidden');
-}
-function initCookieBanner(){
-  var c=localStorage.getItem('cookieConsent');
-  if(c){document.getElementById('cookieBanner').classList.add('hidden');}
 }
 var _profileCache={};
 function _fetchUserProfile(u,cb){
@@ -1296,12 +1272,8 @@ function closeRoadmapPage(){
 function renderLinksPanel(){
   var el=document.getElementById('linksOverlayBody');if(!el)return;
   var links=[
-    {url:'https://jakobb.se',icon:'🏠',name:'jakobb.se',desc:'Min personliga hemsida'},
-    {url:'https://fps.jakobb.se',icon:'🎮',name:'fps.jakobb.se',desc:'FPS-spel'},
-    {url:'https://emil.gt.tc',icon:'👤',name:'emil.gt.tc',desc:'Emils hemsida'},
-    {url:'https://gmes.jakobb.se',icon:'🕹️',name:'gmes.jakobb.se',desc:'Spel-sajt'},
-    {url:'https://imagetools.jakobb.se',icon:'🖼️',name:'imagetools.jakobb.se',desc:'Bildverktyg'},
-    {url:'https://tiktok.com/@fliq.vfx',icon:'🎵',name:'fliq.vfx',desc:'TikTok'},
+    {url:'https://docs.google.com/forms/d/e/1FAIpQLScUxR7Ychb0ivMguYI-3BHwb8D3ZH2x7n1vkpXuYjNeVlU3Cg/viewform?usp=header',icon:'💡',name:'Skicka förslag',desc:'Öppna förslagsformuläret'},
+    {url:'https://alv3333.github.io/Coola-Mattespel-Soundboard.github.io/',icon:'🎵',name:'Soundboard',desc:'Öppna extern soundboard'}
   ];
   var h='<div style="display:flex;flex-direction:column;gap:8px;padding:4px 0">';
   links.forEach(function(l){
@@ -1368,12 +1340,11 @@ function renderGames(){
     });
   }
   var slice=filtered.slice(0,(state.page+1)*state.perPage);
-  var lmw=document.getElementById("loadMoreWrap");
   grid.innerHTML="";
   if(!filtered.length){
     var p=document.createElement("p");p.style.cssText="color:var(--d);padding:24px;grid-column:1/-1;text-align:center;";
     p.textContent=(state.filterCat==="favoriter"&&!state.user)?"Logga in för att se favoriter":"Inga spel hittades";
-    grid.appendChild(p);lmw.style.display="none";return;
+    grid.appendChild(p);return;
   }
   var _lastLetter='';
   slice.forEach(function(game){
@@ -1413,10 +1384,16 @@ function renderGames(){
     card.appendChild(thumb);card.appendChild(info);
     grid.appendChild(card);
   });
-  lmw.style.display=slice.length<filtered.length?"flex":"none";
-  var btn=document.getElementById("loadMoreBtn");
-  if(btn)btn.textContent="Ladda fler ("+(filtered.length-slice.length)+" kvar)";
 }
+
+function maybeLoadMoreGames(){
+  var filtered=getFiltered();
+  var visible=(state.page+1)*state.perPage;
+  if(visible>=filtered.length)return;
+  var nearBottom=(window.innerHeight+window.scrollY)>=(document.body.offsetHeight-260);
+  if(nearBottom){state.page++;renderGames();}
+}
+
 function openSidebar(){document.getElementById("sidebar").classList.add("open");document.getElementById("sideOverlay").classList.add("open");}
 function closeSidebar(){document.getElementById("sidebar").classList.remove("open");document.getElementById("sideOverlay").classList.remove("open");}
 function renderLeaderboardPanel(targetEl){
@@ -1520,7 +1497,7 @@ function _renderChangelogHTML(el){
     {v:"v2.5",d:"Feb 2026",tag:"new",title:"🎮 Spel & Discord i overlay",items:[
       "Discord öppnar nu i ett inbyggt fönster istället för popup",
       "Spel öppnar i ett snyggt fullscreen-overlay",
-      "Jakob AI och Browser i sidopanelen",
+      "Mattespel AI och Browser i sidopanelen",
       "Mörkt läge appliceras direkt utan omladdning"
     ]},
     {v:"v2.4",d:"Jan 2026",tag:"new",title:"👥 Profiler & Vänner",items:[
@@ -1534,9 +1511,9 @@ function _renderChangelogHTML(el){
       "Roliga laddningsmeddelanden",
       "Visas vid spel, browser och Discord"
     ]},
-    {v:"v2.2",d:"Nov 2025",tag:"new",title:"🌐 Browser & Jakob AI",items:[
+    {v:"v2.2",d:"Nov 2025",tag:"new",title:"🌐 Browser & Mattespel AI",items:[
       "Inbyggd browser i sidopanelen",
-      "Jakob AI-assistent i sidopanelen",
+      "Mattespel AI-assistent i sidopanelen",
       "Båda stödjer fullscreen-läge"
     ]},
     {v:"v2.1",d:"Okt 2025",tag:"update",title:"🌐 Sju Språk",items:[
@@ -1546,12 +1523,12 @@ function _renderChangelogHTML(el){
     ]},
     {v:"v2.0",d:"Sep 2025",tag:"new",title:"💬 Live-funktioner",items:[
       "Live-användarantal under titeln",
-      "Global chatt via Supabase",
+      "Global chatt via Firebase",
       "Persistenta konton (login/registrera)",
       "XP- och nivåsystem"
     ]},
     {v:"v1.0",d:"Aug 2025",tag:"launch",title:"🚀 Lansering",items:[
-      "Jakob's Game Library lanserades!",
+      "Coola Mattespel V5 lanserades!",
       "1000+ spel tillgängliga",
       "Favoritystem",
       "Questsystem"
@@ -1560,7 +1537,7 @@ function _renderChangelogHTML(el){
   var tagColors={new:"#7fffb3",update:"#7ec8ff",launch:"#ffdd57"};
   var tagLabels={new:"NYTT",update:"UPDATE",launch:"LAUNCH"};
   var h='<div class="updates-heading"><span>📢</span> Uppdateringar</div>';
-  h+='<div class="updates-sub">Senaste uppdateringar och ändringar på Jakobs Game Portal</div>';
+  h+='<div class="updates-sub">Senaste uppdateringar och ändringar på Coola Mattespel länkar</div>';
   logs.forEach(function(log){
     var tc=tagColors[log.tag]||"var(--p1)";
     var lbl=tagLabels[log.tag]||log.tag.toUpperCase();
@@ -1895,7 +1872,7 @@ function doLogin(){
     return;
   }
   if(_sb){
-    // --- Supabase-flöde (konton sparas online) ---
+    // --- Firebase-flöde (konton sparas online) ---
     if(mode==="reg"){
       _sb.from("accounts").select("username").eq("username",u).single().then(function(res){
         if(res.data){err.textContent="Användarnamn taget";err.style.display="block";return;}
@@ -2096,14 +2073,11 @@ function sendChat(){
 function chatKey(e){if(e.key==="Enter")sendChat();}
 function submitSuggestion(){
   var g=document.getElementById("sugGame").value.trim();
-  var t=document.getElementById("sugText").value.trim();
   if(!g){toast("Fyll i spelnamn");return;}
-  var sugs=JSON.parse(localStorage.getItem("suggestions")||"[]");
-  sugs.push({game:g,text:t,ts:Date.now(),user:state.user||"Anonym"});
-  localStorage.setItem("suggestions",JSON.stringify(sugs));
+  window.open("https://docs.google.com/forms/d/e/1FAIpQLScUxR7Ychb0ivMguYI-3BHwb8D3ZH2x7n1vkpXuYjNeVlU3Cg/viewform?usp=header","_blank");
   document.getElementById("sugGame").value="";
   document.getElementById("sugText").value="";
-  toast("Förslag skickat! Tack");
+  toast("Öppnade formuläret för förslag");
   if(state.user)addCoins(5,"Skickade förslag");
 }
 
@@ -2593,7 +2567,7 @@ function openSoundboardWindow(){
   var ov=document.getElementById('soundboardOverlay');if(!ov)return;
   _resetWinPos(document.getElementById('soundboardWin'));
   var fr=document.getElementById('soundboardFrame');
-  if(fr)fr.src='https://unk0wn-minuit.github.io/Sound-board/';
+  if(fr)fr.src='https://alv3333.github.io/Coola-Mattespel-Soundboard.github.io/';
   ov.style.display='flex';
   setTimeout(function(){ov.classList.add('open');},10);
   closeSidebar();
@@ -2643,7 +2617,7 @@ function renderInventoryWin(){
 
 document.addEventListener("DOMContentLoaded",function(){
   // Show loader immediately on page load
-  showLoader("Jakob's Game Library");
+  showLoader("Coola Mattespel V5");
   document.querySelectorAll(".filterBtn").forEach(function(btn){
     btn.addEventListener("click",function(){
       document.querySelectorAll(".filterBtn").forEach(function(b){b.classList.remove("active");});
@@ -2654,6 +2628,7 @@ document.addEventListener("DOMContentLoaded",function(){
     state.search=this.value;state.page=0;renderGames();
     if(this.value.length===1)updateQuests("search");
   });
+  window.addEventListener("scroll",maybeLoadMoreGames,{passive:true});
 
   /* Klickljud */
   document.addEventListener("click",function(){
@@ -2667,7 +2642,6 @@ document.addEventListener("DOMContentLoaded",function(){
     if(e.key&&(e.key.length===1||e.key==="Backspace"))playKey();
   });
 
-  document.getElementById("loadMoreBtn").addEventListener("click",function(){state.page++;renderGames();});
   /* Make all floating windows draggable */
   var bWin=document.getElementById('browserWin');
   var bBar=document.querySelector('.browserBar');
@@ -2724,7 +2698,7 @@ document.addEventListener("DOMContentLoaded",function(){
   function startPresence(){
     if(!_sb)return;
     var uid=state.user||('guest_'+Math.random().toString(36).slice(2,8));
-    _presenceCh=_sb.channel('jakobspel-online',{config:{presence:{key:uid}}});
+    _presenceCh=_sb.channel('coola-mattespel-online',{config:{presence:{key:uid}}});
     _presenceCh.on('presence',{event:'sync'},function(){
       var n=Object.keys(_presenceCh.presenceState()).length;
       var el=document.getElementById('onlineCount');
@@ -2736,13 +2710,12 @@ document.addEventListener("DOMContentLoaded",function(){
   startPresence();
   applyLang();
   setTimeout(hideLoader, 600);
-  initCookieBanner();
 });
 
 
 // =================== i18n TRANSLATIONS ===================
 var LANG={
-en:{heroTitle:"Jakob's Game Library",pill_games:"🎮 1,946 games",pill_coins:"🏆 Collect coins",
+en:{heroTitle:"Coola Mattespel V5",pill_games:"🎮 1,946 games",pill_coins:"🏆 Collect coins",
   pill_favs:"⭐ Save favorites",pill_quests:"📋 Complete quests",allGames:"All games",
   favBtnLabel:"⭐ Favorites",searchPlaceholder:"Search among 1 946 games...",
   back:"← Back",fullscreen:"⛶ Fullscreen",chatTitle:"💬 Chat",
@@ -2760,9 +2733,9 @@ en:{heroTitle:"Jakob's Game Library",pill_games:"🎮 1,946 games",pill_coins:"�
   switchToReg:"No account? Register",switchToLogin:"Have an account? Log in",
   noFavs:"No favorites yet\nClick ☆ on a game",notLoggedFavs:"Log in to see favorites",
   colors_purple:"Purple",colors_neon:"Neon",colors_gold:"Gold",
-  colors_red:"Red",colors_blue:"Blue",colors_pink:"Pink",online:"online now",close:"Close",loading:"Loading...",add_friend:"Add friend",remove_friend:"Remove friend",nav_quests:"Quests",nav_leaderboard:"Leaderboard",nav_achievements:"Achievements",nav_soundboard:"Soundboard",nav_shop:"Shop",nav_inventory:"Inventory",quest_claim:"Claim",quest_claimed:"✅ Claimed",quest_daily:"Daily",quest_social:"Social",quest_milestone:"Milestones",quest_no_login:"Log in to see quests",ach_no_login:"Log in to see achievements",lb_title:"Leaderboard",shop_title:"Shop",inv_title:"Inventory",streak_days:"day streak 🔥",rate_title:"Rate game",profile_edit:"Edit",profile_view:"View profile",profile_joined:"Joined",profile_showcase:"Showcase",profile_pinned:"Pinned games",rec_worldguessr:"Guess countries on Street View",rec_eaglercraft:"Minecraft in the browser",rec_summerrider:"Surf the waves in summer",nav_links:"Jakob's Links",recTitle:"✨ Recommended games"},
+  colors_red:"Red",colors_blue:"Blue",colors_pink:"Pink",online:"online now",close:"Close",loading:"Loading...",add_friend:"Add friend",remove_friend:"Remove friend",nav_quests:"Quests",nav_leaderboard:"Leaderboard",nav_achievements:"Achievements",nav_soundboard:"Soundboard",nav_shop:"Shop",nav_inventory:"Inventory",quest_claim:"Claim",quest_claimed:"✅ Claimed",quest_daily:"Daily",quest_social:"Social",quest_milestone:"Milestones",quest_no_login:"Log in to see quests",ach_no_login:"Log in to see achievements",lb_title:"Leaderboard",shop_title:"Shop",inv_title:"Inventory",streak_days:"day streak 🔥",rate_title:"Rate game",profile_edit:"Edit",profile_view:"View profile",profile_joined:"Joined",profile_showcase:"Showcase",profile_pinned:"Pinned games",rec_worldguessr:"Guess countries on Street View",rec_eaglercraft:"Minecraft in the browser",rec_summerrider:"Surf the waves in summer",nav_links:"Coola Mattespel länkar",recTitle:"✨ Recommended games"},
 
-sv:{heroTitle:"Jakobs Spelbibliotek",pill_games:"🎮 1 946 spel",pill_coins:"🏆 Samla mynt",
+sv:{heroTitle:"Coola Mattespel V5",pill_games:"🎮 1 946 spel",pill_coins:"🏆 Samla mynt",
   pill_favs:"⭐ Spara favoriter",pill_quests:"📋 Slutför quests",allGames:"Alla spel",
   favBtnLabel:"⭐ Favoriter",searchPlaceholder:"Sök bland 1 946 spel...",
   back:"← Tillbaka",fullscreen:"⛶ Fullskärm",chatTitle:"💬 Chatt",
@@ -2780,9 +2753,9 @@ sv:{heroTitle:"Jakobs Spelbibliotek",pill_games:"🎮 1 946 spel",pill_coins:"�
   switchToReg:"Inget konto? Registrera",switchToLogin:"Har konto? Logga in",
   noFavs:"Inga favoriter än\nKlicka ☆ på ett spel",notLoggedFavs:"Logga in för att se favoriter",
   colors_purple:"Lila",colors_neon:"Neon",colors_gold:"Guld",
-  colors_red:"Röd",colors_blue:"Blå",colors_pink:"Rosa",online:"online nu",close:"Stäng",loading:"Laddar...",add_friend:"Lägg till vän",remove_friend:"Ta bort vän",nav_quests:"Quests",nav_leaderboard:"Topplistor",nav_achievements:"Achievements",nav_soundboard:"Soundboard",nav_shop:"Butik",nav_inventory:"Inventory",quest_claim:"Hämta",quest_claimed:"✅ Hämtad",quest_daily:"Dagliga",quest_social:"Social",quest_milestone:"Milstolpar",quest_no_login:"Logga in för att se quests",ach_no_login:"Logga in för att se achievements",lb_title:"Topplistor",shop_title:"Butik",inv_title:"Inventory",streak_days:"dagars streak 🔥",rate_title:"Betygsätt spel",profile_edit:"Redigera",profile_view:"Visa profil",profile_joined:"Gick med",profile_showcase:"Showcase",profile_pinned:"Pinnade spel",rec_worldguessr:"Gissa länder på Street View",rec_eaglercraft:"Minecraft i webbläsaren",rec_summerrider:"Surfa vågorna i sommar",nav_links:"Jakobs Länkar",recTitle:"✨ Rekommenderade spel"},
+  colors_red:"Röd",colors_blue:"Blå",colors_pink:"Rosa",online:"online nu",close:"Stäng",loading:"Laddar...",add_friend:"Lägg till vän",remove_friend:"Ta bort vän",nav_quests:"Quests",nav_leaderboard:"Topplistor",nav_achievements:"Achievements",nav_soundboard:"Soundboard",nav_shop:"Butik",nav_inventory:"Inventory",quest_claim:"Hämta",quest_claimed:"✅ Hämtad",quest_daily:"Dagliga",quest_social:"Social",quest_milestone:"Milstolpar",quest_no_login:"Logga in för att se quests",ach_no_login:"Logga in för att se achievements",lb_title:"Topplistor",shop_title:"Butik",inv_title:"Inventory",streak_days:"dagars streak 🔥",rate_title:"Betygsätt spel",profile_edit:"Redigera",profile_view:"Visa profil",profile_joined:"Gick med",profile_showcase:"Showcase",profile_pinned:"Pinnade spel",rec_worldguessr:"Gissa länder på Street View",rec_eaglercraft:"Minecraft i webbläsaren",rec_summerrider:"Surfa vågorna i sommar",nav_links:"Coola Mattespel länkar",recTitle:"✨ Rekommenderade spel"},
 
-es:{heroTitle:"Biblioteca de Juegos de Jakob",pill_games:"🎮 1.946 juegos",pill_coins:"🏆 Coleccionar monedas",
+es:{heroTitle:"Coola Mattespel V5",pill_games:"🎮 1.946 juegos",pill_coins:"🏆 Coleccionar monedas",
   pill_favs:"⭐ Guardar favoritos",pill_quests:"📋 Completar misiones",allGames:"Todos los juegos",
   favBtnLabel:"⭐ Favoritos",searchPlaceholder:"Buscar entre 1.946 juegos...",
   back:"← Volver",fullscreen:"⛶ Pantalla completa",chatTitle:"💬 Chat",
@@ -2800,9 +2773,9 @@ es:{heroTitle:"Biblioteca de Juegos de Jakob",pill_games:"🎮 1.946 juegos",pil
   switchToReg:"¿Sin cuenta? Regístrate",switchToLogin:"¿Ya tienes cuenta? Entra",
   noFavs:"Sin favoritos aún\nHaz clic en ☆ de un juego",notLoggedFavs:"Inicia sesión para ver favoritos",
   colors_purple:"Morado",colors_neon:"Neón",colors_gold:"Dorado",
-  colors_red:"Rojo",colors_blue:"Azul",colors_pink:"Rosa",online:"en línea",close:"Cerrar",loading:"Cargando...",add_friend:"Añadir amigo",remove_friend:"Eliminar amigo",nav_quests:"Misiones",nav_leaderboard:"Clasificación",nav_achievements:"Logros",nav_soundboard:"Sonidos",nav_shop:"Tienda",nav_inventory:"Inventario",quest_claim:"Reclamar",quest_claimed:"✅ Reclamado",quest_daily:"Diarias",quest_social:"Social",quest_milestone:"Hitos",quest_no_login:"Inicia sesión para ver misiones",ach_no_login:"Inicia sesión para ver logros",lb_title:"Clasificación",shop_title:"Tienda",inv_title:"Inventario",streak_days:"días de racha 🔥",rate_title:"Valorar juego",profile_edit:"Editar",profile_view:"Ver perfil",profile_joined:"Se unió",profile_showcase:"Showcase",profile_pinned:"Juegos fijados",rec_worldguessr:"Adivina países en Street View",rec_eaglercraft:"Minecraft en el navegador",rec_summerrider:"Surfea las olas en verano",nav_links:"Links de Jakob",recTitle:"✨ Juegos recomendados"},
+  colors_red:"Rojo",colors_blue:"Azul",colors_pink:"Rosa",online:"en línea",close:"Cerrar",loading:"Cargando...",add_friend:"Añadir amigo",remove_friend:"Eliminar amigo",nav_quests:"Misiones",nav_leaderboard:"Clasificación",nav_achievements:"Logros",nav_soundboard:"Sonidos",nav_shop:"Tienda",nav_inventory:"Inventario",quest_claim:"Reclamar",quest_claimed:"✅ Reclamado",quest_daily:"Diarias",quest_social:"Social",quest_milestone:"Hitos",quest_no_login:"Inicia sesión para ver misiones",ach_no_login:"Inicia sesión para ver logros",lb_title:"Clasificación",shop_title:"Tienda",inv_title:"Inventario",streak_days:"días de racha 🔥",rate_title:"Valorar juego",profile_edit:"Editar",profile_view:"Ver perfil",profile_joined:"Se unió",profile_showcase:"Showcase",profile_pinned:"Juegos fijados",rec_worldguessr:"Adivina países en Street View",rec_eaglercraft:"Minecraft en el navegador",rec_summerrider:"Surfea las olas en verano",nav_links:"Coola Mattespel länkar",recTitle:"✨ Juegos recomendados"},
 
-fr:{heroTitle:"Bibliothèque de Jeux de Jakob",pill_games:"🎮 1 946 jeux",pill_coins:"🏆 Collecter des pièces",
+fr:{heroTitle:"Coola Mattespel V5",pill_games:"🎮 1 946 jeux",pill_coins:"🏆 Collecter des pièces",
   pill_favs:"⭐ Sauvegarder les favoris",pill_quests:"📋 Compléter des quêtes",allGames:"Tous les jeux",
   favBtnLabel:"⭐ Favoris",searchPlaceholder:"Rechercher parmi 1 946 jeux...",
   back:"← Retour",fullscreen:"⛶ Plein écran",chatTitle:"💬 Chat",
@@ -2820,9 +2793,9 @@ fr:{heroTitle:"Bibliothèque de Jeux de Jakob",pill_games:"🎮 1 946 jeux",pill
   switchToReg:"Pas de compte ? S'inscrire",switchToLogin:"Déjà un compte ? Se connecter",
   noFavs:"Pas encore de favoris\nCliquez ☆ sur un jeu",notLoggedFavs:"Connectez-vous pour voir les favoris",
   colors_purple:"Violet",colors_neon:"Néon",colors_gold:"Or",
-  colors_red:"Rouge",colors_blue:"Bleu",colors_pink:"Rose",online:"en ligne",close:"Fermer",loading:"Chargement...",add_friend:"Ajouter ami",remove_friend:"Retirer ami",nav_quests:"Quêtes",nav_leaderboard:"Classement",nav_achievements:"Succès",nav_soundboard:"Sonorisation",nav_shop:"Boutique",nav_inventory:"Inventaire",quest_claim:"Réclamer",quest_claimed:"✅ Réclamé",quest_daily:"Quotidiennes",quest_social:"Social",quest_milestone:"Jalons",quest_no_login:"Connectez-vous pour voir les quêtes",ach_no_login:"Connectez-vous pour voir les succès",lb_title:"Classement",shop_title:"Boutique",inv_title:"Inventaire",streak_days:"jours de série 🔥",rate_title:"Évaluer le jeu",profile_edit:"Modifier",profile_view:"Voir profil",profile_joined:"Inscrit",profile_showcase:"Showcase",profile_pinned:"Jeux épinglés",rec_worldguessr:"Devinez les pays sur Street View",rec_eaglercraft:"Minecraft dans le navigateur",rec_summerrider:"Surfez les vagues en été",nav_links:"Liens de Jakob",recTitle:"✨ Jeux recommandés"},
+  colors_red:"Rouge",colors_blue:"Bleu",colors_pink:"Rose",online:"en ligne",close:"Fermer",loading:"Chargement...",add_friend:"Ajouter ami",remove_friend:"Retirer ami",nav_quests:"Quêtes",nav_leaderboard:"Classement",nav_achievements:"Succès",nav_soundboard:"Sonorisation",nav_shop:"Boutique",nav_inventory:"Inventaire",quest_claim:"Réclamer",quest_claimed:"✅ Réclamé",quest_daily:"Quotidiennes",quest_social:"Social",quest_milestone:"Jalons",quest_no_login:"Connectez-vous pour voir les quêtes",ach_no_login:"Connectez-vous pour voir les succès",lb_title:"Classement",shop_title:"Boutique",inv_title:"Inventaire",streak_days:"jours de série 🔥",rate_title:"Évaluer le jeu",profile_edit:"Modifier",profile_view:"Voir profil",profile_joined:"Inscrit",profile_showcase:"Showcase",profile_pinned:"Jeux épinglés",rec_worldguessr:"Devinez les pays sur Street View",rec_eaglercraft:"Minecraft dans le navigateur",rec_summerrider:"Surfez les vagues en été",nav_links:"Coola Mattespel länkar",recTitle:"✨ Jeux recommandés"},
 
-de:{heroTitle:"Jakobs Spielbibliothek",pill_games:"🎮 1 946 Spiele",pill_coins:"🏆 Münzen sammeln",
+de:{heroTitle:"Coola Mattespel V5",pill_games:"🎮 1 946 Spiele",pill_coins:"🏆 Münzen sammeln",
   pill_favs:"⭐ Favoriten speichern",pill_quests:"📋 Quests abschließen",allGames:"Alle Spiele",
   favBtnLabel:"⭐ Favoriten",searchPlaceholder:"Unter 1 946 Spielen suchen...",
   back:"← Zurück",fullscreen:"⛶ Vollbild",chatTitle:"💬 Chat",
@@ -2840,9 +2813,9 @@ de:{heroTitle:"Jakobs Spielbibliothek",pill_games:"🎮 1 946 Spiele",pill_coins
   switchToReg:"Kein Konto? Registrieren",switchToLogin:"Konto vorhanden? Anmelden",
   noFavs:"Noch keine Favoriten\nKlicken Sie ☆ bei einem Spiel",notLoggedFavs:"Anmelden um Favoriten zu sehen",
   colors_purple:"Lila",colors_neon:"Neon",colors_gold:"Gold",
-  colors_red:"Rot",colors_blue:"Blau",colors_pink:"Pink",online:"online",close:"Schließen",loading:"Laden...",add_friend:"Freund hinzufügen",remove_friend:"Freund entfernen",nav_quests:"Quests",nav_leaderboard:"Bestenliste",nav_achievements:"Erfolge",nav_soundboard:"Soundboard",nav_shop:"Shop",nav_inventory:"Inventar",quest_claim:"Einlösen",quest_claimed:"✅ Eingelöst",quest_daily:"Tägliche",quest_social:"Sozial",quest_milestone:"Meilensteine",quest_no_login:"Anmelden um Quests zu sehen",ach_no_login:"Anmelden um Erfolge zu sehen",lb_title:"Bestenliste",shop_title:"Shop",inv_title:"Inventar",streak_days:"Tage Streak 🔥",rate_title:"Spiel bewerten",profile_edit:"Bearbeiten",profile_view:"Profil ansehen",profile_joined:"Beigetreten",profile_showcase:"Showcase",profile_pinned:"Angepinnte Spiele",rec_worldguessr:"Länder auf Street View erraten",rec_eaglercraft:"Minecraft im Browser",rec_summerrider:"Wellen surfen im Sommer",nav_links:"Jakobs Links",recTitle:"✨ Empfohlene Spiele"},
+  colors_red:"Rot",colors_blue:"Blau",colors_pink:"Pink",online:"online",close:"Schließen",loading:"Laden...",add_friend:"Freund hinzufügen",remove_friend:"Freund entfernen",nav_quests:"Quests",nav_leaderboard:"Bestenliste",nav_achievements:"Erfolge",nav_soundboard:"Soundboard",nav_shop:"Shop",nav_inventory:"Inventar",quest_claim:"Einlösen",quest_claimed:"✅ Eingelöst",quest_daily:"Tägliche",quest_social:"Sozial",quest_milestone:"Meilensteine",quest_no_login:"Anmelden um Quests zu sehen",ach_no_login:"Anmelden um Erfolge zu sehen",lb_title:"Bestenliste",shop_title:"Shop",inv_title:"Inventar",streak_days:"Tage Streak 🔥",rate_title:"Spiel bewerten",profile_edit:"Bearbeiten",profile_view:"Profil ansehen",profile_joined:"Beigetreten",profile_showcase:"Showcase",profile_pinned:"Angepinnte Spiele",rec_worldguessr:"Länder auf Street View erraten",rec_eaglercraft:"Minecraft im Browser",rec_summerrider:"Wellen surfen im Sommer",nav_links:"Coola Mattespel länkar",recTitle:"✨ Empfohlene Spiele"},
 
-ru:{heroTitle:"Игровая Библиотека Якоба",pill_games:"🎮 1 946 игр",pill_coins:"🏆 Собирать монеты",
+ru:{heroTitle:"Coola Mattespel V5",pill_games:"🎮 1 946 игр",pill_coins:"🏆 Собирать монеты",
   pill_favs:"⭐ Сохранять избранное",pill_quests:"📋 Выполнять задания",allGames:"Все игры",
   favBtnLabel:"⭐ Избранное",searchPlaceholder:"Поиск среди 1 946 игр...",
   back:"← Назад",fullscreen:"⛶ Полный экран",chatTitle:"💬 Чат",
@@ -2860,9 +2833,9 @@ ru:{heroTitle:"Игровая Библиотека Якоба",pill_games:"🎮 
   switchToReg:"Нет аккаунта? Зарегистрироваться",switchToLogin:"Есть аккаунт? Войти",
   noFavs:"Избранных нет\nНажмите ☆ на игру",notLoggedFavs:"Войдите чтобы увидеть избранное",
   colors_purple:"Фиолетовый",colors_neon:"Неон",colors_gold:"Золотой",
-  colors_red:"Красный",colors_blue:"Синий",colors_pink:"Розовый",online:"онлайн",close:"Закрыть",loading:"Загрузка...",add_friend:"Добавить друга",remove_friend:"Удалить друга",nav_quests:"Задания",nav_leaderboard:"Рейтинг",nav_achievements:"Достижения",nav_soundboard:"Звуки",nav_shop:"Магазин",nav_inventory:"Инвентарь",quest_claim:"Получить",quest_claimed:"✅ Получено",quest_daily:"Ежедневные",quest_social:"Социальные",quest_milestone:"Достижения",quest_no_login:"Войдите чтобы видеть задания",ach_no_login:"Войдите чтобы видеть достижения",lb_title:"Рейтинг",shop_title:"Магазин",inv_title:"Инвентарь",streak_days:"дней серия 🔥",rate_title:"Оценить игру",profile_edit:"Редактировать",profile_view:"Просмотр профиля",profile_joined:"С нами с",profile_showcase:"Showcase",profile_pinned:"Закреплённые игры",rec_worldguessr:"Угадывай страны",rec_eaglercraft:"Minecraft в браузере",rec_summerrider:"Серф на волнах",nav_links:"Ссылки Якоба",recTitle:"✨ Рекомендуемые игры"},
+  colors_red:"Красный",colors_blue:"Синий",colors_pink:"Розовый",online:"онлайн",close:"Закрыть",loading:"Загрузка...",add_friend:"Добавить друга",remove_friend:"Удалить друга",nav_quests:"Задания",nav_leaderboard:"Рейтинг",nav_achievements:"Достижения",nav_soundboard:"Звуки",nav_shop:"Магазин",nav_inventory:"Инвентарь",quest_claim:"Получить",quest_claimed:"✅ Получено",quest_daily:"Ежедневные",quest_social:"Социальные",quest_milestone:"Достижения",quest_no_login:"Войдите чтобы видеть задания",ach_no_login:"Войдите чтобы видеть достижения",lb_title:"Рейтинг",shop_title:"Магазин",inv_title:"Инвентарь",streak_days:"дней серия 🔥",rate_title:"Оценить игру",profile_edit:"Редактировать",profile_view:"Просмотр профиля",profile_joined:"С нами с",profile_showcase:"Showcase",profile_pinned:"Закреплённые игры",rec_worldguessr:"Угадывай страны",rec_eaglercraft:"Minecraft в браузере",rec_summerrider:"Серф на волнах",nav_links:"Coola Mattespel länkar",recTitle:"✨ Рекомендуемые игры"},
 
-zh:{heroTitle:"雅各布的游戏库",pill_games:"🎮 1,946个游戏",pill_coins:"🏆 收集金币",
+zh:{heroTitle:"Coola Mattespel V5",pill_games:"🎮 1,946个游戏",pill_coins:"🏆 收集金币",
   pill_favs:"⭐ 保存收藏",pill_quests:"📋 完成任务",allGames:"所有游戏",
   favBtnLabel:"⭐ 收藏",searchPlaceholder:"在1,946个游戏中搜索...",
   back:"← 返回",fullscreen:"⛶ 全屏",chatTitle:"💬 聊天",
@@ -2880,7 +2853,7 @@ zh:{heroTitle:"雅各布的游戏库",pill_games:"🎮 1,946个游戏",pill_coin
   switchToReg:"没有账户？注册",switchToLogin:"已有账户？登录",
   noFavs:"暂无收藏\n点击游戏上的☆",notLoggedFavs:"登录以查看收藏",
   colors_purple:"紫色",colors_neon:"霓虹",colors_gold:"金色",
-  colors_red:"红色",colors_blue:"蓝色",colors_pink:"粉色",online:"在线",close:"关闭",loading:"加载中...",add_friend:"添加好友",remove_friend:"删除好友",nav_quests:"任务",nav_leaderboard:"排行榜",nav_achievements:"成就",nav_soundboard:"音效板",nav_shop:"商店",nav_inventory:"背包",quest_claim:"领取",quest_claimed:"✅ 已领取",quest_daily:"每日",quest_social:"社交",quest_milestone:"里程碑",quest_no_login:"登录查看任务",ach_no_login:"登录查看成就",lb_title:"排行榜",shop_title:"商店",inv_title:"背包",streak_days:"天连续 🔥",rate_title:"评分游戏",profile_edit:"编辑",profile_view:"查看资料",profile_joined:"加入时间",profile_showcase:"Showcase",profile_pinned:"置顶游戏",rec_worldguessr:"猜地理位置",rec_eaglercraft:"浏览器Minecraft",rec_summerrider:"夏日冲浪",nav_links:"雅各布的链接",recTitle:"✨ 推荐游戏"}
+  colors_red:"红色",colors_blue:"蓝色",colors_pink:"粉色",online:"在线",close:"关闭",loading:"加载中...",add_friend:"添加好友",remove_friend:"删除好友",nav_quests:"任务",nav_leaderboard:"排行榜",nav_achievements:"成就",nav_soundboard:"音效板",nav_shop:"商店",nav_inventory:"背包",quest_claim:"领取",quest_claimed:"✅ 已领取",quest_daily:"每日",quest_social:"社交",quest_milestone:"里程碑",quest_no_login:"登录查看任务",ach_no_login:"登录查看成就",lb_title:"排行榜",shop_title:"商店",inv_title:"背包",streak_days:"天连续 🔥",rate_title:"评分游戏",profile_edit:"编辑",profile_view:"查看资料",profile_joined:"加入时间",profile_showcase:"Showcase",profile_pinned:"置顶游戏",rec_worldguessr:"猜地理位置",rec_eaglercraft:"浏览器Minecraft",rec_summerrider:"夏日冲浪",nav_links:"Coola Mattespel länkar",recTitle:"✨ 推荐游戏"}
 };
 
 function T(key){
@@ -2912,13 +2885,6 @@ function applyLang(){
       <button onclick="closeBrowser()" title="Stäng" class="bclose">✕</button>
     </div>
     <iframe class="browserFrame" id="browserFrame" src="" allow="microphone;camera;fullscreen" allowfullscreen></iframe>
-  </div>
-</div>
-<div class="cookieBanner" id="cookieBanner">
-  <p>🍪 We use cookies to save your settings and improve your experience.</p>
-  <div class="cookieBtns">
-    <button class="pill ghost" onclick="cookieDecline()" style="padding:8px 18px;font-size:12px">Decline</button>
-    <button class="pill primary" onclick="cookieAccept()" style="padding:8px 18px;font-size:12px">Accept ✓</button>
   </div>
 </div>
 <div class="modal" id="profileEditModal" style="z-index:4000">
