@@ -401,6 +401,21 @@
 
     .footer{text-align:center;padding:22px;font-size:12px;color:var(--d);}
 
+    .chatWrap{display:flex;flex-direction:column;height:100%;min-height:420px;}
+    .chatHeader{font-size:12px;color:var(--d);margin-bottom:10px;}
+    .chatLog{
+      flex:1;overflow:auto;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.03);
+      padding:10px;display:flex;flex-direction:column;gap:8px;min-height:220px;
+    }
+    .chatMsg{padding:8px 10px;border-radius:10px;background:var(--glass);border:1px solid var(--line);}
+    .chatMsgMeta{font-size:10px;color:var(--d);margin-bottom:3px;}
+    .chatMsgText{font-size:13px;color:var(--w);word-break:break-word;}
+    .chatComposer{display:flex;gap:8px;margin-top:10px;}
+    .chatComposer input{
+      flex:1;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:10px;padding:10px;color:var(--w);
+    }
+    .chatComposer input:focus{outline:none;border-color:var(--p0);}
+
     [data-theme="light"]{
       --bg0:#f4f0ff;--bg1:#ede6ff;--bg2:#e2d8ff;
       --w:#1a0040;--m:#4a2e8a;--d:#7b5fc0;
@@ -494,17 +509,38 @@
       <button class="sideNavBtn" onclick="openProfileWindow()">
         <span class="sideNavIcon">👤</span><span>Profil</span>
       </button>
+      <button class="sideNavBtn" onclick="openChatWindow()">
+        <span class="sideNavIcon">💬</span><span>Chatt</span>
+      </button>
       <button class="sideNavBtn" onclick="openExternal('https://app.supersigmamatteeducation.xo.je','Browser')">
         <span class="sideNavIcon">🌐</span><span>Browser</span>
       </button>
-      <button class="sideNavBtn" onclick="openExternal('UGS-Files/ai.html','AI')">
+      <button class="sideNavBtn" onclick="openExternal('https://studio.pickaxe.co/STUDIOGX4LHRY55GYHQ15/295XP68K97','AI')">
         <span class="sideNavIcon">🤖</span><span>AI</span>
+      </button>
+      <button class="sideNavBtn" onclick="openExternal('https://docs.google.com/forms/d/e/1FAIpQLScUxR7Ychb0ivMguYI-3BHwb8D3ZH2x7n1vkpXuYjNeVlU3Cg/viewform?usp=header','Förslag')">
+        <span class="sideNavIcon">📝</span><span>Förslag</span>
       </button>
       <button class="sideNavBtn" onclick="openExternal('https://alv3333.github.io/Coola-Mattespel-Soundboard.github.io/','Soundboard')">
         <span class="sideNavIcon">🔊</span><span>Soundboard</span>
       </button>
       <button class="sideNavBtn" onclick="showUpdates()">
         <span class="sideNavIcon">📢</span><span>Uppdateringar</span>
+      </button>
+      <button class="sideNavBtn" onclick="openQuestsWindow()">
+        <span class="sideNavIcon">📜</span><span>Quests</span>
+      </button>
+      <button class="sideNavBtn" onclick="openAchievementsWindow()">
+        <span class="sideNavIcon">🏆</span><span>Achievements</span>
+      </button>
+      <button class="sideNavBtn" onclick="openShopWindow()">
+        <span class="sideNavIcon">🛒</span><span>Shop</span>
+      </button>
+      <button class="sideNavBtn" onclick="openInventoryWindow()">
+        <span class="sideNavIcon">🎒</span><span>Inventory</span>
+      </button>
+      <button class="sideNavBtn" onclick="openRoadmapWindow()">
+        <span class="sideNavIcon">🗺️</span><span>Roadmap</span>
       </button>
     </nav>
 
@@ -524,8 +560,8 @@
         <span class="hintPill">👤 Profilsystem</span>
         <span class="hintPill">🌗 Ljus/Mörkt</span>
       </div>
-      <a class="discordJoin" href="https://discord.gg/fwk4ZmS9" target="_blank" rel="noopener noreferrer">
-        Joina discorden: https://discord.gg/fwk4ZmS9
+      <a class="discordJoin" href="https://discord.gg/j5AFhXTGvd" target="_blank" rel="noopener noreferrer">
+        Joina discorden: https://discord.gg/j5AFhXTGvd
       </a>
       <div class="onlineCount" id="onlineCount">...</div>
     </section>
@@ -621,6 +657,36 @@
     </div>
   </div>
 
+  <!-- CHAT WINDOW -->
+  <div class="panelOverlay" id="chatOverlay" onclick="if(event.target===this)closeChatWindow()">
+    <div class="appWin" style="width:min(760px,96vw);max-height:90vh">
+      <div class="winBar">
+        <div class="winBarTitle">💬 Chatt</div>
+        <button class="winClose" onclick="closeChatWindow()">✕</button>
+      </div>
+      <div class="appBody">
+        <div class="chatWrap">
+          <div class="chatHeader" id="chatHeader">Logga in för att chatta med vänner och andra spelare.</div>
+          <div class="formRow" style="margin-bottom:8px">
+            <select id="chatModeSelect" onchange="changeChatMode(this.value)" style="flex:1;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:10px;padding:8px;color:var(--w);font-size:12px">
+              <option value="global">Global</option>
+              <option value="friends">Friends</option>
+              <option value="private">Private</option>
+            </select>
+            <select id="chatFriendSelect" onchange="changeChatFriend(this.value)" style="flex:1;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:10px;padding:8px;color:var(--w);font-size:12px">
+              <option value="">Välj vän...</option>
+            </select>
+          </div>
+          <div class="chatLog" id="chatLog"></div>
+          <div class="chatComposer">
+            <input id="chatInput" maxlength="220" placeholder="Skriv ett meddelande..." />
+            <button class="pill primary" onclick="sendChatMessage()">Skicka</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- PUBLIC PROFILE CARD -->
   <div class="viewProfileOverlay" id="viewProfileOverlay" onclick="if(event.target===this)closeViewProfile()">
     <div class="profileViewCard" id="profileViewCard"></div>
@@ -631,23 +697,77 @@
     const ACCOUNTS_KEY = "cm_accounts_v4";
     const SESSION_KEY = "cm_session_user_v4";
     const USER_PREFIX = "cm_user_data_";
+    const FIREBASE_CONFIG_KEY = "cm_firebase_config_v1";
     const LOAD_MSGS = [
       "Laddar...", "Förbereder spel...", "Nästan klart...", "Optimerar gränssnitt...",
       "Sätter upp snabbstart..."
     ];
 
-    const FIREBASE_CONFIG = window.CM_FIREBASE_CONFIG || null;
+    let FIREBASE_CONFIG = null;
     let db = null;
     let presenceKey = null;
     let firebaseReady = false;
     let firebaseWarned = false;
     let gamesLoadedFromFirebase = false;
+    let chatUnsub = null;
+
+    const BULK_FILES_LIST_TEXT = `
+      clblooketHACK, clamongUsMULTIPLAYER, clgartic1234, clgarticPhone, clsummerRider3D, clNautilusOS, climposter, clworldguessr, clroblox,
+      cl1, cl10bullets, cl10minutestildawn, cl12minibattles, cl1on1soccer, cl1v1lol, cl1v1tennis, cl2048, cl2048cupcakes, cl2doom, cl2Dshooting,
+      cl3dash, cl3pandas, cl3pandasbrazil, cl3pandasfantasy, cl3pandasjapan, cl3pandasnight, cl3slices2, cl40xescape, cl4thandgoal, cl500calibercontractz,
+      cl60secondsburgerrun, cl60secondssantarun, cl8ballclassic, cl8ballpool, cl9007199254740992, cl99balls, cl99nightsitf, clabandoned3, clabsolutemadness,
+      clacecombat2, clacecombat3, clacegangstertaxi, clachievementunlocked, clachievmentunlocked, clachievmentunlocked2, clachievmentunlocked3, clachillies, clachillies2,
+      clADarkRoom, cladayintheoffice, clADOFAI, cladvancewars, cladvancewars2, cladventneon, clAdventureCapatalist, cladventurecapitalist, clagariolite, clageofwar, clageofwar2,
+      clagesofconflict, clahoysurvival, clai, clakoopasrevenge, clakoopasrevenge2, clakumanorgaiden, clalienhominid, clalienhominidgba, clalienskyinvasion, clalientransporter,
+      clalienvspredator, clallbossesin1, clallocation, clamaze, clamidstthesky, clamigopancho, clamigopancho2, clamigopancho3, clamigopancho4, clamigopancho5, clamigopancho6,
+      clamigopancho7, clamongus, clamorphous, clancientsins, clangry-birdsspace, clangrybirds-space, clangrybirds, clangrybirdsshowdown, clangrybirdsspace, clanimalcrossingwildworld,
+      clanotherworld, clapotris, clappleshooter, clappleworm, claquaparkio, clarceuslegend, clarcheryworldtour, clarena, clarmormayhem2, clarsonate, clascent, clasmallworldcup,
+      classesmentexaminationque, clasteroids, clasteroidsALT, clattackhole, clavalanche, claviamasters, claviamastersbuggy, clAwesomePirates, clawesomeplanes, clawesometanks, clawesometanks2
+    `;
 
     const RECOMMENDED = [
       { id: "clworldguessr", name: "WorldGuessr", emoji: "🌍", desc: "Gissa länder på Street View" },
       { id: "EaglercraftZ_1.11.2", name: "Eaglercraft 1.11.2", emoji: "⛰️", desc: "Minecraft i webbläsaren" },
       { id: "clsummerRider3D", name: "Summer Rider 3D", emoji: "🏄", desc: "Surfa vågorna i sommar" }
     ];
+
+    const QUESTS = [
+      {id:"q1",type:"minutes",game:"clsummerRider3D",target:15,reward:{coins:15,xp:0},title:"Sommarvärme",desc:"Spela SummerRider3D i 15 min"},
+      {id:"q2",type:"minutes",game:"cl1v1lol",target:6,reward:{coins:0,xp:15},title:"Arena Ready",desc:"Spela 1V1LOL i 6 min"},
+      ...Array.from({length:38},(_,i)=>({
+        id:`q${i+3}`,
+        type:i%2===0?"minutes":"plays",
+        game:["clrun3","clslope","clbasketballstars","clretrobowl","clminecraft1-8-8","clsmashkarts","clwordle","cldriftboss"][i%8],
+        target:i%2===0?8+(i%5)*2:2+(i%4),
+        reward:{coins:8+(i%6)*2,xp:6+(i%7)*2},
+        title:`Quest ${i+3}`,
+        desc:i%2===0?"Spela spelet i ett antal minuter":"Starta spelet flera gånger"
+      }))
+    ];
+
+    const ACHIEVEMENTS = [
+      {id:"a1",title:"Första steget",desc:"Spela 1 spel",check:d=>(d.gamesPlayed||0)>=1},
+      {id:"a2",title:"Level 5",desc:"Nå nivå 5",check:d=>getLevel(d.xp||0)>=5},
+      {id:"a3",title:"Level 10",desc:"Nå nivå 10",check:d=>getLevel(d.xp||0)>=10},
+      {id:"a4",title:"Vänlig",desc:"Lägg till 3 vänner",check:d=>(d.friends||[]).length>=3},
+      {id:"a5",title:"Samlare",desc:"Äg 10 shop-items",check:d=>(d.inventory?.owned||[]).length>=10},
+      {id:"a6",title:"Legend",desc:"Tjäna 500 coins",check:d=>(d.coins||0)>=500},
+      {id:"a7",title:"Questare",desc:"Slutför 10 quests",check:d=>(d.quests?.completed||[]).length>=10},
+      {id:"a8",title:"Quest Master",desc:"Slutför 25 quests",check:d=>(d.quests?.completed||[]).length>=25},
+      {id:"a9",title:"Favoritkung",desc:"Spara 10 favoriter",check:d=>(d.favorites||[]).length>=10},
+      {id:"a10",title:"Style Lord",desc:"Equip:a 3 dekorationer",check:d=>Object.values(d.inventory?.equipped||{}).filter(Boolean).length>=3}
+    ];
+
+    const SHOP_ITEMS = Array.from({length:40}, (_, i) => {
+      const slot = ["frame","badge","background","pet","effect"][i % 5];
+      return {
+        id: `item_${i+1}`,
+        slot,
+        name: `${slot.toUpperCase()} #${i+1}`,
+        price: 20 + (i * 7),
+        emoji: ["🖼️","🎖️","🌌","🐾","✨"][i % 5]
+      };
+    });
 
     // Fallback-lista, ersätts av Firebase om /games/filesList finns.
     const DEFAULT_GAMES = [
@@ -754,13 +874,27 @@
       page: 0,
       perPage: 60,
       currentGame: null,
-      currentIsExternal: false
+      currentIsExternal: false,
+      chatMode: "global",
+      chatFriend: "",
+      currentGameStartedAt: 0
     };
 
     function warnFirebaseMissingOnce() {
       if (firebaseWarned || firebaseReady) return;
       firebaseWarned = true;
       toast("Firebase saknas – kör lokal lagring tills config läggs in.");
+    }
+
+    function loadFirebaseConfig() {
+      const raw = localStorage.getItem(FIREBASE_CONFIG_KEY);
+      if (raw) {
+        try {
+          FIREBASE_CONFIG = JSON.parse(raw);
+          return;
+        } catch {}
+      }
+      FIREBASE_CONFIG = window.CM_FIREBASE_CONFIG || null;
     }
 
     function initFirebase() {
@@ -821,7 +955,7 @@
       const fromWindow = window.CM_FILES_LIST || window.filesList || window.CM_FILES_LIST_TEXT || [];
       const rawExtra = Array.isArray(fromWindow)
         ? fromWindow
-        : String(fromWindow).split(",");
+        : String(fromWindow || BULK_FILES_LIST_TEXT).split(",");
       const fallbackIds = DEFAULT_GAMES.map(g => g.id);
       const merged = sanitizeFilesList([...fallbackIds, ...rawExtra]);
       if (merged.length) GAMES = merged;
@@ -845,6 +979,25 @@
       }
     }
 
+    async function loadGamesFromTextFile() {
+      const candidates = ["files-list.txt", "filenames.txt", "UGS-Files/filenames.txt"];
+      for (const path of candidates) {
+        try {
+          const res = await fetch(path, { cache: "no-store" });
+          if (!res.ok) continue;
+          const txt = await res.text();
+          const raw = txt.split(/[\n,]+/g).map(x => x.trim()).filter(Boolean);
+          const sanitized = sanitizeFilesList(raw);
+          if (sanitized.length > 100) {
+            GAMES = sanitized;
+            gamesLoadedFromFirebase = false;
+            return true;
+          }
+        } catch {}
+      }
+      return false;
+    }
+
     function connectPresence() {
       if (!firebaseReady || !db) return;
       const onlineRef = db.ref("presence/online");
@@ -859,8 +1012,106 @@
       onlineRef.on("value", (snap) => {
         const count = snap.numChildren();
         const onlineEl = document.getElementById("onlineCount");
-        if (onlineEl) onlineEl.textContent = `${count || 1} aktiva spelare`;
+        if (onlineEl) onlineEl.textContent = `Aktiva spelare: ${Math.max(1, count || 0)}`;
       });
+    }
+
+    function normalizeRoomName(raw) {
+      return (raw || "global").trim().toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 40) || "global";
+    }
+
+    function getChatRoomKey() {
+      if (!state.user || !state.data) return "global";
+      if (state.chatMode === "global") return "global";
+      if (state.chatMode === "private") {
+        if (!state.chatFriend) return "global";
+        const pair = [state.user, state.chatFriend].map(x => sanitizeUsername(x).toLowerCase()).sort().join("_");
+        return `private_${normalizeRoomName(pair)}`;
+      }
+      const friends = [...(state.data.friends || []), state.user]
+        .map(x => sanitizeUsername(x).toLowerCase())
+        .filter(Boolean)
+        .sort();
+      if (!friends.length) return "global";
+      return `friends_${normalizeRoomName(friends.join("_"))}`;
+    }
+
+    function refreshChatFriendOptions() {
+      const sel = document.getElementById("chatFriendSelect");
+      if (!sel || !state.user || !state.data) return;
+      const friends = state.data.friends || [];
+      sel.innerHTML = `<option value="">Välj vän...</option>` + friends.map(f => `<option value="${f}">${f}</option>`).join("");
+      if (state.chatFriend) sel.value = state.chatFriend;
+    }
+
+    function changeChatMode(mode) {
+      state.chatMode = mode;
+      subscribeChat();
+    }
+
+    function changeChatFriend(friendName) {
+      state.chatFriend = friendName || "";
+      if (state.chatMode === "private") subscribeChat();
+    }
+
+    function renderChatMessages(rows) {
+      const log = document.getElementById("chatLog");
+      if (!log) return;
+      if (!rows.length) {
+        log.innerHTML = `<div style="font-size:12px;color:var(--d);text-align:center;padding:10px">Inga meddelanden än.</div>`;
+        return;
+      }
+      log.innerHTML = rows.map(r => `
+        <div class="chatMsg">
+          <div class="chatMsgMeta">${r.user || "Okänd"} • ${new Date(r.ts || Date.now()).toLocaleString("sv-SE")}</div>
+          <div class="chatMsgText">${(r.text || "").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>
+        </div>
+      `).join("");
+      log.scrollTop = log.scrollHeight;
+    }
+
+    function subscribeChat() {
+      const header = document.getElementById("chatHeader");
+      if (!header) return;
+      refreshChatFriendOptions();
+      if (!state.user || !state.data) {
+        header.textContent = "Logga in för att chatta med vänner och andra spelare.";
+        renderChatMessages([]);
+        return;
+      }
+      const roomKey = getChatRoomKey();
+      header.textContent = roomKey === "global"
+        ? "Global chatt (alla inloggade spelare)."
+        : (state.chatMode === "private" ? `Privat chatt med ${state.chatFriend || "vän"}.` : "Vänchatt (du + dina vänner).");
+      if (!firebaseReady || !db) {
+        header.textContent += " Firebase saknas, chatt är avstängd.";
+        renderChatMessages([]);
+        return;
+      }
+      if (typeof chatUnsub === "function") chatUnsub();
+      const chatRef = db.ref(`chatRooms/${roomKey}/messages`).limitToLast(80);
+      const cb = (snap) => {
+        const val = snap.val() || {};
+        const rows = Object.values(val).sort((a, b) => (a.ts || 0) - (b.ts || 0));
+        renderChatMessages(rows);
+      };
+      chatRef.on("value", cb);
+      chatUnsub = () => chatRef.off("value", cb);
+    }
+
+    function sendChatMessage() {
+      if (!requireLogin("Logga in för att använda chatten.")) return;
+      if (!firebaseReady || !db) return toast("Firebase krävs för chatt.");
+      const input = document.getElementById("chatInput");
+      const text = (input?.value || "").trim().slice(0, 220);
+      if (!text) return;
+      const roomKey = getChatRoomKey();
+      db.ref(`chatRooms/${roomKey}/messages`).push({
+        user: state.user,
+        text,
+        ts: Date.now()
+      });
+      input.value = "";
     }
 
     async function readUserData(username) {
@@ -897,6 +1148,10 @@
         gamesPlayed: 0,
         favorites: [],
         friends: [],
+        stats: { gameMinutes: {}, gamePlays: {} },
+        quests: { completed: [] },
+        achievements: [],
+        inventory: { owned: [], equipped: { frame: "", badge: "", background: "", pet: "", effect: "" } },
         settings: { darkMode: true },
         profile: {
           joinDate: new Date().toISOString().split("T")[0],
@@ -917,6 +1172,9 @@
         return {
           ...merged,
           ...parsed,
+          stats: { ...merged.stats, ...(parsed.stats || {}), gameMinutes: { ...(merged.stats.gameMinutes||{}), ...((parsed.stats||{}).gameMinutes||{}) }, gamePlays: { ...(merged.stats.gamePlays||{}), ...((parsed.stats||{}).gamePlays||{}) } },
+          quests: { ...merged.quests, ...(parsed.quests || {}) },
+          inventory: { ...merged.inventory, ...(parsed.inventory || {}), equipped: { ...merged.inventory.equipped, ...((parsed.inventory||{}).equipped||{}) } },
           settings: { ...merged.settings, ...(parsed.settings || {}) },
           profile: { ...merged.profile, ...(parsed.profile || {}) }
         };
@@ -1086,6 +1344,36 @@
       updateHUD();
     }
 
+    function trackGameSessionEnd() {
+      if (!state.user || !state.data || !state.currentGame || state.currentIsExternal) return;
+      if (!state.currentGameStartedAt) return;
+      const mins = Math.max(0, Math.floor((Date.now() - state.currentGameStartedAt) / 60000));
+      const gid = state.currentGame.id;
+      state.data.stats.gameMinutes[gid] = (state.data.stats.gameMinutes[gid] || 0) + mins;
+      evaluateQuestsAndAchievements();
+      saveCurrentUser();
+      state.currentGameStartedAt = 0;
+    }
+
+    function evaluateQuestsAndAchievements() {
+      if (!state.user || !state.data) return;
+      const completed = new Set(state.data.quests.completed || []);
+      QUESTS.forEach(q => {
+        if (completed.has(q.id)) return;
+        const minutes = state.data.stats.gameMinutes[q.game] || 0;
+        const plays = state.data.stats.gamePlays[q.game] || 0;
+        const ok = q.type === "minutes" ? minutes >= q.target : plays >= q.target;
+        if (ok) {
+          completed.add(q.id);
+          state.data.coins += q.reward.coins || 0;
+          state.data.xp += q.reward.xp || 0;
+          toast(`Quest klar: ${q.title}`);
+        }
+      });
+      state.data.quests.completed = [...completed];
+      state.data.achievements = ACHIEVEMENTS.filter(a => a.check(state.data)).map(a => a.id);
+    }
+
     function openSidebar() {
       document.getElementById("sidebar").classList.add("open");
       document.getElementById("sideOverlay").classList.add("open");
@@ -1249,6 +1537,7 @@
     }
 
     function openGame(gameId) {
+      trackGameSessionEnd();
       const game = GAMES.find(g => g.id === gameId);
       if (!game) return;
 
@@ -1273,7 +1562,10 @@
 
       if (state.user && state.data) {
         state.data.gamesPlayed = (state.data.gamesPlayed || 0) + 1;
+        state.data.stats.gamePlays[game.id] = (state.data.stats.gamePlays[game.id] || 0) + 1;
+        state.currentGameStartedAt = Date.now();
         gain(1, 2);
+        evaluateQuestsAndAchievements();
         saveCurrentUser();
         renderProfileWindow();
       }
@@ -1304,6 +1596,7 @@
     }
 
     function closeGame(scrollTop = true) {
+      trackGameSessionEnd();
       const panel = document.getElementById("inlineGamePanel");
       const frame = document.getElementById("gameFrame");
       panel.style.display = "none";
@@ -1442,14 +1735,18 @@
       applyDarkMode(localStorage.getItem("cm_dark_pref_v4") !== "0");
       closeProfileWindow();
       renderGames();
+      subscribeChat();
       toast("Utloggad.");
     }
 
     function afterLogin(message) {
+      evaluateQuestsAndAchievements();
       updateHUD();
       applyDarkMode(state.data?.settings?.darkMode !== false);
       renderGames();
       renderProfileWindow();
+      refreshChatFriendOptions();
+      subscribeChat();
       toast(message);
     }
 
@@ -1463,6 +1760,19 @@
 
     function closeProfileWindow() {
       document.getElementById("profileOverlay").classList.remove("open");
+    }
+
+    function openChatWindow() {
+      document.getElementById("chatOverlay").classList.add("open");
+      document.getElementById("chatModeSelect").value = state.chatMode;
+      refreshChatFriendOptions();
+      subscribeChat();
+      closeSidebar();
+      setTimeout(() => document.getElementById("chatInput")?.focus(), 0);
+    }
+
+    function closeChatWindow() {
+      document.getElementById("chatOverlay").classList.remove("open");
     }
 
     function handleProfileAvatarUpload(input) {
@@ -1539,6 +1849,8 @@
       inp.value = "";
       toast("Vän tillagd.");
       renderProfileWindow();
+      refreshChatFriendOptions();
+      subscribeChat();
     }
 
     function removeFriend(name) {
@@ -1546,6 +1858,8 @@
       state.data.friends = (state.data.friends || []).filter(f => f !== name);
       saveCurrentUser();
       renderProfileWindow();
+      refreshChatFriendOptions();
+      subscribeChat();
       toast("Vän borttagen.");
     }
 
@@ -1590,6 +1904,8 @@
         state.data.friends.push(name);
         saveCurrentUser();
         renderProfileWindow();
+        refreshChatFriendOptions();
+        subscribeChat();
         toast("Vän tillagd.");
       }
     }
@@ -1650,6 +1966,9 @@
                 <div class="statBox"><span>${(state.data.favorites || []).length}</span><small>Favoriter</small></div>
                 <div class="statBox"><span>${(state.data.gamesPlayed || 0)}</span><small>Spelade</small></div>
               </div>
+              <div style="margin-top:8px;font-size:11px;color:var(--d)">
+                Equipped: ${Object.values(state.data.inventory?.equipped || {}).filter(Boolean).length} items
+              </div>
 
               <div class="formGroup" style="margin-top:10px">
                 <label>Status</label>
@@ -1698,6 +2017,14 @@
               <h4>Bläddra profiler</h4>
               <input id="profileSearchInput" oninput="renderUsersBrowser(this.value)" placeholder="Sök användare..." style="width:100%;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:10px;padding:8px 10px;color:var(--w);font-size:12px;margin-bottom:8px" />
               <div id="profileSearchResults"></div>
+            </div>
+
+            <div class="profileCard" style="margin-top:10px">
+              <h4>Egen Firebase Config</h4>
+              <textarea id="firebaseConfigInput" placeholder='{"apiKey":"...","databaseURL":"..."}' style="width:100%;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:10px;padding:8px;color:var(--w);font-size:11px;min-height:90px">${localStorage.getItem(FIREBASE_CONFIG_KEY) || ""}</textarea>
+              <div class="formRow" style="margin-top:8px">
+                <button class="miniBtn ok" onclick="saveCustomFirebaseConfig()">Spara config</button>
+              </div>
             </div>
           </div>
         </div>
@@ -1776,6 +2103,24 @@
       document.getElementById("viewProfileOverlay").classList.remove("open");
     }
 
+    function saveCustomFirebaseConfig() {
+      const el = document.getElementById("firebaseConfigInput");
+      if (!el) return;
+      const raw = (el.value || "").trim();
+      if (!raw) {
+        localStorage.removeItem(FIREBASE_CONFIG_KEY);
+        toast("Firebase config rensad.");
+        return;
+      }
+      try {
+        JSON.parse(raw);
+        localStorage.setItem(FIREBASE_CONFIG_KEY, raw);
+        toast("Firebase config sparad. Ladda om sidan.");
+      } catch {
+        toast("Ogiltig JSON för Firebase config.");
+      }
+    }
+
     function showUpdates() {
       closeSidebar();
       closeGame(false);
@@ -1809,6 +2154,119 @@
       document.body.appendChild(panel);
     }
 
+    function openRoadmapWindow() {
+      closeSidebar();
+      const milestones = [
+        "Q1: Stabil Firebase sync + privat/global chatt",
+        "Q2: Full quest-kedja + säsongs achievements",
+        "Q3: Guilds, turneringar och leaderboard",
+        "Q4: Daily events + cosmetics bundles"
+      ];
+      quickPanel("🗺️ Roadmap", milestones);
+    }
+
+    function openQuestsWindow() {
+      if (!requireLogin()) return;
+      evaluateQuestsAndAchievements();
+      const rows = QUESTS.map(q => {
+        const done = (state.data.quests.completed || []).includes(q.id);
+        const progress = q.type === "minutes"
+          ? `${Math.min(q.target, state.data.stats.gameMinutes[q.game] || 0)}/${q.target} min`
+          : `${Math.min(q.target, state.data.stats.gamePlays[q.game] || 0)}/${q.target} starter`;
+        return `${done ? "✅" : "🕒"} ${q.title} • ${progress} • Reward ${q.reward.coins || 0}🪙 / ${q.reward.xp || 0}XP`;
+      });
+      quickPanel("📜 Quests (40st)", rows);
+    }
+
+    function openAchievementsWindow() {
+      if (!requireLogin()) return;
+      evaluateQuestsAndAchievements();
+      const unlocked = new Set(state.data.achievements || []);
+      const rows = ACHIEVEMENTS.map(a => `${unlocked.has(a.id) ? "🏆" : "🔒"} ${a.title} – ${a.desc}`);
+      quickPanel("🏆 Achievements (10st)", rows);
+    }
+
+    function buyShopItem(itemId) {
+      if (!requireLogin()) return;
+      const item = SHOP_ITEMS.find(x => x.id === itemId);
+      if (!item) return;
+      if ((state.data.inventory.owned || []).includes(itemId)) return toast("Du äger redan den.");
+      if ((state.data.coins || 0) < item.price) return toast("Inte tillräckligt med coins.");
+      state.data.coins -= item.price;
+      state.data.inventory.owned.push(itemId);
+      saveCurrentUser();
+      updateHUD();
+      toast(`Köpte ${item.name}`);
+      openShopWindow();
+    }
+
+    function equipItem(itemId) {
+      if (!requireLogin()) return;
+      if (!(state.data.inventory.owned || []).includes(itemId)) return;
+      const item = SHOP_ITEMS.find(x => x.id === itemId);
+      if (!item) return;
+      state.data.inventory.equipped[item.slot] = itemId;
+      saveCurrentUser();
+      toast(`Equipped ${item.name}`);
+      openInventoryWindow();
+      renderProfileWindow();
+    }
+
+    function unequipSlot(slot) {
+      if (!requireLogin()) return;
+      state.data.inventory.equipped[slot] = "";
+      saveCurrentUser();
+      openInventoryWindow();
+      renderProfileWindow();
+    }
+
+    function openShopWindow() {
+      if (!requireLogin()) return;
+      const rows = SHOP_ITEMS.map(it => {
+        const owned = (state.data.inventory.owned || []).includes(it.id);
+        return `${it.emoji} ${it.name} (${it.slot}) • ${it.price}🪙 ${owned ? "• ÄGD" : `• <button class='miniBtn ok' onclick=\"buyShopItem('${it.id}')\">Köp</button>`}`;
+      });
+      quickPanel("🛒 Shop (40 items)", rows, true);
+    }
+
+    function openInventoryWindow() {
+      if (!requireLogin()) return;
+      const owned = (state.data.inventory.owned || []).map(id => SHOP_ITEMS.find(x => x.id === id)).filter(Boolean);
+      const equipped = state.data.inventory.equipped || {};
+      const head = Object.keys(equipped).map(slot => {
+        const item = SHOP_ITEMS.find(x => x.id === equipped[slot]);
+        return `• ${slot}: ${item ? item.name : "Ingen"} <button class='miniBtn danger' onclick=\"unequipSlot('${slot}')\">Unequip</button>`;
+      });
+      const rows = [
+        ...head,
+        "— Ägda items —",
+        ...(owned.length ? owned.map(it => `${it.emoji} ${it.name} (${it.slot}) <button class='miniBtn ok' onclick=\"equipItem('${it.id}')\">Equip</button>`) : ["Inga items än."])
+      ];
+      quickPanel("🎒 Inventory", rows, true);
+    }
+
+    function quickPanel(title, rows, allowHtml = false) {
+      closeSidebar();
+      const panel = document.createElement("div");
+      panel.id = "quickTempPanel";
+      panel.className = "panelOverlay open";
+      panel.onclick = (e) => { if (e.target === panel) panel.remove(); };
+      panel.innerHTML = `
+        <div class="appWin" style="width:min(760px,96vw);max-height:88vh">
+          <div class="winBar">
+            <div class="winBarTitle">${title}</div>
+            <button class="winClose" onclick="document.getElementById('quickTempPanel').remove()">✕</button>
+          </div>
+          <div class="appBody">
+            <div style="display:grid;gap:8px">
+              ${rows.map(r => `<div style="padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--glass);font-size:13px;color:var(--m)">${allowHtml ? r : String(r).replace(/</g, "&lt;")}</div>`).join("")}
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(panel);
+    }
+
     document.getElementById("searchInput").addEventListener("input", (e) => {
       state.search = e.target.value.trim();
       state.page = 0;
@@ -1820,6 +2278,10 @@
       renderGames();
     });
 
+    document.getElementById("chatInput").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") sendChatMessage();
+    });
+
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
         closeSidebar();
@@ -1829,13 +2291,15 @@
 
     (async function init() {
       showPageLoader("Laddar Coola Mattespel...");
+      loadFirebaseConfig();
       const hasFirebase = initFirebase();
       if (hasFirebase) {
         await loadGamesFromFirebase();
         connectPresence();
       }
       if (!gamesLoadedFromFirebase) {
-        mergeCurrentFilesListWithExtra();
+        const loadedFromTxt = await loadGamesFromTextFile();
+        if (!loadedFromTxt) mergeCurrentFilesListWithExtra();
       }
 
       renderRecommended();
@@ -1845,6 +2309,7 @@
       if (sessionUser && accounts[sessionUser.toLowerCase()]) {
         state.user = sessionUser;
         state.data = getUserData(sessionUser);
+        evaluateQuestsAndAchievements();
       }
 
       updateHUD();
@@ -1860,12 +2325,12 @@
         warnFirebaseMissingOnce();
         const onlineEl = document.getElementById("onlineCount");
         let online = 80 + Math.floor(Math.random() * 50);
-        onlineEl.textContent = `${online} online nu`;
+        onlineEl.textContent = `Aktiva spelare: ${online}`;
         setInterval(() => {
           online += Math.floor(Math.random() * 5) - 2;
           if (online < 40) online = 40;
           if (online > 180) online = 180;
-          onlineEl.textContent = `${online} online nu`;
+          onlineEl.textContent = `Aktiva spelare: ${online}`;
         }, 3500);
       }
 
