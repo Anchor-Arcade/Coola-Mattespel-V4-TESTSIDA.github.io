@@ -1266,6 +1266,11 @@
           <h4 style="margin-top:12px;">🔎 Browsa profiler</h4>
           <div class="chat-row"><input id="profileBrowseInput" class="chat-input" placeholder="Sök username..." oninput="renderProfileBrowser()" /></div>
           <div id="profileBrowseList" class="info-card"></div>
+          <h4 style="margin-top:12px;">✏️ Redigera profil</h4>
+          <input id="profileStatusInput" class="chat-input" maxlength="60" placeholder="Status (max 60 tecken)" />
+          <input id="profileBioInput" class="chat-input" maxlength="150" placeholder="Bio / About me (max 150 tecken)" />
+          <input id="profileFeaturedItemInput" class="chat-input" maxlength="40" placeholder="Featured item ID (lämna tomt för inget)" />
+          <button class="chat-send" onclick="saveProfileDetails()">Spara profil</button>
         </div>
       </div>
       <div class="profile-actions" style="margin-top:10px;">
@@ -1707,6 +1712,10 @@ const firebaseConfig = {
 
     function sanitizeText(v) {
       return (v || "").replace(/\s+/g, " ").trim().slice(0, 200);
+    }
+
+    function sanitizeProfileText(v, maxLen) {
+      return (v || "").replace(/\s+/g, " ").trim().slice(0, maxLen);
     }
 const bannedWords = [
   "nigger",
@@ -2287,7 +2296,7 @@ function showInventory() {
       const ref = db.ref("accounts").push();
       const quests = {};
       questsConfig.forEach((q) => { quests[q.id] = { progressMs: 0, claimed: false }; });
-      await ref.set({ email, username, usernameLower: username.toLowerCase(), password, coins: 0, xp: 0, verified: false, banned: false, timeoutUntil: 0, createdAt: Date.now(), lastQuestReset: getTodayKey(), quests, inventory: {}, equipped: {}, rewardedLevel: 1 });
+      await ref.set({ email, username, usernameLower: username.toLowerCase(), password, coins: 0, xp: 0, verified: false, banned: false, timeoutUntil: 0, createdAt: Date.now(), lastQuestReset: getTodayKey(), quests, inventory: {}, equipped: {}, rewardedLevel: 1, status: "", bio: "", featuredItem: "" });
       alert("Konto skapat! Logga in nu.");
     }
 
@@ -2451,9 +2460,15 @@ function showInventory() {
 
     function renderProfile() {
       const profileStylePreview = document.getElementById("profileStylePreview");
+      const profileStatusInput = document.getElementById("profileStatusInput");
+      const profileBioInput = document.getElementById("profileBioInput");
+      const profileFeaturedItemInput = document.getElementById("profileFeaturedItemInput");
       if (!currentUser) {
         profileInfoEl.innerHTML = "Inte inloggad.";
         if (profileStylePreview) profileStylePreview.textContent = "Ingen profil att visa.";
+        if (profileStatusInput) profileStatusInput.value = "";
+        if (profileBioInput) profileBioInput.value = "";
+        if (profileFeaturedItemInput) profileFeaturedItemInput.value = "";
         friendRequestsEl.innerHTML = "";
         friendsListEl.innerHTML = "";
         privateChatEl.style.display = "none";
@@ -2465,6 +2480,9 @@ function showInventory() {
       const lv = getLevelFromXp(currentUser.xp || 0);
       profileInfoEl.innerHTML = `Inloggad som <b>${getDisplayUsername()}</b><br>Mail: ${currentUser.email}<br>Coins: ${currentUser.coins || 0}<br>XP: ${currentUser.xp || 0}<br>Level: ${lv.level}<br>Shop-effekter i profil: ${ownedEffects.length ? ownedEffects.join(", ") : "Inga köpta ännu."}`;
       if (profileStylePreview) profileStylePreview.innerHTML = buildProfileVisual(currentUser);
+      if (profileStatusInput) profileStatusInput.value = currentUser.status || "";
+      if (profileBioInput) profileBioInput.value = currentUser.bio || "";
+      if (profileFeaturedItemInput) profileFeaturedItemInput.value = currentUser.featuredItem || "";
       db.ref(`friend-requests/${currentUser.id}`).on("value", (snap) => {
         friendRequestsEl.innerHTML = "<b>Vänförfrågningar (måste accepteras)</b><br>";
         if (!snap.exists()) { friendRequestsEl.innerHTML += "Inga."; return; }
@@ -2484,6 +2502,15 @@ function showInventory() {
         }
       });
       renderProfileBrowser();
+    }
+
+    async function saveProfileDetails() {
+      if (!currentUser || !db) return alert("Logga in först.");
+      const status = sanitizeProfileText(document.getElementById("profileStatusInput")?.value || "", 60);
+      const bio = sanitizeProfileText(document.getElementById("profileBioInput")?.value || "", 150);
+      const featuredItem = sanitizeProfileText(document.getElementById("profileFeaturedItemInput")?.value || "", 40);
+      await db.ref(`accounts/${currentUser.id}`).update({ status, bio, featuredItem });
+      alert("Profilen sparades.");
     }
 
     async function sendFriendRequestToUsername(name) {
@@ -2606,9 +2633,15 @@ function showInventory() {
       const dynamicStyle = glowLayers
         ? `style="border-color: rgba(255,255,255,.32); box-shadow: ${glowLayers}, 0 14px 24px rgba(0,0,0,.35);"`
         : "";
+      const status = sanitizeProfileText(user?.status || "", 60);
+      const bio = sanitizeProfileText(user?.bio || "", 150);
+      const featuredItem = sanitizeProfileText(user?.featuredItem || "", 40);
 
       return `<div class="profile-visual-card" ${dynamicStyle}>
         <div class="profile-visual-name">${user?.username || "Gäst"}${user?.verified ? " ✔️" : ""}</div>
+        <div class="profile-stat" style="margin-top:8px;">💬 Status: <b>${status || "Ingen status ännu."}</b></div>
+        <div class="profile-stat" style="margin-top:8px;">📝 Bio: ${bio || "Ingen bio ännu."}</div>
+        <div class="profile-stat" style="margin-top:8px;">⭐ Featured item: <b>${featuredItem || "Ingen vald"}</b></div>
         <div class="profile-visual-stats">
           <div class="profile-stat">🏅 Level <b>${lv.level}</b></div>
           <div class="profile-stat">✨ XP <b>${user?.xp || 0}</b></div>
