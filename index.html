@@ -35,11 +35,11 @@ html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:var
 .menuBtn:hover{background:rgba(123,44,255,.2);}
 .menuBtn span{display:block;width:20px;height:2px;background:var(--p1);border-radius:2px;}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
-.logo{width:32px;height:32px;border-radius:11px;overflow:hidden;background:radial-gradient(circle at 30% 25%,var(--p1),var(--p0));display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;border:1px solid rgba(255,255,255,.18);box-shadow:0 6px 16px rgba(0,0,0,.45),0 0 0 1px rgba(123,44,255,.25) inset;}
+.logo{width:32px;height:32px;border-radius:0;overflow:visible;background:transparent;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;border:none;box-shadow:none;}
 .logo img{width:100%;height:100%;object-fit:cover;}
 .logoEmoji{font-size:22px;}
 .logoInner{width:100%;height:100%;display:flex;align-items:center;justify-content:center;}
-.spark{position:absolute;border-radius:50%;background:var(--p1);animation:sparkle 2s ease-in-out infinite;}
+.spark{display:none;}
 .spark.s2{width:4px;height:4px;top:6px;right:8px;animation-delay:-.7s;}
 .spark.s3{width:3px;height:3px;bottom:8px;left:6px;animation-delay:-1.4s;}
 @keyframes sparkle{0%,100%{opacity:.2;transform:scale(.8);}50%{opacity:1;transform:scale(1.3);}}
@@ -1109,10 +1109,8 @@ var _profileCache={};
 function _fetchUserProfile(u,cb){
   var now=Date.now();var c=_profileCache[u];
   if(c&&(now-c.ts)<600000){cb(c.data);return;}
-  if(!_sb){cb(null);return;}
-  _sb.from('user_data').select('*').eq('username',u).single()
-    .then(function(r){var d=r.data||null;if(d)_profileCache[u]={data:d,ts:Date.now()};cb(d);})
-    .catch(function(){cb(null);});
+  if(!_firestore){cb(null);return;}
+  _firestore.collection('user_data').doc(u).get().then(function(doc){var d=(doc&&doc.data)?doc.data():null;if(d)_profileCache[u]={data:d,ts:Date.now()};cb(d);}).catch(function(){cb(null);});
 }
 function saveState(){
   if(!state.user)return;
@@ -2143,24 +2141,27 @@ function _renderChatMsgs(msgs){
     });
   });
 }
+function _chatCol(){return _firestore?_firestore.collection('chat_messages'):null;}
+function _fetchChat(cb){var c=_chatCol();if(!c){cb([]);return;}c.orderBy('timestamp','asc').limit(300).get().then(function(snap){var arr=[];snap.forEach(function(d){arr.push(d.data()||{});});cb(arr);}).catch(function(){cb([]);});}
+function _insertChat(doc,cb){var c=_chatCol();if(!c){cb&&cb(false);return;}c.add(doc).then(function(){cb&&cb(true);}).catch(function(){cb&&cb(false);});}
 function loadChatMsgs(){
-  if(_sb){
-    _sb.from("chat_messages").select("*").order("timestamp",{ascending:true}).limit(200)
-      .then(function(res){
-        if(res.error||!res.data)return;
-        var msgs=res.data.map(function(r){return{user:r.username,text:r.text,ts:r.timestamp,isAdmin:r.is_admin};});
-        _renderChatMsgs(msgs);
-      });
+  var sel=document.getElementById('chatTarget');if(sel&&state.user){
+    var friends=JSON.parse(localStorage.getItem('friends_'+state.user)||'[]');
+    sel.innerHTML='<option value="">Alla</option>'+friends.map(function(f){return '<option value="'+f+'">Privat: '+f+'</option>';}).join('');
+  }
+  if(_firestore){
+    _fetchChat(function(rows){
+      var msgs=rows.map(function(r){return{user:r.username||r.user||'?',text:r.text||'',ts:r.timestamp||Date.now(),isAdmin:!!r.is_admin,to:r.to||null,verified:!!r.verified};});
+      msgs=msgs.filter(function(m){return !m.to||m.to==='all'||m.to===state.user||m.user===state.user;});
+      _renderChatMsgs(msgs);
+    });
     return;
   }
   var msgs=JSON.parse(localStorage.getItem('globalChat')||'[]');
   msgs=msgs.filter(function(m){return !m.to||m.to===state.user||m.user===state.user;});
   _renderChatMsgs(msgs);
-  var sel=document.getElementById('chatTarget');if(sel&&state.user){
-    var friends=JSON.parse(localStorage.getItem('friends_'+state.user)||'[]');
-    sel.innerHTML='<option value=\"\">Alla</option>'+friends.map(function(f){return '<option value=\"'+f+'\">Privat: '+f+'</option>';}).join('');
-  }
 }
+
 function sendChat(){
   if(!state.user){toast("Logga in för att chatta");return;}
   var _cd=new Date().toDateString();var _ck='chatSent_'+state.user+'_'+_cd;
@@ -2176,13 +2177,11 @@ function sendChat(){
   }
   var msg={user:state.user,text:txt,ts:Date.now(),isAdmin:!!state.isAdmin,to:to||null,verified:isVerifiedUser(state.user)};
   inp.value="";updateQuests('chat');
-  if(_sb){
-    _sb.from("chat_messages").insert({username:state.user,text:txt,timestamp:msg.ts,is_admin:!!state.isAdmin})
-      .then(function(){loadChatMsgs();}).catch(function(){
-        // fallback
-        var msgs=JSON.parse(localStorage.getItem("globalChat")||"[]");
-        msgs.push(msg);localStorage.setItem("globalChat",JSON.stringify(msgs));loadChatMsgs();
-      });
+  if(_firestore){
+    _insertChat({username:state.user,text:txt,timestamp:msg.ts,is_admin:!!state.isAdmin,to:to||'all',verified:isVerifiedUser(state.user)},function(ok){
+      if(!ok){var msgs=JSON.parse(localStorage.getItem("globalChat")||"[]");msgs.push(msg);localStorage.setItem("globalChat",JSON.stringify(msgs));}
+      loadChatMsgs();
+    });
   }else{
     var msgs=JSON.parse(localStorage.getItem("globalChat")||"[]");
     msgs.push(msg);if(msgs.length>300)msgs.splice(0,msgs.length-300);
@@ -2201,12 +2200,12 @@ function submitSuggestion(){
   if(state.user)addCoins(5,"Skickade förslag");
 }
 
-function adminBroadcast(){var msg=document.getElementById('adminBroadcastMsg');if(!msg||!msg.value.trim())return toast('Skriv ett meddelande','error');var txt='📢 '+msg.value.trim();if(_sb){_sb.from('chat_messages').insert({username:'[ADMIN]',text:txt,timestamp:Date.now(),is_admin:true}).then(function(){loadChatMsgs();});}else{var msgs=JSON.parse(localStorage.getItem('globalChat')||'[]');msgs.push({user:'[ADMIN]',text:txt,ts:Date.now(),isAdmin:true});localStorage.setItem('globalChat',JSON.stringify(msgs));}msg.value='';toast('Broadcast skickat!','ok');if(document.getElementById('chatMessages'))loadChatMsgs();}
+function adminBroadcast(){var msg=document.getElementById('adminBroadcastMsg');if(!msg||!msg.value.trim())return toast('Skriv ett meddelande','error');var txt='📢 '+msg.value.trim();if(_firestore){_insertChat({username:'[ADMIN]',text:txt,timestamp:Date.now(),is_admin:true,to:'all',verified:true},function(){loadChatMsgs();});}else{var msgs=JSON.parse(localStorage.getItem('globalChat')||'[]');msgs.push({user:'[ADMIN]',text:txt,ts:Date.now(),isAdmin:true,to:'all'});localStorage.setItem('globalChat',JSON.stringify(msgs));}msg.value='';toast('Broadcast skickat!','ok');if(document.getElementById('chatMessages'))loadChatMsgs();}
 function adminGiveCoins(){var uEl=document.getElementById('adminCoinUser');var aEl=document.getElementById('adminCoinAmount');if(!uEl||!aEl||!uEl.value.trim())return toast('Ange ett användarnamn','error');var amount=parseInt(aEl.value)||0;if(amount<=0)return toast('Ange ett giltigt antal mynt','error');if(uEl.value.trim()===state.user){state.coins+=amount;saveState();updateHUD();}else{var key='jspel_'+uEl.value.trim();var data=JSON.parse(localStorage.getItem(key)||'{}');data.coins=(data.coins||0)+amount;localStorage.setItem(key,JSON.stringify(data));}toast(amount+' mynt gavs till '+uEl.value.trim(),'ok');uEl.value='';aEl.value='';renderAdminPanel();}
 function adminKick(u){if(u===state.user)return toast('Kan inte kicka dig själv','error');toast(u+' kickades','ok');}
 function adminBan(u){if(u===state.user)return toast('Kan inte banna dig själv','error');var banned=JSON.parse(localStorage.getItem('bannedUsers')||'[]');if(banned.indexOf(u)<0){banned.push(u);localStorage.setItem('bannedUsers',JSON.stringify(banned));}toast(u+' bannades','ok');renderAdminPanel();}
 function adminUnban(u){var banned=JSON.parse(localStorage.getItem('bannedUsers')||'[]');var idx=banned.indexOf(u);if(idx>=0){banned.splice(idx,1);localStorage.setItem('bannedUsers',JSON.stringify(banned));}toast(u+' avbannades','ok');renderAdminPanel();}
-function adminClearChat(){if(!confirm('Rensa all chatt?'))return;localStorage.setItem('globalChat','[]');toast('Chatten rensades','ok');renderAdminPanel();if(document.getElementById('chatMessages'))loadChatMsgs();}
+function adminClearChat(){if(!confirm('Rensa all chatt?'))return;localStorage.setItem('globalChat','[]');if(_firestore){_chatCol().get().then(function(snap){var b=_firestore.batch();snap.forEach(function(d){b.delete(d.ref);});return b.commit();}).catch(function(){});}toast('Chatten rensades','ok');renderAdminPanel();if(document.getElementById('chatMessages'))loadChatMsgs();}
 function showSiteAnnouncements(){
   var ann=JSON.parse(localStorage.getItem('admin_announcements')||'[]');
   var dismissed=JSON.parse(localStorage.getItem('dismissed_announcements')||'[]');
