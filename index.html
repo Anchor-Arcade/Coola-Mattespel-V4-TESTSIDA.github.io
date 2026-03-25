@@ -442,17 +442,17 @@ html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:var
     <button class="sideNavBtn" onclick="goHome()"><span class="sideNavIcon">🏠</span><span class="sideNavLabel">Hem</span></button>
     <button class="sideNavBtn active" data-tab="favoriter" onclick="openPanelOverlay('fav')"><span class="sideNavIcon">⭐</span><span class="sideNavLabel" data-i18n="nav_favs">Favorites</span></button>
     <button class="sideNavBtn" onclick="openProfileWindow()"><span class="sideNavIcon">👤</span><span class="sideNavLabel" data-i18n="nav_profile">Profile</span></button>
-    <button class="sideNavBtn" onclick="openThemesWindow()"><span class="sideNavIcon">🎨</span><span class="sideNavLabel" data-i18n="nav_themes">Themes</span></button>
     <button class="sideNavBtn" onclick="closeSidebar();openPanelOverlay('forslag')"><span class="sideNavIcon">💡</span><span class="sideNavLabel" data-i18n="nav_suggest">Förslag</span></button>
+    <button class="sideNavBtn" onclick="openSoundboardWindow()"><span class="sideNavIcon">🎵</span><span class="sideNavLabel">Soundboard</span></button>
+    <button class="sideNavBtn" onclick="openBrowser('ai')"><span class="sideNavIcon">🤖</span><span class="sideNavLabel">AI</span></button>
+    <button class="sideNavBtn" onclick="openBrowser('browser')"><span class="sideNavIcon">🌐</span><span class="sideNavLabel">Browser</span></button>
     <button class="sideNavBtn" onclick="closeSidebar();openPanelOverlay('quests')"><span class="sideNavIcon">📋</span><span class="sideNavLabel">Quests</span></button>
     <button class="sideNavBtn" data-tab="butik" onclick="openPanelOverlay('butik')"><span class="sideNavIcon">🛒</span><span class="sideNavLabel">Shop</span></button>
-    <button class="sideNavBtn" onclick="closeSidebar();openPanelOverlay('settings')"><span class="sideNavIcon">⚙️</span><span class="sideNavLabel" data-i18n="nav_settings">Settings</span></button>
-    <button class="sideNavBtn" onclick="openSoundboardWindow()"><span class="sideNavIcon">🎵</span><span class="sideNavLabel">Soundboard</span></button>
     <button class="sideNavBtn" onclick="closeSidebar();openChat()"><span class="sideNavIcon">💬</span><span class="sideNavLabel" data-i18n="nav_chat">Chat</span></button>
     <button class="sideNavBtn" onclick="closeSidebar();openPanelOverlay('achievements')"><span class="sideNavIcon">🏅</span><span class="sideNavLabel">Achievements</span></button>
-    <button class="sideNavBtn" onclick="openBrowser('browser')"><span class="sideNavIcon">🌐</span><span class="sideNavLabel">Browser</span></button>
-    <button class="sideNavBtn" onclick="openBrowser('ai')"><span class="sideNavIcon">🤖</span><span class="sideNavLabel">AI</span></button>
     <button class="sideNavBtn" onclick="closeSidebar();openInventoryWindow()"><span class="sideNavIcon">🎒</span><span class="sideNavLabel">Inventory</span></button>
+    <button class="sideNavBtn" onclick="openThemesWindow()"><span class="sideNavIcon">🎨</span><span class="sideNavLabel" data-i18n="nav_themes">Themes</span></button>
+    <button class="sideNavBtn" onclick="closeSidebar();openPanelOverlay('settings')"><span class="sideNavIcon">⚙️</span><span class="sideNavLabel" data-i18n="nav_settings">Settings</span></button>
   </nav>
   <div class="sideContent" id="sideContent">
     <div class="sidePanel active" id="panel_favoriter"></div>
