@@ -35,7 +35,7 @@ html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:var
 .menuBtn:hover{background:rgba(123,44,255,.2);}
 .menuBtn span{display:block;width:20px;height:2px;background:var(--p1);border-radius:2px;}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
-.logo{width:32px;height:32px;border-radius:12px;overflow:hidden;background:linear-gradient(135deg,var(--p2),var(--p0));display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;}
+.logo{width:32px;height:32px;border-radius:11px;overflow:hidden;background:radial-gradient(circle at 30% 25%,var(--p1),var(--p0));display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;border:1px solid rgba(255,255,255,.18);box-shadow:0 6px 16px rgba(0,0,0,.45),0 0 0 1px rgba(123,44,255,.25) inset;}
 .logo img{width:100%;height:100%;object-fit:cover;}
 .logoEmoji{font-size:22px;}
 .logoInner{width:100%;height:100%;display:flex;align-items:center;justify-content:center;}
@@ -166,7 +166,7 @@ html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:var
 .searchWrap input:focus{outline:none;border-color:var(--p0);}
 .searchWrap::before{content:'🔍';position:absolute;left:36px;top:11px;font-size:14px;pointer-events:none;}
 .gamesGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;padding:0 24px 24px;}
-.gameCard{border-radius:14px;background:var(--glass);border:1px solid var(--line);overflow:hidden;cursor:pointer;transition:transform .2s,box-shadow .2s,border-color .2s;position:relative;display:flex;flex-direction:column;}
+.gameCard{border-radius:14px;background:linear-gradient(180deg,rgba(0,0,0,.28),rgba(0,0,0,.5)),var(--glass);border:1px solid rgba(123,44,255,.35);overflow:hidden;cursor:pointer;transition:transform .2s,box-shadow .2s,border-color .2s;position:relative;display:flex;flex-direction:column;}
 .gameCard:hover{transform:translateY(-4px);box-shadow:var(--shadow2);border-color:rgba(181,108,255,.4);}
 .gameCard.locked .gameThumb::after{content:'🔒';position:absolute;top:6px;right:8px;font-size:13px;}
 .gameThumb{height:90px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
@@ -406,7 +406,7 @@ html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:var
 
 <header class="topbar">
   <button class="menuBtn" onclick="openSidebar()" aria-label="Meny"><span></span><span></span><span></span></button>
-  <a class="brand" href="#">
+  <a class="brand" href="#" onclick="event.preventDefault();goHome()" title="Hem">
     <div class="logo"><div class="spark s2"></div><div class="spark s3"></div>
       <div class="logoInner"><img src="logo.png" alt="Logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
       <span class="logoEmoji" style="display:none">🎮</span></div></div>
@@ -438,6 +438,7 @@ html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:var
 <div class="sidebar" id="sidebar">
   <div class="sideHead"><h3>🎮 Meny</h3><button class="closeBtn" onclick="closeSidebar()">✕</button></div>
   <nav class="sideNavList">
+    <button class="sideNavBtn" onclick="goHome()"><span class="sideNavIcon">🏠</span><span class="sideNavLabel">Hem</span></button>
     <button class="sideNavBtn active" data-tab="favoriter" onclick="openPanelOverlay('fav')"><span class="sideNavIcon">⭐</span><span class="sideNavLabel" data-i18n="nav_favs">Favorites</span></button>
     <button class="sideNavBtn" onclick="openProfileWindow()"><span class="sideNavIcon">👤</span><span class="sideNavLabel" data-i18n="nav_profile">Profile</span></button>
     <button class="sideNavBtn" onclick="openThemesWindow()"><span class="sideNavIcon">🎨</span><span class="sideNavLabel" data-i18n="nav_themes">Themes</span></button>
@@ -1443,6 +1444,25 @@ function maybeLoadMoreGames(){
   if(nearBottom){state.page++;renderGames();}
 }
 
+function goHome(){
+  try{document.querySelectorAll("iframe").forEach(function(fr){fr.src="about:blank";});}catch(e){}
+  try{closeGame();}catch(e){}
+  try{closeBrowser();}catch(e){}
+  try{closeSoundboardWindow();}catch(e){}
+  try{closeInventoryWindow();}catch(e){}
+  try{closeProfileWindow();}catch(e){}
+  try{closeProfileOverlay();}catch(e){}
+  try{closeChat();}catch(e){}
+  document.querySelectorAll(".panelOverlay.open").forEach(function(el){el.classList.remove("open");});
+  document.querySelectorAll(".appOverlay.open").forEach(function(el){el.classList.remove("open");});
+  closeSidebar();
+  var rec=document.getElementById("recommendedWrap");if(rec)rec.style.display="";
+  var hero=document.querySelector(".hero");if(hero)hero.style.display="";
+  var filterBar=document.querySelector(".filterBar");if(filterBar)filterBar.style.display="";
+  var searchWrap=document.querySelector(".searchWrap");if(searchWrap)searchWrap.style.display="";
+  renderGames();renderRecommendedSection();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
 function openSidebar(){document.getElementById("sidebar").classList.add("open");document.getElementById("sideOverlay").classList.add("open");}
 function closeSidebar(){document.getElementById("sidebar").classList.remove("open");document.getElementById("sideOverlay").classList.remove("open");}
 function renderLeaderboardPanel(targetEl){
