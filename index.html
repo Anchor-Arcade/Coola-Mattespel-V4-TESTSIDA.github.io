@@ -151,6 +151,8 @@ html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:var
 .main{padding-top:64px;}
 .hero{padding:36px 24px 20px;text-align:center;}
 .hero h1{font-size:clamp(32px,6vw,64px);font-weight:900;letter-spacing:-.02em;background:linear-gradient(135deg,var(--w) 0%,var(--p1) 60%,var(--p0) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:10px;line-height:1.1;}
+.discordBanner{margin:0 auto 10px;max-width:700px;padding:10px 14px;border-radius:12px;border:1px solid var(--line);background:linear-gradient(135deg,rgba(114,137,218,.22),rgba(123,44,255,.24));font-size:13px;font-weight:700;cursor:pointer;}
+.discordBanner a{color:#fff;text-decoration:underline;}
 .hintRow{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;}
 .hintPill{background:rgba(123,44,255,.15);border:1px solid var(--line);border-radius:20px;padding:5px 13px;font-size:11px;color:var(--m);}
 .filterBar{display:flex;gap:8px;padding:0 24px 14px;overflow-x:auto;scrollbar-width:none;}
@@ -708,6 +710,7 @@ html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:var
 <main class="main">
   <section class="hero">
     <h1 data-i18n="heroTitle">Coola Mattespel V5</h1>
+    <div class="discordBanner" onclick="window.open('https://discord.gg/j5AFhXTGvd','_blank','noopener')">Joina Discorden: <a href="https://discord.gg/j5AFhXTGvd" target="_blank" rel="noopener" onclick="event.stopPropagation()">https://discord.gg/j5AFhXTGvd</a></div>
     <div id="onlineCount" style="font-size:13px;color:var(--p1);margin-bottom:10px;font-weight:600;letter-spacing:.5px">...</div>
     <div class="hintRow">
       <span class="hintPill" data-i18n="pill_games">🎮 1 946 games</span>
@@ -749,12 +752,12 @@ var FIREBASE_CONFIG={
   appId:"1:611002035280:web:964ca0a72daa2a69e53555"
 };
 var _sb=null;
+var _firestore=null;
 try{
   if(FIREBASE_CONFIG.projectId!=="DIN_FIREBASE_PROJECT_ID"){
-    firebase.initializeApp(FIREBASE_CONFIG);
-    var _firestore=firebase.firestore();
+    if(!firebase.apps||!firebase.apps.length)firebase.initializeApp(FIREBASE_CONFIG);
+    _firestore=firebase.firestore();
     console.log("Firebase ansluten!");
-    // TODO: Mappa in Firestore-anrop där _sb används om du vill köra helt molnbaserat.
   }else{
     console.log("Firebase ej konfigurerat - använder lokal lagring.");
   }
@@ -1377,7 +1380,7 @@ function renderGames(){
     letter.innerHTML='<span style="font-size:22px">'+getGameIcon(displayName)+'</span>';;
     thumb.appendChild(bg);thumb.appendChild(letter);
     var info=document.createElement("div");info.className="gameInfo";
-    var nm=document.createElement("div");nm.className="gameName";nm.textContent=displayName.replace(/^cl/i,"").trim();
+    var nm=document.createElement("div");nm.className="gameName";nm.textContent=_titleCaseGameName(displayName);
     var acts=document.createElement("div");acts.className="gameActions";
     var fb=document.createElement("button");
     fb.className="favBtn"+(isFav?" active":"");
@@ -1444,7 +1447,7 @@ function renderFavsPanel(){
   state.favorites.forEach(function(idx){
     var g=GAMES[idx];if(!g)return;
     var item=document.createElement("div");item.className="favItem";item.dataset.idx=idx;
-    var nm=document.createElement("span");nm.className="favItemName";nm.textContent=g.name.replace(/^cl/i,"").trim();
+    var nm=document.createElement("span");nm.className="favItemName";nm.textContent=_titleCaseGameName(g.name||g.f||'Spel');
     item.appendChild(nm);sec.appendChild(item);
   });
   el.appendChild(sec);
@@ -2752,21 +2755,29 @@ document.addEventListener("DOMContentLoaded",function(){
     if(document.getElementById("chatOverlay").classList.contains("open"))loadChatMsgs();
   },3000);
 
-  // ---- LIVE PRESENCE COUNTER ----
-  var _presenceCh=null;
-  function startPresence(){
-    if(!_sb)return;
-    var uid=state.user||('guest_'+Math.random().toString(36).slice(2,8));
-    _presenceCh=_sb.channel('coola-mattespel-online',{config:{presence:{key:uid}}});
-    _presenceCh.on('presence',{event:'sync'},function(){
-      var n=Object.keys(_presenceCh.presenceState()).length;
-      var el=document.getElementById('onlineCount');
-      if(el)el.textContent=n+' '+(T('online')||'online');
-    }).subscribe(function(status){
-      if(status==='SUBSCRIBED')_presenceCh.track({t:Date.now()});
-    });
+  // ---- LIVE PRESENCE COUNTER (Firestore + fallback) ----
+  var _presenceId=(state.user?('user_'+state.user):('guest_'+Math.random().toString(36).slice(2,8)));
+  function updatePresenceCount(){
+    if(_firestore){
+      var now=Date.now();
+      var ref=_firestore.collection('online_users').doc(_presenceId);
+      ref.set({id:_presenceId,user:state.user||null,ts:now},{merge:true}).then(function(){
+        return _firestore.collection('online_users').where('ts','>=',now-70000).get();
+      }).then(function(snap){
+        var el=document.getElementById('onlineCount');
+        if(el)el.textContent=snap.size+' '+(T('online')||'online');
+      }).catch(function(){
+        var el=document.getElementById('onlineCount');
+        if(el)el.textContent='1 '+(T('online')||'online');
+      });
+      return;
+    }
+    var el=document.getElementById('onlineCount');
+    if(el)el.textContent='1 '+(T('online')||'online');
   }
-  startPresence();
+  updatePresenceCount();
+  setInterval(updatePresenceCount,20000);
+  window.addEventListener('beforeunload',function(){if(_firestore){_firestore.collection('online_users').doc(_presenceId).delete().catch(function(){});}});
   applyLang();
   setTimeout(hideLoader, 600);
 });
