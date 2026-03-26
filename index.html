@@ -1174,6 +1174,21 @@ function _cloudUserDoc(){
   if(!_rtdb||!state.user)return null;
   return _rtdb.ref('user_data/'+state.user);
 }
+function _collectCloudBundle(){
+  if(!state.user)return{};
+  var u=state.user;
+  var out={};
+  var prefixes=['quests_'+u+'_','qdp_'+u+'_','playtime_'+u+'_','daily_streak_'+u,'unlocked_'+u,'friends_'+u,'owned_'+u,'profile_ext_'+u,'avatar_'+u,'jspel_'+u];
+  for(var i=0;i<localStorage.length;i++){
+    var k=localStorage.key(i);if(!k)continue;
+    if(prefixes.some(function(p){return k.indexOf(p)===0||k===p;}))out[k]=localStorage.getItem(k);
+  }
+  return out;
+}
+function _applyCloudBundle(bundle){
+  if(!bundle||typeof bundle!=='object')return;
+  Object.keys(bundle).forEach(function(k){if(typeof bundle[k]==='string')localStorage.setItem(k,bundle[k]);});
+}
 function _cloudSnapshot(){
   if(!state.user)return null;
   return {
@@ -1186,7 +1201,8 @@ function _cloudSnapshot(){
     owned:JSON.parse(localStorage.getItem('owned_'+state.user)||'[]'),
     quests:JSON.parse(localStorage.getItem('quests_'+state.user+'_'+_todayKeyDate())||'{"claimed":[]}'),
     friends:JSON.parse(localStorage.getItem('friends_'+state.user)||'[]'),
-    updatedAt:Date.now()
+    updatedAt:Date.now(),
+    cloud_bundle:_collectCloudBundle()
   };
 }
 function _cloudPush(){
@@ -1212,6 +1228,7 @@ function _cloudPull(cb){
       if(Array.isArray(d.owned))localStorage.setItem('owned_'+state.user,JSON.stringify(d.owned));
       if(d.quests)localStorage.setItem('quests_'+state.user+'_'+_todayKeyDate(),JSON.stringify(d.quests));
       if(Array.isArray(d.friends))localStorage.setItem('friends_'+state.user,JSON.stringify(d.friends));
+      _applyCloudBundle(d.cloud_bundle||{});
       localStorage.setItem('jspel_'+state.user,JSON.stringify({coins:state.coins,xp:state.xp,level:state.level,favorites:state.favorites,gamesPlayed:state.gamesPlayed,settings:state.settings}));
     }
     if(cb)cb();
@@ -1699,6 +1716,7 @@ function _setQuestDailyProg(key,val){
   var d=JSON.parse(localStorage.getItem(k)||'{}');
   d[key]=(d[key]||0)+val;
   localStorage.setItem(k,JSON.stringify(d));
+  _cloudPush();
 }
 function getQuests(){
   if(!state.user)return[];
@@ -2032,7 +2050,7 @@ function renderAdminPanel(){
 
     +'<div style="background:var(--glass);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px"><div style="font-size:11px;color:var(--d);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">💰 Ge mynt</div><div style="display:flex;gap:6px;margin-bottom:6px"><input id="adminCoinUser" placeholder="Användarnamn" style="flex:1;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:8px;padding:7px;color:var(--w);font-size:12px"><input id="adminCoinAmount" type="number" placeholder="Antal" min="1" max="9999" style="width:70px;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:8px;padding:7px;color:var(--w);font-size:12px"></div><button onclick="adminGiveCoins()" style="width:100%;background:linear-gradient(135deg,#ffaa00,#ff6b00);color:#000;border:none;border-radius:8px;padding:8px;cursor:pointer;font-size:12px;font-weight:600">🪙 Ge mynt</button></div>'
 
-    +'<div style="background:var(--glass);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px"><div style="font-size:11px;color:var(--d);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">🛡️ Admin-rättigheter</div><div style="display:flex;gap:6px;margin-bottom:6px"><input id="adminRoleUser" placeholder="Användarnamn" style="flex:1;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:8px;padding:7px;color:var(--w);font-size:12px"><button onclick="var u=document.getElementById('adminRoleUser').value.trim();if(u)adminToggleAdmin(u);" style="background:linear-gradient(135deg,var(--p0),var(--p2));color:#fff;border:none;border-radius:8px;padding:7px 12px;cursor:pointer;font-size:12px;font-weight:600">Ge / Ta admin</button></div><div style="font-size:10px;color:var(--d)">Nuvarande admins: '+getAdminList().join(', ')+'</div></div>'
+    +'<div style="background:var(--glass);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px"><div style="font-size:11px;color:var(--d);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">🛡️ Admin-rättigheter</div><div style="display:flex;gap:6px;margin-bottom:6px"><input id="adminRoleUser" placeholder="Användarnamn" style="flex:1;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:8px;padding:7px;color:var(--w);font-size:12px"><button onclick="var u=document.getElementById(\"adminRoleUser\").value.trim();if(u)adminToggleAdmin(u);" style="background:linear-gradient(135deg,var(--p0),var(--p2));color:#fff;border:none;border-radius:8px;padding:7px 12px;cursor:pointer;font-size:12px;font-weight:600">Ge / Ta admin</button></div><div style="font-size:10px;color:var(--d)">Nuvarande admins: '+getAdminList().join(', ')+'</div></div>'
 
     +'<div style="background:var(--glass);border:1px solid var(--line);border-radius:12px;padding:12px"><div style="font-size:11px;color:var(--d);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">🗑️ Rensa chatt</div><button onclick="adminClearChat()" style="width:100%;background:rgba(255,50,50,.2);color:#ff6b6b;border:1px solid rgba(255,50,50,.3);border-radius:8px;padding:8px;cursor:pointer;font-size:12px;font-weight:600">🗑️ Rensa all chatt</button></div>'
     +'</div>';
@@ -2390,6 +2408,7 @@ function checkDailyStreak(){
   }
   data.last=today;
   localStorage.setItem(key,JSON.stringify(data));
+  _cloudPush();
   var bonus=Math.min(data.streak*5,50);
   addCoins(bonus,'Daglig inloggning dag '+data.streak);
   setTimeout(function(){
