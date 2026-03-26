@@ -1977,9 +1977,66 @@ function renderProfilePanel(){
 }
 
 
-function renderAdminPanel(){var el=document.getElementById('adminOverlayBody');if(!el)return;var users=getAllUsers();var totalMsgs=JSON.parse(localStorage.getItem('globalChat')||'[]').length;var bannedList=JSON.parse(localStorage.getItem('bannedUsers')||'[]');var announcements=JSON.parse(localStorage.getItem('admin_announcements')||'[]');var chatEnabled=isChatEnabled();el.innerHTML='<div style="padding:8px 0"><div style="background:var(--glass);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px"><div style="font-size:11px;color:var(--d);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">📊 Statistik</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div style="background:rgba(255,255,255,.05);border-radius:8px;padding:8px;text-align:center"><div style="font-size:20px;font-weight:700;color:var(--p1)">'+users.length+'</div><div style="font-size:10px;color:var(--d)">Användare</div></div><div style="background:rgba(255,255,255,.05);border-radius:8px;padding:8px;text-align:center"><div style="font-size:20px;font-weight:700;color:var(--p1)">'+totalMsgs+'</div><div style="font-size:10px;color:var(--d)">Chattmeddelanden</div></div><div style="background:rgba(255,255,255,.05);border-radius:8px;padding:8px;text-align:center"><div style="font-size:20px;font-weight:700;color:var(--p1)">'+bannedList.length+'</div><div style="font-size:10px;color:var(--d)">Bannade</div></div><div style="background:rgba(255,255,255,.05);border-radius:8px;padding:8px;text-align:center"><div style="font-size:20px;font-weight:700;color:var(--p1)">'+GAMES.length+'</div><div style="font-size:10px;color:var(--d)">Spel</div></div></div></div><div style="background:var(--glass);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px"><div style="font-size:11px;color:var(--d);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">💬 Chat-kontroll</div><div style="font-size:12px;color:var(--m);margin-bottom:8px">Status: <b>'+(chatEnabled?'Aktiv ✅':'Stannad ⛔')+'</b></div><button onclick="toggleChatEnabled();renderAdminPanel()" style="width:100%;background:'+(chatEnabled?'rgba(255,50,50,.2);color:#ff7a7a;border:1px solid rgba(255,80,80,.3)':'rgba(0,200,100,.2);color:#7fffb3;border:1px solid rgba(127,255,179,.35)')+';border-radius:8px;padding:8px;cursor:pointer;font-size:12px;font-weight:700">'+(chatEnabled?'⛔ Stanna chatten':'✅ Starta chatten')+'</button></div><div style="background:var(--glass);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px"><div style="font-size:11px;color:var(--d);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">📢 Broadcast</div><textarea id="adminBroadcastMsg" data-i18n-ph="chatPlaceholder" placeholder="Write a message..." style="width:100%;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:8px;padding:8px;color:var(--w);font-size:12px;font-family:inherit;resize:vertical;min-height:60px;box-sizing:border-box"></textarea><button onclick="adminBroadcast()" style="width:100%;margin-top:6px;background:var(--p0);color:#fff;border:none;border-radius:8px;padding:8px;cursor:pointer;font-size:12px;font-weight:600">📤 Skicka</button></div><div style="background:var(--glass);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px"><div style="font-size:11px;color:var(--d);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">📌 Tillkännagivanden</div><div style="display:flex;gap:6px;margin-bottom:8px"><input id="adminAnnounceInput" placeholder="Nytt tillkännagivande..." style="flex:1;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:8px;padding:7px;color:var(--w);font-size:12px"><button onclick="addAnnouncement()" style="background:var(--p0);color:#fff;border:none;border-radius:8px;padding:7px 10px;cursor:pointer;font-size:12px">+</button></div>'+(announcements.length?announcements.map(function(a,i){return'<div style="background:rgba(255,255,255,.05);border-radius:6px;padding:6px 8px;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--m)"><span>'+a+'</span><button onclick="removeAnnouncement('+i+')" style="background:rgba(255,50,50,.2);color:#ff6b6b;border:none;border-radius:4px;padding:2px 6px;cursor:pointer;font-size:10px">✕</button></div>';}).join(''):'<div style="font-size:11px;color:var(--d);text-align:center;padding:8px">Inga tillkännagivanden</div>')+'</div><div style="background:var(--glass);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px"><div style="font-size:11px;color:var(--d);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">💰 Ge mynt</div><div style="display:flex;gap:6px;margin-bottom:6px"><input id="adminCoinUser" placeholder="Användarnamn" style="flex:1;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:8px;padding:7px;color:var(--w);font-size:12px"><input id="adminCoinAmount" type="number" placeholder="Antal" min="1" max="9999" style="width:70px;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:8px;padding:7px;color:var(--w);font-size:12px"></div><button onclick="adminGiveCoins()" style="width:100%;background:linear-gradient(135deg,#ffaa00,#ff6b00);color:#000;border:none;border-radius:8px;padding:8px;cursor:pointer;font-size:12px;font-weight:600">🪙 Ge mynt</button></div><div style="background:var(--glass);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px"><div style="font-size:11px;color:var(--d);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">👥 Användare ('+users.length+')</div><div style="max-height:200px;overflow-y:auto">'+users.map(function(u){var isBanned=bannedList.indexOf(u)>=0;var uData=JSON.parse(localStorage.getItem('jspel_'+u)||'{}');return'<div style="display:flex;align-items:center;gap:8px;padding:6px;border-radius:8px;background:rgba(255,255,255,.03);margin-bottom:4px"><div style="width:28px;height:28px;border-radius:50%;background:var(--p0);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;flex-shrink:0;color:#fff">'+u.charAt(0).toUpperCase()+'</div><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;color:var(--w);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+u+(isVerifiedUser(u)?' ✔️':'')+'</div><div style="font-size:10px;color:var(--d)">Mynt: '+(uData.coins||0)+' | Nivå: '+(uData.level||1)+'</div></div>'+(isBanned?'<button onclick="adminUnban(\'+u+\')" style="background:rgba(0,200,100,.2);color:#00c864;border:none;border-radius:6px;padding:3px 7px;cursor:pointer;font-size:10px">Avbanna</button>':'<button onclick="adminKick(\'+u+\')" style="background:rgba(255,150,0,.15);color:#ff9600;border:none;border-radius:6px;padding:3px 7px;cursor:pointer;font-size:10px;margin-right:4px">Kicka</button><button onclick="adminBan(\'+u+\')" style="background:rgba(255,50,50,.15);color:#ff4040;border:none;border-radius:6px;padding:3px 7px;cursor:pointer;font-size:10px">Banna</button>')+'<button onclick="adminToggleVerify(\'+u+\')" style="background:rgba(100,200,255,.2);color:#7ec8ff;border:none;border-radius:6px;padding:3px 7px;cursor:pointer;font-size:10px;margin-left:4px">'+(isVerifiedUser(u)?'Avverifiera':'Verifiera')+'</button>'+'</div>';}).join('')+'</div></div>'+
-'<div style="background:var(--glass);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px"><div style="font-size:11px;color:var(--d);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">🛡️ Admin-rättigheter</div><div style="display:flex;gap:6px;margin-bottom:6px"><input id="adminRoleUser" placeholder="Användarnamn" style="flex:1;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:8px;padding:7px;color:var(--w);font-size:12px"><button onclick="var u=document.getElementById(\'adminRoleUser\').value.trim();if(u)adminToggleAdmin(u);" style="background:linear-gradient(135deg,var(--p0),var(--p2));color:#fff;border:none;border-radius:8px;padding:7px 12px;cursor:pointer;font-size:12px;font-weight:600">Ge / Ta admin</button></div><div style="font-size:10px;color:var(--d)">Nuvarande admins: '+getAdminList().join(", ")+'</div></div>'+
-'<div style="background:var(--glass);border:1px solid var(--line);border-radius:12px;padding:12px"><div style="font-size:11px;color:var(--d);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">🗑️ Rensa chatt</div><button onclick="adminClearChat()" style="width:100%;background:rgba(255,50,50,.2);color:#ff6b6b;border:1px solid rgba(255,50,50,.3);border-radius:8px;padding:8px;cursor:pointer;font-size:12px;font-weight:600">🗑️ Rensa all chatt</button></div></div>';}
+function renderAdminPanel(){
+  var el=document.getElementById('adminOverlayBody');if(!el)return;
+  var users=getAllUsers();
+  var totalMsgs=JSON.parse(localStorage.getItem('globalChat')||'[]').length;
+  var bannedList=JSON.parse(localStorage.getItem('bannedUsers')||'[]');
+  var announcements=JSON.parse(localStorage.getItem('admin_announcements')||'[]');
+  var chatEnabled=isChatEnabled();
+
+  var userRows=users.map(function(u){
+    var isBanned=bannedList.indexOf(u)>=0;
+    var uData=JSON.parse(localStorage.getItem('jspel_'+u)||'{}');
+    var verified=isVerifiedUser(u);
+    var actions=isBanned
+      ?'<button onclick="adminUnban(\''+u+'\')" style="background:linear-gradient(135deg,rgba(0,200,100,.25),rgba(0,200,100,.12));color:#8dffb6;border:1px solid rgba(127,255,179,.35);border-radius:999px;padding:6px 10px;cursor:pointer;font-size:10px;font-weight:700">♻️ Avbanna</button>'
+      :'<button onclick="adminKick(\''+u+'\')" style="background:linear-gradient(135deg,rgba(255,190,0,.24),rgba(255,150,0,.12));color:#ffd27a;border:1px solid rgba(255,190,0,.28);border-radius:999px;padding:6px 10px;cursor:pointer;font-size:10px;font-weight:700">👢 Kicka</button>'
+       +'<button onclick="adminBan(\''+u+'\')" style="background:linear-gradient(135deg,rgba(255,70,70,.24),rgba(255,30,30,.12));color:#ff9b9b;border:1px solid rgba(255,80,80,.35);border-radius:999px;padding:6px 10px;cursor:pointer;font-size:10px;font-weight:700">⛔ Banna</button>';
+    var verifyBtn='<button onclick="adminToggleVerify(\''+u+'\')" style="background:linear-gradient(135deg,rgba(100,200,255,.24),rgba(80,150,255,.12));color:#a9deff;border:1px solid rgba(126,200,255,.35);border-radius:999px;padding:6px 10px;cursor:pointer;font-size:10px;font-weight:700">'+(verified?'✅ Avverifiera':'✔️ Verifiera')+'</button>';
+
+    return '<div style="display:flex;gap:10px;padding:10px;border-radius:12px;background:linear-gradient(135deg,rgba(255,255,255,.045),rgba(255,255,255,.02));border:1px solid var(--line);margin-bottom:7px;align-items:flex-start">'
+      +'<div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--p0),var(--p2));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0;color:#fff;border:2px solid rgba(255,255,255,.16)">'+u.charAt(0).toUpperCase()+'</div>'
+      +'<div style="flex:1;min-width:0">'
+      +'<div style="font-size:13px;font-weight:800;color:var(--w);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+u+(verified?' <span style="color:#7ec8ff">✔️</span>':'')+(isBanned?' <span style="color:#ff8888">(Bannad)</span>':'')+'</div>'
+      +'<div style="font-size:10px;color:var(--d);margin-top:2px">🪙 '+(uData.coins||0)+' · 🎚️ Nivå '+(uData.level||1)+'</div>'
+      +'<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">'+actions+verifyBtn+'</div>'
+      +'</div></div>';
+  }).join('');
+
+  el.innerHTML=''
+    +'<div style="padding:8px 0">'
+    +'<div style="background:var(--glass);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px">'
+      +'<div style="font-size:11px;color:var(--d);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">📊 Statistik</div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
+        +'<div style="background:rgba(255,255,255,.05);border-radius:8px;padding:8px;text-align:center"><div style="font-size:20px;font-weight:700;color:var(--p1)">'+users.length+'</div><div style="font-size:10px;color:var(--d)">Användare</div></div>'
+        +'<div style="background:rgba(255,255,255,.05);border-radius:8px;padding:8px;text-align:center"><div style="font-size:20px;font-weight:700;color:var(--p1)">'+totalMsgs+'</div><div style="font-size:10px;color:var(--d)">Chattmeddelanden</div></div>'
+        +'<div style="background:rgba(255,255,255,.05);border-radius:8px;padding:8px;text-align:center"><div style="font-size:20px;font-weight:700;color:var(--p1)">'+bannedList.length+'</div><div style="font-size:10px;color:var(--d)">Bannade</div></div>'
+        +'<div style="background:rgba(255,255,255,.05);border-radius:8px;padding:8px;text-align:center"><div style="font-size:20px;font-weight:700;color:var(--p1)">'+GAMES.length+'</div><div style="font-size:10px;color:var(--d)">Spel</div></div>'
+      +'</div></div>'
+
+    +'<div style="background:var(--glass);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px">'
+      +'<div style="font-size:11px;color:var(--d);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">💬 Chat-kontroll</div>'
+      +'<div style="font-size:12px;color:var(--m);margin-bottom:8px">Status: <b>'+(chatEnabled?'Aktiv ✅':'Stannad ⛔')+'</b></div>'
+      +'<button onclick="toggleChatEnabled();renderAdminPanel()" style="width:100%;background:'+(chatEnabled?'rgba(255,50,50,.2);color:#ff7a7a;border:1px solid rgba(255,80,80,.3)':'rgba(0,200,100,.2);color:#7fffb3;border:1px solid rgba(127,255,179,.35)')+';border-radius:8px;padding:8px;cursor:pointer;font-size:12px;font-weight:700">'+(chatEnabled?'⛔ Stanna chatten':'✅ Starta chatten')+'</button>'
+    +'</div>'
+
+    +'<div style="background:var(--glass);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px">'
+      +'<div style="font-size:11px;color:var(--d);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">👥 Användare ('+users.length+')</div>'
+      +'<div style="max-height:320px;overflow-y:auto;padding-right:2px">'+(userRows||'<div style="font-size:11px;color:var(--d);text-align:center;padding:10px">Inga användare ännu</div>')+'</div>'
+    +'</div>'
+
+    +'<div style="background:var(--glass);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px"><div style="font-size:11px;color:var(--d);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">📢 Broadcast</div><textarea id="adminBroadcastMsg" data-i18n-ph="chatPlaceholder" placeholder="Write a message..." style="width:100%;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:8px;padding:8px;color:var(--w);font-size:12px;font-family:inherit;resize:vertical;min-height:60px;box-sizing:border-box"></textarea><button onclick="adminBroadcast()" style="width:100%;margin-top:6px;background:var(--p0);color:#fff;border:none;border-radius:8px;padding:8px;cursor:pointer;font-size:12px;font-weight:600">📤 Skicka</button></div>'
+
+    +'<div style="background:var(--glass);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px"><div style="font-size:11px;color:var(--d);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">📌 Tillkännagivanden</div><div style="display:flex;gap:6px;margin-bottom:8px"><input id="adminAnnounceInput" placeholder="Nytt tillkännagivande..." style="flex:1;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:8px;padding:7px;color:var(--w);font-size:12px"><button onclick="addAnnouncement()" style="background:var(--p0);color:#fff;border:none;border-radius:8px;padding:7px 10px;cursor:pointer;font-size:12px">+</button></div>'+(announcements.length?announcements.map(function(a,i){return'<div style="background:rgba(255,255,255,.05);border-radius:6px;padding:6px 8px;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--m)"><span>'+a+'</span><button onclick="removeAnnouncement('+i+')" style="background:rgba(255,50,50,.2);color:#ff6b6b;border:none;border-radius:4px;padding:2px 6px;cursor:pointer;font-size:10px">✕</button></div>';}).join(''):'<div style="font-size:11px;color:var(--d);text-align:center;padding:8px">Inga tillkännagivanden</div>')+'</div>'
+
+    +'<div style="background:var(--glass);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px"><div style="font-size:11px;color:var(--d);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">💰 Ge mynt</div><div style="display:flex;gap:6px;margin-bottom:6px"><input id="adminCoinUser" placeholder="Användarnamn" style="flex:1;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:8px;padding:7px;color:var(--w);font-size:12px"><input id="adminCoinAmount" type="number" placeholder="Antal" min="1" max="9999" style="width:70px;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:8px;padding:7px;color:var(--w);font-size:12px"></div><button onclick="adminGiveCoins()" style="width:100%;background:linear-gradient(135deg,#ffaa00,#ff6b00);color:#000;border:none;border-radius:8px;padding:8px;cursor:pointer;font-size:12px;font-weight:600">🪙 Ge mynt</button></div>'
+
+    +'<div style="background:var(--glass);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px"><div style="font-size:11px;color:var(--d);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">🛡️ Admin-rättigheter</div><div style="display:flex;gap:6px;margin-bottom:6px"><input id="adminRoleUser" placeholder="Användarnamn" style="flex:1;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:8px;padding:7px;color:var(--w);font-size:12px"><button onclick="var u=document.getElementById('adminRoleUser').value.trim();if(u)adminToggleAdmin(u);" style="background:linear-gradient(135deg,var(--p0),var(--p2));color:#fff;border:none;border-radius:8px;padding:7px 12px;cursor:pointer;font-size:12px;font-weight:600">Ge / Ta admin</button></div><div style="font-size:10px;color:var(--d)">Nuvarande admins: '+getAdminList().join(', ')+'</div></div>'
+
+    +'<div style="background:var(--glass);border:1px solid var(--line);border-radius:12px;padding:12px"><div style="font-size:11px;color:var(--d);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">🗑️ Rensa chatt</div><button onclick="adminClearChat()" style="width:100%;background:rgba(255,50,50,.2);color:#ff6b6b;border:1px solid rgba(255,50,50,.3);border-radius:8px;padding:8px;cursor:pointer;font-size:12px;font-weight:600">🗑️ Rensa all chatt</button></div>'
+    +'</div>';
+}
 function getAllUsers(){
   var users=[];
   for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.startsWith("acc_"))users.push(k.substring(4));}
@@ -2130,6 +2187,37 @@ function adminToggleVerify(u){
   renderAdminPanel();
   if(document.getElementById('chatOverlay').classList.contains('open'))loadChatMsgs();
 }
+
+function _toHex(buf){return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');}
+function _randomSalt(){var a=new Uint8Array(16);(window.crypto||window.msCrypto).getRandomValues(a);return _toHex(a);}
+function _hashPassword(p,salt,iters){
+  var c=window.crypto||window.msCrypto;
+  if(!c||!c.subtle){return Promise.resolve(btoa(salt+'|'+p));}
+  var enc=new TextEncoder();
+  return c.subtle.importKey('raw',enc.encode(String(p)),'PBKDF2',false,['deriveBits']).then(function(key){
+    return c.subtle.deriveBits({name:'PBKDF2',salt:enc.encode(String(salt)),iterations:iters||120000,hash:'SHA-256'},key,256);
+  }).then(_toHex);
+}
+function _verifyPassword(acc,p){
+  if(!acc)return Promise.resolve(false);
+  if(acc.password_salt&&acc.password_hash){
+    return _hashPassword(p,acc.password_salt,acc.password_iter||120000).then(function(h){return h===acc.password_hash;});
+  }
+  return Promise.resolve(acc.password_hash===btoa(p));
+}
+function _claimUsername(u){
+  if(!_rtdb)return Promise.resolve(true);
+  var key=_usernameKey(u);
+  return _rtdb.ref('username_claims/'+key).transaction(function(cur){
+    if(cur===null)return {username:u,ts:Date.now()};
+    return;
+  }).then(function(res){return !!(res&&res.committed);}).catch(function(){return false;});
+}
+function _releaseUsernameClaim(u){
+  if(!_rtdb)return Promise.resolve();
+  return _rtdb.ref('username_claims/'+_usernameKey(u)).remove().catch(function(){});
+}
+
 function _titleCaseGameName(name){
   var n=(name||'').replace(/^cl/i,'').replace(/[_-]+/g,' ').trim();
   if(!n)return 'Spel';
@@ -2153,13 +2241,22 @@ function _getLocalAccountByUsername(u){
 function _findCloudAccount(u){
   if(_rtdb){
     var ulc=_usernameKey(u);
-    return _rtdb.ref('accounts').orderByChild('username_lc').equalTo(ulc).limitToFirst(1).once('value').then(function(snap){
-      var v=snap.val();
-      if(!v)return null;
-      var k=Object.keys(v)[0];
-      var d=v[k]||{};
-      d._id=k;
-      return d;
+    return _rtdb.ref('accounts/'+ulc).once('value').then(function(snap){
+      var direct=snap.val();
+      if(direct){direct._id=ulc;return direct;}
+      return _rtdb.ref('accounts').orderByChild('username_lc').equalTo(ulc).limitToFirst(1).once('value').then(function(legacy){
+        var v=legacy.val();
+        if(v){
+          var k=Object.keys(v)[0];
+          var d=v[k]||{};
+          d._id=k;
+          return d;
+        }
+        return _rtdb.ref('user_data/'+u).once('value').then(function(userSnap){
+          if(!userSnap.val())return null;
+          return {username:u,username_lc:ulc,password_hash:'',_id:ulc};
+        });
+      });
     });
   }
   if(_sb){
@@ -2171,10 +2268,15 @@ function _findCloudAccount(u){
   return Promise.resolve(null);
 }
 function _createCloudAccount(u,p){
-  var payload={username:u,username_lc:_usernameKey(u),password_hash:btoa(p),is_admin:isUserAdmin(u),banned:false,created_at:Date.now()};
-  if(_rtdb)return _rtdb.ref('accounts').push(payload);
-  if(_sb)return _sb.from("accounts").insert(payload);
-  return Promise.reject(new Error("Ingen molndatabas tillgänglig"));
+  var ulc=_usernameKey(u);
+  var salt=_randomSalt();
+  var iter=120000;
+  return _hashPassword(p,salt,iter).then(function(hash){
+    var payload={username:u,username_lc:ulc,password_hash:hash,password_salt:salt,password_iter:iter,is_admin:isUserAdmin(u),banned:false,created_at:Date.now()};
+    if(_rtdb)return _rtdb.ref('accounts/'+ulc).set(payload);
+    if(_sb)return _sb.from("accounts").insert(payload);
+    return Promise.reject(new Error("Ingen molndatabas tillgänglig"));
+  });
 }
 
 function doLogin(){
@@ -2185,7 +2287,6 @@ function doLogin(){
   if(!u||!p){err.textContent="Fyll i alla fält";err.style.display="block";return;}
   if(!_safeUsername(u)){err.textContent="Användarnamn måste vara 3-24 tecken (a-z, 0-9, _ eller -) och får inte innehålla förbjudna ord";err.style.display="block";return;}
 
-  // Admin bypass – works on any device without a DB account
   if(isUserAdmin(u)&&btoa(btoa(p))===ADMINPW){
     loadState(u);state.user=u;state.isAdmin=true;
     localStorage.setItem("lastUser",u);
@@ -2194,36 +2295,47 @@ function doLogin(){
     toast("Välkommen, "+u+"! (Admin)");
     return;
   }
+
   if(_rtdb||_sb){
-    // --- Molnflöde (konton sparas online) ---
     if(mode==="reg"){
       _findCloudAccount(u).then(function(existing){
         if(existing){err.textContent="Användarnamn taget";err.style.display="block";return;}
-        var initSettings={animations:true,sounds:true,darkMode:true,theme:"purple",lang:"sv"};
-        _createCloudAccount(u,p).then(function(){
-          if(_rtdb)_rtdb.ref('user_data/'+u).update({username:u,coins:50,xp:0,level:1,favorites:[],games_played:0,settings:initSettings}).catch(function(){});
-          else if(_sb)_sb.from("user_data").insert({username:u,coins:50,xp:0,level:1,favorites:[],games_played:0,settings:initSettings}).then(function(){});
-          localStorage.setItem("acc_"+u,btoa(p));
-          closeLoginModal();
-          openLoginModal(false);
-          document.getElementById("loginUser").value=u;
-          document.getElementById("loginPass").value="";
-          toast("Konto skapat! Logga in för att fortsätta.","ok");
-        }).catch(function(e){
-          err.textContent="Fel vid registrering: "+((e&&e.message)||"okänt fel");
-          err.style.display="block";
+        return _claimUsername(u).then(function(claimed){
+          if(!claimed){err.textContent="Användarnamn taget";err.style.display="block";return;}
+          var initSettings={animations:true,sounds:true,darkMode:true,theme:"purple",lang:"sv"};
+          return _createCloudAccount(u,p).then(function(){
+            if(_rtdb)_rtdb.ref('user_data/'+u).update({username:u,coins:50,xp:0,level:1,favorites:[],games_played:0,settings:initSettings}).catch(function(){});
+            else if(_sb)_sb.from("user_data").insert({username:u,coins:50,xp:0,level:1,favorites:[],games_played:0,settings:initSettings}).then(function(){});
+            localStorage.setItem("acc_"+u,btoa(p));
+            closeLoginModal();
+            openLoginModal(false);
+            document.getElementById("loginUser").value=u;
+            document.getElementById("loginPass").value="";
+            toast("Konto skapat! Logga in för att fortsätta.","ok");
+          }).catch(function(e){
+            _releaseUsernameClaim(u);
+            err.textContent="Fel vid registrering: "+((e&&e.message)||"okänt fel");
+            err.style.display="block";
+          });
         });
       });
-    }else{
-      _findCloudAccount(u).then(function(acc){
-        if(!acc){err.textContent="Fel användarnamn eller lösenord";err.style.display="block";return;}
-        if(acc.banned){err.textContent="Ditt konto är bannat";err.style.display="block";return;}
-        if(acc.password_hash!==btoa(p)){err.textContent="Fel användarnamn eller lösenord";err.style.display="block";return;}
+      return;
+    }
+
+    _findCloudAccount(u).then(function(acc){
+      if(!acc){err.textContent="Fel användarnamn eller lösenord";err.style.display="block";return;}
+      if(acc.banned){err.textContent="Ditt konto är bannat";err.style.display="block";return;}
+      _verifyPassword(acc,p).then(function(okPw){
+        if(!okPw){err.textContent="Fel användarnamn eller lösenord";err.style.display="block";return;}
+        var resolvedUser=acc.username||u;
+        if(_rtdb&&acc.password_salt==null){
+          var ns=_randomSalt();
+          _hashPassword(p,ns,120000).then(function(nh){_rtdb.ref('accounts/'+_usernameKey(resolvedUser)).update({password_hash:nh,password_salt:ns,password_iter:120000}).catch(function(){});});
+        }
         var userDocPromise=_rtdb
-          ? _rtdb.ref('user_data/'+(acc.username||u)).once('value').then(function(ud){return (ud&&ud.val)?(ud.val()||{}):{};})
-          : _sb.from("user_data").select("*").eq("username",acc.username||u).limit(1).then(function(ud){return (ud&&ud.data&&ud.data[0])||{};});
+          ? _rtdb.ref('user_data/'+resolvedUser).once('value').then(function(ud){return (ud&&ud.val)?(ud.val()||{}):{};})
+          : _sb.from("user_data").select("*").eq("username",resolvedUser).limit(1).then(function(ud){return (ud&&ud.data&&ud.data[0])||{};});
         userDocPromise.then(function(d){
-          var resolvedUser=acc.username||u;
           state.user=resolvedUser;
           state.coins=d.coins||0;state.xp=d.xp||0;state.level=d.level||1;
           state.favorites=d.favorites||[];state.gamesPlayed=d.games_played||0;
@@ -2237,32 +2349,32 @@ function doLogin(){
           applyDarkMode(state.settings.darkMode===true);
           if(state.settings.theme&&state.settings.theme!=="purple")applyTheme(state.settings.theme);
         });
-      }).catch(function(e){
-        err.textContent="Fel vid inloggning: "+((e&&e.message)||"okänt fel");
-        err.style.display="block";
       });
-    }
-  }else{
-    // --- Lokalt läge (localStorage) ---
-    if(mode==="reg"){
-      if(_getLocalAccountByUsername(u)){err.textContent="Användarnamn taget";err.style.display="block";return;}
-      localStorage.setItem("acc_"+u,btoa(p));
-      loadState(u);state.user=u;state.isAdmin=isUserAdmin(u);
-      localStorage.setItem("lastUser",u);
-      addCoins(50,"Välkomstbonus!");
-      toast("Välkommen, "+u+"! +50 mynt");
-    }else{
-      var localAcc=_getLocalAccountByUsername(u);
-      if(!localAcc||localAcc.password_hash!==btoa(p)){err.textContent="Fel användarnamn eller lösenord";err.style.display="block";return;}
-      if(localAcc.banned){err.textContent="Ditt konto är bannat";err.style.display="block";return;}
-      loadState(localAcc.username);state.user=localAcc.username;
-      state.isAdmin=isUserAdmin(localAcc.username)||(btoa(btoa(p))===ADMINPW);
-      localStorage.setItem("lastUser",localAcc.username);
-      toast("Välkommen tillbaka, "+localAcc.username+"!");
-    }
-    closeLoginModal();
-    finishLogin();
+    }).catch(function(e){
+      err.textContent="Fel vid inloggning: "+((e&&e.message)||"okänt fel");
+      err.style.display="block";
+    });
+    return;
   }
+
+  if(mode==="reg"){
+    if(_getLocalAccountByUsername(u)){err.textContent="Användarnamn taget";err.style.display="block";return;}
+    localStorage.setItem("acc_"+u,btoa(p));
+    loadState(u);state.user=u;state.isAdmin=isUserAdmin(u);
+    localStorage.setItem("lastUser",u);
+    addCoins(50,"Välkomstbonus!");
+    toast("Välkommen, "+u+"! +50 mynt");
+  }else{
+    var localAcc=_getLocalAccountByUsername(u);
+    if(!localAcc||localAcc.password_hash!==btoa(p)){err.textContent="Fel användarnamn eller lösenord";err.style.display="block";return;}
+    if(localAcc.banned){err.textContent="Ditt konto är bannat";err.style.display="block";return;}
+    loadState(localAcc.username);state.user=localAcc.username;
+    state.isAdmin=isUserAdmin(localAcc.username)||(btoa(btoa(p))===ADMINPW);
+    localStorage.setItem("lastUser",localAcc.username);
+    toast("Välkommen tillbaka, "+localAcc.username+"!");
+  }
+  closeLoginModal();
+  finishLogin();
 }
 function checkDailyStreak(){
   if(!state.user)return;
