@@ -944,8 +944,82 @@ function renderRoadmapPanel(targetEl){
   h+='<div style="text-align:center;font-size:11px;color:var(--d);margin-top:12px;padding:8px">💬 Har du idéer? Använd Förslag i menyn!</div>';
   el.innerHTML=h;
 }
+var _THUMB_CANDIDATE_CACHE={};
+function getGameThumbCandidatesByFile(file){
+  var raw=(file||'').toString().trim();
+  if(!raw)return [];
+  if(_THUMB_CANDIDATE_CACHE[raw])return _THUMB_CANDIDATE_CACHE[raw].slice();
+  var clean=raw.replace(/^\/+/, '').replace(/\.html?$/i,'');
+  var cleanNoSpace=clean.replace(/\s+/g,'');
+  var cleanLower=clean.toLowerCase();
+  var cleanNoPrefix=cleanLower.replace(/^cl/,'');
+  var roots=[
+    'https://nikehub.org/homework',
+    'https://nikehub.org/homework/',
+    'https://nikehub.org/homework/images/',
+    'https://nikehub.org/homework/img/',
+    'https://nikehub.org/homework/thumbs/',
+    'https://nikehub.org/homework/thumbnails/',
+    'https://nikehub.org/homework/assets/images/',
+    'https://nikehub.org/homework/assets/img/',
+    'https://nikehub.org/homework/assets/thumbs/',
+    'https://cdn.jsdelivr.net/gh/gn-math/covers@main',
+    'https://cdn.jsdelivr.net/gh/gn-math/covers@main/',
+    'https://cdn.jsdelivr.net/npm/gn-math.github.io-main@1.0.0/',
+    'https://cdn.jsdelivr.net/npm/gn-math.github.io-main@1.0.1/',
+    'https://cdn.jsdelivr.net/npm/gn-math.github.io-main@1.0.4/'
+  ];
+  var exts=['.png','.webp','.jpg','.jpeg','.gif'];
+  var set={};
+  var out=[];
+  function push(u){if(!u||set[u])return;set[u]=1;out.push(u);} 
+  var nameVariants=[];
+  [clean,cleanNoSpace,cleanLower,cleanNoPrefix].forEach(function(v){
+    if(!v)return;
+    var enc=encodeURIComponent(v);
+    if(nameVariants.indexOf(enc)<0)nameVariants.push(enc);
+  });
+  roots.forEach(function(root){
+    nameVariants.forEach(function(v){
+      if(root.slice(-1)==='/'){
+        exts.forEach(function(ext){push(root+v+ext);});
+      }else{
+        exts.forEach(function(ext){push(root+'/'+v+ext);});
+      }
+    });
+  });
+  _THUMB_CANDIDATE_CACHE[raw]=out.slice();
+  return out;
+}
 function getGameThumbSrcByFile(file){
-  return "";
+  var list=getGameThumbCandidatesByFile(file);
+  return list.length?list[0]:"";
+}
+function _applyNextThumbCandidate(img){
+  if(!img)return;
+  var raw=img.getAttribute('data-thumb-candidates')||'';
+  var list=[];
+  try{list=JSON.parse(raw)||[];}catch(e){list=[];}
+  var idx=parseInt(img.getAttribute('data-thumb-index')||'0',10);
+  idx=isNaN(idx)?0:idx;
+  if(list[idx]){
+    img.setAttribute('data-thumb-index',String(idx+1));
+    img.src=list[idx];
+    return;
+  }
+  var fb=img.getAttribute('data-thumb-fallback')||getFallbackGameThumb('Game');
+  img.onerror=null;
+  img.src=fb;
+}
+function setGameThumbWithFallbacks(img,file,fallbackName){
+  if(!img)return;
+  var candidates=getGameThumbCandidatesByFile(file);
+  img.setAttribute('data-thumb-candidates',JSON.stringify(candidates));
+  img.setAttribute('data-thumb-index','1');
+  img.setAttribute('data-thumb-fallback',getFallbackGameThumb(fallbackName||'Game'));
+  img.onerror=function(){_applyNextThumbCandidate(this);};
+  if(candidates.length){img.src=candidates[0];}
+  else{img.onerror=null;img.src=getFallbackGameThumb(fallbackName||'Game');}
 }
 function getFallbackGameThumb(displayName){
   var txt=encodeURIComponent((_titleCaseGameName(displayName||"Game")).slice(0,24));
@@ -978,7 +1052,7 @@ function renderRecommendedSection(){
     var thumb=getGameThumbSrcByFile(g.f)||getFallbackGameThumb(g.name);
     h+='<div onclick="openGameByFile(\''+g.f+'\')" style="flex-shrink:0;width:180px;border-radius:16px;background:linear-gradient(135deg,'+g.color+'22,'+g.color+'08);border:1.5px solid '+g.color+'44;padding:16px 14px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden" onmouseenter="this.style.transform=\'scale(1.03)\';this.style.borderColor=\''+g.color+'\'" onmouseleave="this.style.transform=\'\';this.style.borderColor=\''+g.color+'44\'">';
     if(thumb){
-      h+='<img src="'+thumb+'" loading="lazy" alt="'+g.name+'" onerror="this.src=\''+getFallbackGameThumb('fallback')+'\'" style="width:100%;height:72px;object-fit:cover;border-radius:10px;margin-bottom:8px;border:1px solid '+g.color+'55">';
+      h+='<img src="'+thumb+'" loading="lazy" alt="'+g.name+'" onerror="this.src=\''+getFallbackGameThumb(g.name)+'\'" style="width:100%;height:72px;object-fit:cover;border-radius:10px;margin-bottom:8px;border:1px solid '+g.color+'55">';
       h+='<div style="font-size:32px;margin-bottom:8px;display:none">'+g.emoji+'</div>';
     }else{
       h+='<div style="font-size:32px;margin-bottom:8px">'+g.emoji+'</div>';
@@ -1536,13 +1610,11 @@ function renderGames(){
     card.dataset.idx=realIdx;
     var thumb=document.createElement("div");thumb.className="gameThumb";
     var bg=document.createElement("div");bg.className="gameThumbBg";bg.style.background='linear-gradient(135deg,var(--p1),var(--p0))';
-    var thumbSrc=getGameThumbSrcByFile(game.f);
     var img=document.createElement("img");
     img.className="gameThumbImage";
     img.loading="lazy";
     img.alt=_titleCaseGameName(displayName);
-    img.src=thumbSrc||getFallbackGameThumb(displayName);
-    img.onerror=function(){this.src=getFallbackGameThumb(displayName);};
+    setGameThumbWithFallbacks(img,game.f,displayName);
     thumb.appendChild(img);
     var letter=document.createElement("div");letter.className="gameThumbLetter";
     letter.innerHTML='<span style="font-size:22px">'+getGameIcon(displayName)+'</span>';;
