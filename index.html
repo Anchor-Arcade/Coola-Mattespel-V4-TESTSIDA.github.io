@@ -947,17 +947,52 @@ function renderRoadmapPanel(targetEl){
 var GAME_THUMBS={};
 var PLAYABLE_THUMBS_BY_NAME={};
 
-async function _loadIconsMap(){
-  try{
-    var res=await fetch("Icons.json?t="+Date.now(),{cache:"no-store"});
-    if(!res.ok)throw new Error("icons fetch failed");
-    var data=await res.json();
-    GAME_THUMBS=(data&&typeof data.gameThumbs==="object"&&data.gameThumbs)?data.gameThumbs:{};
-    PLAYABLE_THUMBS_BY_NAME=(data&&typeof data.playableThumbsByName==="object"&&data.playableThumbsByName)?data.playableThumbsByName:{};
-  }catch(e){
-    GAME_THUMBS=GAME_THUMBS||{};
-    PLAYABLE_THUMBS_BY_NAME=PLAYABLE_THUMBS_BY_NAME||{};
+function _normalizeIconsPayload(data){
+  if(!data||typeof data!=="object")return{gameThumbs:{},playableThumbsByName:{}};
+  if(Array.isArray(data)){
+    var playableFromArray={};
+    data.forEach(function(row){
+      if(!row||typeof row!=="object")return;
+      var title=String(row.title||row.name||"").trim();
+      var image=String(row.image_url||row.image||row.thumb||"").trim();
+      if(title&&image)playableFromArray[title.toLowerCase()]=image;
+    });
+    return{gameThumbs:{},playableThumbsByName:playableFromArray};
   }
+  var gameThumbs=(data&&typeof data.gameThumbs==="object"&&data.gameThumbs)?data.gameThumbs:{};
+  var playable=(data&&typeof data.playableThumbsByName==="object"&&data.playableThumbsByName)?data.playableThumbsByName:{};
+  return{gameThumbs:gameThumbs,playableThumbsByName:playable};
+}
+function _readIconsViaXHR(url){
+  return new Promise(function(resolve,reject){
+    try{
+      var xhr=new XMLHttpRequest();
+      xhr.open("GET",url,true);
+      xhr.onreadystatechange=function(){
+        if(xhr.readyState!==4)return;
+        if(xhr.status===200||xhr.status===0){
+          try{resolve(JSON.parse(xhr.responseText));}catch(err){reject(err);}
+        }else reject(new Error("xhr failed"));
+      };
+      xhr.onerror=function(){reject(new Error("xhr error"));};
+      xhr.send();
+    }catch(e){reject(e);}
+  });
+}
+async function _loadIconsMap(){
+  var urls=["Icons.json","icons.json","./Icons.json","./icons.json"];
+  var loaded=null;
+  for(var i=0;i<urls.length;i++){
+    var u=urls[i];
+    try{
+      var res=await fetch(u+"?t="+Date.now(),{cache:"no-store"});
+      if(res.ok){loaded=await res.json();break;}
+    }catch(e){}
+    try{loaded=await _readIconsViaXHR(u);if(loaded)break;}catch(e2){}
+  }
+  var normalized=_normalizeIconsPayload(loaded);
+  GAME_THUMBS=normalized.gameThumbs||{};
+  PLAYABLE_THUMBS_BY_NAME=normalized.playableThumbsByName||{};
   _rebuildPlayableThumbKeyMap();
   renderGames();
   renderRecommendedSection();
@@ -1045,16 +1080,25 @@ function _normalizeThumbKey(n){
   return _normalizeGameName(n).replace(/[^a-z0-9]/g,'');
 }
 var PLAYABLE_THUMBS_BY_KEY={};
+var PLAYABLE_THUMBS_BY_NAME_LOWER={};
 function _rebuildPlayableThumbKeyMap(){
   PLAYABLE_THUMBS_BY_KEY={};
+  PLAYABLE_THUMBS_BY_NAME_LOWER={};
   Object.keys(PLAYABLE_THUMBS_BY_NAME||{}).forEach(function(name){
-    PLAYABLE_THUMBS_BY_KEY[_normalizeThumbKey(name)]=PLAYABLE_THUMBS_BY_NAME[name];
+    var value=PLAYABLE_THUMBS_BY_NAME[name];
+    PLAYABLE_THUMBS_BY_KEY[_normalizeThumbKey(name)]=value;
+    PLAYABLE_THUMBS_BY_NAME_LOWER[String(name).toLowerCase()]=value;
   });
 }
 function getGameThumbSrcByFile(file,name){
-  var nKey=_normalizeThumbKey(name);
-  var fKey=_normalizeThumbKey(String(file||'').replace(/\.html$/i,''));
-  return GAME_THUMBS[file]||PLAYABLE_THUMBS_BY_KEY[nKey]||PLAYABLE_THUMBS_BY_KEY[fKey]||_remoteThumbMap[file]||"";
+  var safeFile=String(file||"");
+  var safeName=String(name||"");
+  var baseFile=safeFile.replace(/\.html$/i,'');
+  var nKey=_normalizeThumbKey(safeName);
+  var fKey=_normalizeThumbKey(baseFile);
+  var exactName=PLAYABLE_THUMBS_BY_NAME[safeName]||PLAYABLE_THUMBS_BY_NAME_LOWER[safeName.toLowerCase()];
+  var directFileName=PLAYABLE_THUMBS_BY_NAME[baseFile]||PLAYABLE_THUMBS_BY_NAME_LOWER[baseFile.toLowerCase()];
+  return GAME_THUMBS[safeFile]||exactName||directFileName||PLAYABLE_THUMBS_BY_KEY[nKey]||PLAYABLE_THUMBS_BY_KEY[fKey]||_remoteThumbMap[safeFile]||"";
 }
 function getFallbackGameThumb(displayName){
   var txt=encodeURIComponent((_titleCaseGameName(displayName||"Game")).slice(0,24));
