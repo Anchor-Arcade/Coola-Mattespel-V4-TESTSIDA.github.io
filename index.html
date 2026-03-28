@@ -950,7 +950,9 @@ function getGameThumbCandidatesByFile(file){
   if(!raw)return [];
   if(_THUMB_CANDIDATE_CACHE[raw])return _THUMB_CANDIDATE_CACHE[raw].slice();
   var clean=raw.replace(/^\/+/, '').replace(/\.html?$/i,'');
-  var encoded=encodeURIComponent(clean);
+  var cleanNoSpace=clean.replace(/\s+/g,'');
+  var cleanLower=clean.toLowerCase();
+  var cleanNoPrefix=cleanLower.replace(/^cl/,'');
   var roots=[
     'https://nikehub.org/homework',
     'https://nikehub.org/homework/',
@@ -960,18 +962,31 @@ function getGameThumbCandidatesByFile(file){
     'https://nikehub.org/homework/thumbnails/',
     'https://nikehub.org/homework/assets/images/',
     'https://nikehub.org/homework/assets/img/',
-    'https://nikehub.org/homework/assets/thumbs/'
+    'https://nikehub.org/homework/assets/thumbs/',
+    'https://cdn.jsdelivr.net/gh/gn-math/covers@main',
+    'https://cdn.jsdelivr.net/gh/gn-math/covers@main/',
+    'https://cdn.jsdelivr.net/npm/gn-math.github.io-main@1.0.0/',
+    'https://cdn.jsdelivr.net/npm/gn-math.github.io-main@1.0.1/',
+    'https://cdn.jsdelivr.net/npm/gn-math.github.io-main@1.0.4/'
   ];
   var exts=['.png','.webp','.jpg','.jpeg','.gif'];
   var set={};
   var out=[];
   function push(u){if(!u||set[u])return;set[u]=1;out.push(u);} 
+  var nameVariants=[];
+  [clean,cleanNoSpace,cleanLower,cleanNoPrefix].forEach(function(v){
+    if(!v)return;
+    var enc=encodeURIComponent(v);
+    if(nameVariants.indexOf(enc)<0)nameVariants.push(enc);
+  });
   roots.forEach(function(root){
-    if(root.slice(-1)==='/'){
-      exts.forEach(function(ext){push(root+encoded+ext);});
-    }else{
-      exts.forEach(function(ext){push(root+'/'+encoded+ext);});
-    }
+    nameVariants.forEach(function(v){
+      if(root.slice(-1)==='/'){
+        exts.forEach(function(ext){push(root+v+ext);});
+      }else{
+        exts.forEach(function(ext){push(root+'/'+v+ext);});
+      }
+    });
   });
   _THUMB_CANDIDATE_CACHE[raw]=out.slice();
   return out;
