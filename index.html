@@ -1112,9 +1112,17 @@ function _initGameThumbLazyLoad(root){
 function _normalizeGameName(n){
   return String(n||'').toLowerCase().replace(/^cl\s*/,'').replace(/[_-]+/g,' ').replace(/\s+/g,' ').trim();
 }
+function _normalizeThumbKey(n){
+  return _normalizeGameName(n).replace(/[^a-z0-9]/g,'');
+}
+var PLAYABLE_THUMBS_BY_KEY={};
+Object.keys(PLAYABLE_THUMBS_BY_NAME).forEach(function(name){
+  PLAYABLE_THUMBS_BY_KEY[_normalizeThumbKey(name)]=PLAYABLE_THUMBS_BY_NAME[name];
+});
 function getGameThumbSrcByFile(file,name){
-  var n=_normalizeGameName(name);
-  return GAME_THUMBS[file]||PLAYABLE_THUMBS_BY_NAME[n]||_remoteThumbMap[file]||"";
+  var nKey=_normalizeThumbKey(name);
+  var fKey=_normalizeThumbKey(String(file||'').replace(/\.html$/i,''));
+  return GAME_THUMBS[file]||PLAYABLE_THUMBS_BY_KEY[nKey]||PLAYABLE_THUMBS_BY_KEY[fKey]||_remoteThumbMap[file]||"";
 }
 function getFallbackGameThumb(displayName){
   var txt=encodeURIComponent((_titleCaseGameName(displayName||"Game")).slice(0,24));
