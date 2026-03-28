@@ -956,7 +956,79 @@ var GAME_THUMBS={
   "clminecraft1.21.4.html":"https://upload.wikimedia.org/wikipedia/en/5/51/Minecraft_cover.png",
   "clwebecomewhatwebehold.html":"https://img.itch.zone/aW1nLzI1NTQxNjkucG5n/original/65s6L5.png"
 };
-function getGameThumbSrcByFile(file){return GAME_THUMBS[file]||"";}
+var ZONES_URLS=[
+  "https://cdn.jsdelivr.net/gh/gnmathcopy/assets@latest/zones.json",
+  "https://cdn.jsdelivr.net/gh/gnmathcopy/assets@master/zones.json",
+  "https://cdn.jsdelivr.net/gh/gnmathcopy/assets/zones.json"
+];
+var COVER_URL="https://cdn.jsdelivr.net/gh/gnmathcopy/covers@main";
+var HTML_URL="https://cdn.jsdelivr.net/npm/gn-math.github.io-main@1.0.5/html-main";
+var _remoteThumbMap={};
+var _remoteThumbsLoaded=false;
+var _thumbObserver=null;
+function _extractFileNameFromZoneUrl(raw){
+  if(!raw||typeof raw!=="string")return"";
+  var resolved=raw.replace(/\{COVER_URL\}/g,COVER_URL).replace(/\{HTML_URL\}/g,HTML_URL);
+  try{
+    var u=new URL(resolved,HTML_URL+"/");
+    var parts=u.pathname.split("/");
+    var last=parts[parts.length-1]||"";
+    return decodeURIComponent(last);
+  }catch(e){return"";}
+}
+function _resolveCoverFromZone(zone){
+  if(!zone||!zone.cover||typeof zone.cover!=="string")return"";
+  return zone.cover.replace(/\{COVER_URL\}/g,COVER_URL).replace(/\{HTML_URL\}/g,HTML_URL);
+}
+async function _loadRemoteThumbMap(){
+  for(var i=0;i<ZONES_URLS.length;i++){
+    try{
+      var res=await fetch(ZONES_URLS[i]+"?t="+Date.now(),{cache:"no-store"});
+      if(!res.ok)continue;
+      var zones=await res.json();
+      if(!Array.isArray(zones))continue;
+      var nextMap={};
+      zones.forEach(function(zone){
+        var file=_extractFileNameFromZoneUrl(zone&&zone.url);
+        var cover=_resolveCoverFromZone(zone);
+        if(file&&cover)nextMap[file]=cover;
+      });
+      if(Object.keys(nextMap).length){
+        _remoteThumbMap=nextMap;
+        _remoteThumbsLoaded=true;
+        renderGames();
+        renderRecommendedSection();
+        return;
+      }
+    }catch(e){}
+  }
+  _remoteThumbsLoaded=true;
+}
+function _initGameThumbLazyLoad(root){
+  if(typeof IntersectionObserver!=="function"){
+    (root||document).querySelectorAll("img.lazy-game-img").forEach(function(img){
+      if(img&&img.dataset&&img.dataset.src){img.src=img.dataset.src;img.classList.remove("lazy-game-img");}
+    });
+    return;
+  }
+  if(!_thumbObserver){
+    _thumbObserver=new IntersectionObserver(function(entries,observer){
+      entries.forEach(function(entry){
+        if(!entry.isIntersecting)return;
+        var img=entry.target;
+        if(img&&img.dataset&&img.dataset.src){
+          img.src=img.dataset.src;
+          img.classList.remove("lazy-game-img");
+        }
+        observer.unobserve(img);
+      });
+    },{rootMargin:"100px",threshold:0.1});
+  }
+  (root||document).querySelectorAll("img.lazy-game-img").forEach(function(img){_thumbObserver.observe(img);});
+}
+function getGameThumbSrcByFile(file){
+  return GAME_THUMBS[file]||_remoteThumbMap[file]||"";
+}
 function getFallbackGameThumb(displayName){
   var txt=encodeURIComponent((_titleCaseGameName(displayName||"Game")).slice(0,24));
   var svg="<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 340'>"
@@ -1533,6 +1605,7 @@ function renderGames(){
     var card=document.createElement("div");
     card.className="gameCard"+(locked?" locked":"");
     card.dataset.idx=realIdx;
+    card.dataset.file=game.f||"";
     var thumb=document.createElement("div");thumb.className="gameThumb";
     var bg=document.createElement("div");bg.className="gameThumbBg";bg.style.background='linear-gradient(135deg,var(--p1),var(--p0))';
     var thumbSrc=getGameThumbSrcByFile(game.f);
@@ -1540,7 +1613,9 @@ function renderGames(){
     img.className="gameThumbImage";
     img.loading="lazy";
     img.alt=_titleCaseGameName(displayName);
-    img.src=thumbSrc||getFallbackGameThumb(displayName);
+    img.dataset.src=thumbSrc||getFallbackGameThumb(displayName);
+    img.classList.add("lazy-game-img");
+    img.src=getFallbackGameThumb(displayName);
     img.onerror=function(){this.src=getFallbackGameThumb(displayName);};
     thumb.appendChild(img);
     var letter=document.createElement("div");letter.className="gameThumbLetter";
@@ -1558,6 +1633,7 @@ function renderGames(){
     card.appendChild(thumb);card.appendChild(info);
     grid.appendChild(card);
   });
+  _initGameThumbLazyLoad(grid);
 }
 
 function maybeLoadMoreGames(){
@@ -3142,6 +3218,7 @@ function renderInventoryWin(){
 document.addEventListener("DOMContentLoaded",function(){
   // Show loader immediately on page load
   showLoader("Coola Mattespel V4");
+  _loadRemoteThumbMap();
   document.querySelectorAll(".filterBtn").forEach(function(btn){
     btn.addEventListener("click",function(){
       document.querySelectorAll(".filterBtn").forEach(function(b){b.classList.remove("active");});
