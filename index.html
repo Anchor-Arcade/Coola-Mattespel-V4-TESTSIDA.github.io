@@ -518,7 +518,6 @@ html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:var
     <button class="sideNavBtn" onclick="openBrowser('browser')"><span class="sideNavIcon">🌐</span><span class="sideNavLabel">Browser</span></button>
     <button class="sideNavBtn" onclick="closeSidebar();openPanelOverlay('quests')"><span class="sideNavIcon">📋</span><span class="sideNavLabel">Quests</span></button>
     <button class="sideNavBtn" data-tab="butik" onclick="openPanelOverlay('butik')"><span class="sideNavIcon">🛒</span><span class="sideNavLabel">Shop</span></button>
-    <button class="sideNavBtn" onclick="closeSidebar();openChat()"><span class="sideNavIcon">💬</span><span class="sideNavLabel" data-i18n="nav_chat">Chat</span></button>
     <button class="sideNavBtn" onclick="closeSidebar();openPanelOverlay('achievements')"><span class="sideNavIcon">🏅</span><span class="sideNavLabel">Achievements</span></button>
     <button class="sideNavBtn" onclick="closeSidebar();openInventoryWindow()"><span class="sideNavIcon">🎒</span><span class="sideNavLabel">Inventory</span></button>
     <button class="sideNavBtn" onclick="openThemesWindow()"><span class="sideNavIcon">🎨</span><span class="sideNavLabel" data-i18n="nav_themes">Themes</span></button>
@@ -670,25 +669,7 @@ html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:var
   </div>
 </div>
 
-<div class="appOverlay" id="chatOverlay" onclick="if(event.target===this)closeChat()">
-  <div class="appWin" id="chatWin" style="width:min(440px,95vw);height:min(540px,88vh);display:flex;flex-direction:column">
-    <div class="winBar" id="chatWinBar">
-      <div class="winBar-title"><span class="winBar-icon">💬</span> <span data-i18n="chatTitle">Chat</span></div>
-      <div class="winBar-controls">
-        <button class="winBtn wClose" onclick="closeChat()">✕</button>
-      </div>
-    </div>
-    <div id="chatStatusBar" style="padding:8px 12px;border-bottom:1px solid var(--line);font-size:12px;color:var(--m)">Chatstatus: Aktiv ✅</div>
-    <div style="flex:1;overflow-y:auto;min-height:0" class="chatMessages" id="chatMessages"></div>
-    <div class="chatInputRow" style="flex-shrink:0;padding:8px;border-top:1px solid var(--line)">
-      <select id="chatTarget" class="formInput" style="max-width:130px;padding:8px 10px;font-size:12px;flex-shrink:0">
-        <option value="">Alla</option>
-      </select>
-      <input type="text" id="chatInput" data-i18n-ph="chatPlaceholder" placeholder="Skriv ett meddelande..." onkeydown="chatKey(event)" maxlength="250">
-      <button class="pill primary" onclick="sendChat()" style="padding:8px 14px;flex-shrink:0" data-i18n="sendBtn">Skicka</button>
-    </div>
-  </div>
-</div>
+
 
 <!-- ---- PANEL OVERLAY WINDOWS ---- -->
 <div class="panelOverlay" id="discordOverlay" onclick="if(event.target===this)closePanelOverlay('discord')">
@@ -888,6 +869,8 @@ try{
   if(FIREBASE_CONFIG.projectId!=="DIN_FIREBASE_PROJECT_ID"){
     if(!firebase.apps||!firebase.apps.length)firebase.initializeApp(FIREBASE_CONFIG);
     _rtdb=firebase.database();
+    window._onlineRtdb=_rtdb;
+    _rtdb=null;
     console.log("Firebase ansluten!");
   }else{
     console.log("Firebase ej konfigurerat - använder lokal lagring.");
@@ -1242,76 +1225,21 @@ function renderProfileOverlay(){
   var av=localStorage.getItem("avatar_"+state.user)||"";
   var favs=state.favorites.length;
   var played=state.gamesPlayed||0;
-  var friends=JSON.parse(localStorage.getItem("friends_"+state.user)||"[]");
-  var friendsHTML="";
-  friends.forEach(function(fn){
-    friendsHTML+="<div class='friend-row'><span class='friend-name'>"+fn+"</span><button class='pill ghost rmfriend' data-fn='"+fn+"' style='font-size:11px;padding:4px 10px'>Remove</button></div>";
-  });
-  if(!friends.length)friendsHTML="<p style='color:var(--d);font-size:12px'>No friends yet.</p>";
   var ava=av?"<img src='"+av+"' style='width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid var(--p1);margin-bottom:10px'>":"<div style='width:80px;height:80px;border-radius:50%;background:var(--glass);border:3px solid var(--p1);display:inline-flex;align-items:center;justify-content:center;font-size:32px;margin-bottom:10px'>&#128100;</div>";
   el.innerHTML="<div class='profile-grid'><div>"
     +"<div class='profile-card' style='text-align:center;margin-bottom:12px'>"+ava+"<div style='font-weight:800;font-size:18px;color:var(--w)'>"+state.user+"</div><div style='font-size:12px;color:var(--d)'>"+T("stat_level")+" "+state.level+"</div></div>"
     +"<div class='profile-card' style='margin-bottom:12px'><h4>"+T("sett_account")+"</h4><div class='profile-stat-row'><div class='p-stat'><span>"+state.coins+"</span><small>"+T("stat_coins")+"</small></div><div class='p-stat'><span>"+favs+"</span><small>"+T("stat_favs")+"</small></div><div class='p-stat'><span>"+played+"</span><small>"+T("stat_played")+"</small></div></div>"
     +"<button class='pill ghost' onclick='closeProfileOverlay();doLogout()' style='width:100%;justify-content:center;margin-top:4px'>"+T("sett_logout")+"</button></div>"
-    +"</div><div>"
-    +"<div class='profile-card' style='margin-bottom:12px'><h4>Friends</h4><div class='user-search-row'><input type='text' id='friendInput' class='formInput' placeholder='Add friend by username...' style='font-size:12px;padding:8px 10px'><button class='pill primary' onclick='addFriend()' style='padding:8px 14px;font-size:12px'>Add</button></div><div id='friendsList'>"+friendsHTML+"</div></div>"
-    +"<div class='profile-card'><h4>Browse Profiles</h4><div class='user-search-row'><input type='text' id='profileSearchInput' class='formInput' placeholder='Search username...' style='font-size:12px;padding:8px 10px' oninput='searchProfiles(this.value)'></div><div id='profileSearchResults'><p style='color:var(--d);font-size:12px'>Type to search...</p></div></div>"
     +"</div></div>";
-  el.querySelectorAll(".rmfriend").forEach(function(btn){
-    btn.addEventListener("click",function(){removeFriend(this.dataset.fn);});
-  });
 }
 function closeProfileOverlay(){
   var ov=document.getElementById("profileOverlay");
   if(ov){ov.classList.remove("open");setTimeout(function(){ov.style.display="none";},250);}
 }
-function addFriend(){
-  var inp=document.getElementById("friendInput");if(!inp)return;
-  var name=inp.value.trim();if(!name||name===state.user)return;
-  var friends=JSON.parse(localStorage.getItem("friends_"+state.user)||"[]");
-  if(friends.indexOf(name)<0){friends.push(name);localStorage.setItem("friends_"+state.user,JSON.stringify(friends));_cloudPush();}
-  inp.value="";renderProfileOverlay();
-}
-function removeFriend(name){
-  var friends=JSON.parse(localStorage.getItem("friends_"+state.user)||"[]");
-  localStorage.setItem("friends_"+state.user,JSON.stringify(friends.filter(function(f){return f!==name;})));
-  renderProfileOverlay();
-}
-function searchProfiles(q){
-  var el=document.getElementById("profileSearchResults");if(!el)return;
-  if(!q||q.length<2){el.innerHTML="<p style='color:var(--d);font-size:12px'>Type to search users...</p>";return;}
-  if(!_rtdb){el.innerHTML="<p style='color:var(--d);font-size:12px'>Not available offline</p>";return;}
-  _rtdb.ref('user_data').limitToFirst(200).once('value').then(function(snap){
-    var rows=[];
-    var all=snap.val()||{};
-    Object.keys(all).forEach(function(k){var d=all[k]||{};rows.push({username:d.username||k,is_admin:!!d.is_admin,avatar:d.avatar||'',profile_ext:d.profile_ext||{}});});
-    var ql=q.toLowerCase();
-    rows=rows.filter(function(u){return (u.username||'').toLowerCase().indexOf(ql)>=0;}).slice(0,8);
-    if(!rows.length){el.innerHTML="<p style='color:var(--d);font-size:12px'>No users found</p>";return;}
-    var h2="";var frs=JSON.parse(localStorage.getItem("friends_"+state.user)||"[]");
-    rows.forEach(function(u){
-      var isFr=frs.indexOf(u.username)>=0;
-      var avatar=u.avatar
-        ?"<img src='"+u.avatar+"' style='width:28px;height:28px;border-radius:50%;object-fit:cover;border:1px solid var(--line)'>"
-        :"<div style='width:28px;height:28px;border-radius:50%;background:var(--p0);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff'>"+(u.username||'?').charAt(0).toUpperCase()+"</div>";
-      var bannerStyle=(u.profile_ext&&u.profile_ext.customBanner)?("background-image:url("+u.profile_ext.customBanner+");background-size:cover;background-position:center;"):"background:linear-gradient(135deg,var(--p2),var(--p0));";
-      h2+="<div class='friend-row' style='padding:6px;border-radius:10px;border:1px solid var(--line);margin-bottom:6px;background:var(--glass2)'><div style='height:24px;border-radius:6px;margin-bottom:6px;"+bannerStyle+"'></div><div style='display:flex;align-items:center;gap:8px'>"+avatar+"<span class='friend-name' style='flex:1'>"+(u.is_admin?"&#128737; ":"")+u.username+"</span>"
-        +(state.user&&u.username!==state.user?"<button class='pill ghost srchbtn' data-un='"+u.username+"' data-isfriend='"+(isFr?1:0)+"' style='font-size:11px;padding:4px 10px'>"+(isFr?"Friend":"+ Add")+"</button>":"")+"</div></div>";
-    });
-    el.innerHTML=h2;
-    el.querySelectorAll(".srchbtn").forEach(function(btn){
-      btn.addEventListener("click",function(){
-        if(this.dataset.isfriend==="1"){removeFriend(this.dataset.un);}else{addFriendDirect(this.dataset.un);}
-        var qi=document.getElementById("profileSearchInput");if(qi)searchProfiles(qi.value);
-      });
-    });
-  }).catch(function(){el.innerHTML="<p style='color:var(--d);font-size:12px'>Could not search right now</p>";});
-}
-function addFriendDirect(name){
-  var friends=JSON.parse(localStorage.getItem("friends_"+state.user)||"[]");
-  if(friends.indexOf(name)<0){friends.push(name);localStorage.setItem("friends_"+state.user,JSON.stringify(friends));_cloudPush();}
-  renderProfileOverlay();
-}
+function addFriend(){toast('Kompis-funktionen är borttagen.','error');}
+function removeFriend(name){return;}
+function searchProfiles(q){var el=document.getElementById("profileSearchResults");if(el)el.innerHTML="";return;}
+function addFriendDirect(name){return;}
 function openDiscord(){
   openBrowser('discord');
 }
@@ -1410,35 +1338,8 @@ function _cloudSnapshot(){
     cloud_bundle:_collectCloudBundle()
   };
 }
-function _cloudPush(){
-  var ref=_cloudUserDoc();
-  var data=_cloudSnapshot();
-  if(!ref||!data)return;
-  ref.update(data).catch(function(){});
-}
-function _cloudPull(cb){
-  var ref=_cloudUserDoc();
-  if(!ref){if(cb)cb();return;}
-  ref.once('value').then(function(doc){
-    var d=(doc&&doc.val)?doc.val():null;
-    if(d){
-      state.coins=(d.coins!=null)?d.coins:state.coins;
-      state.xp=(d.xp!=null)?d.xp:state.xp;
-      state.level=(d.level!=null)?d.level:state.level;
-      state.favorites=Array.isArray(d.favorites)?d.favorites:state.favorites;
-      state.gamesPlayed=(d.games_played!=null)?d.games_played:state.gamesPlayed;
-      state.settings=Object.assign({animations:true,sounds:true,darkMode:true,theme:'purple',lang:'sv'},d.settings||state.settings||{});
-      if(d.avatar)localStorage.setItem('avatar_'+state.user,d.avatar);
-      if(d.profile_ext)localStorage.setItem('profile_ext_'+state.user,JSON.stringify(d.profile_ext));
-      if(Array.isArray(d.owned))localStorage.setItem('owned_'+state.user,JSON.stringify(d.owned));
-      if(d.quests)localStorage.setItem('quests_'+state.user+'_'+_todayKeyDate(),JSON.stringify(d.quests));
-      if(Array.isArray(d.friends))localStorage.setItem('friends_'+state.user,JSON.stringify(d.friends));
-      _applyCloudBundle(d.cloud_bundle||{});
-      localStorage.setItem('jspel_'+state.user,JSON.stringify({coins:state.coins,xp:state.xp,level:state.level,favorites:state.favorites,gamesPlayed:state.gamesPlayed,settings:state.settings}));
-    }
-    if(cb)cb();
-  }).catch(function(){if(cb)cb();});
-}
+function _cloudPush(){return;}
+function _cloudPull(cb){if(cb)cb();}
 
 function _ratingDoc(idx){return _rtdb?_rtdb.ref('game_ratings/'+String(idx)):null;}
 function _cloudPushRating(idx,stars){
@@ -2447,8 +2348,7 @@ function toggleChatEnabled(){
   localStorage.setItem('chatEnabled',String(next));
   _setGlobalFlag('chatEnabled',next);
   _pullGlobalFlags();
-  setTimeout(updateChatStatusUI,300);
-  if(document.getElementById('chatOverlay').classList.contains('open'))loadChatMsgs();
+  var cov=document.getElementById('chatOverlay');if(cov&&cov.classList.contains('open'))loadChatMsgs();
 }
 function adminToggleVerify(u){
   if(!state.isAdmin)return;
@@ -2459,7 +2359,7 @@ function adminToggleVerify(u){
   localStorage.setItem('verifiedUsers',JSON.stringify(list));
   _setGlobalFlag('verifiedUsers',list);
   renderAdminPanel();
-  if(document.getElementById('chatOverlay').classList.contains('open'))loadChatMsgs();
+  var cov=document.getElementById('chatOverlay');if(cov&&cov.classList.contains('open'))loadChatMsgs();
 }
 
 function _toHex(buf){return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');}
@@ -2705,110 +2605,17 @@ function doLogout(){
   updateHUD();closeSidebar();renderGames();
   toast("Loggad ut");
 }
-function openChat(){
-  var ov=document.getElementById("chatOverlay");if(!ov)return;
-  _resetWinPos(document.getElementById("chatWin"));
-  ov.style.display="flex";
-  setTimeout(function(){ov.classList.add("open");},10);
-  closeSidebar();_pullGlobalFlags();setTimeout(updateChatStatusUI,150);loadChatMsgs();
-}
-function closeChat(){
-  var ov=document.getElementById("chatOverlay");
-  if(ov){ov.classList.remove("open");setTimeout(function(){ov.style.display="none";},200);}
-}
-function _renderChatMsgs(msgs){
-  var el=document.getElementById('chatMessages');if(!el)return;
-  el.innerHTML=msgs.map(function(m){
-    var isMe=m.user===state.user;
-    var av='';
-    if(isMe){av=localStorage.getItem('avatar_'+m.user)||'';}
-    else if(_profileCache[m.user]&&_profileCache[m.user].data){var cd=_profileCache[m.user].data;av=cd.avatar||((cd.settings&&cd.settings._avatar)||'');}
-    var avatarHtml=av
-      ?'<img src="'+av+'" onclick="viewProfile(this.dataset.u)" data-u="'+m.user+'" style="width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid var(--p1);cursor:pointer">'
-      :'<div data-chat-av="'+m.user+'" onclick="viewProfile(this.dataset.u)" data-u="'+m.user+'" style="width:28px;height:28px;border-radius:50%;background:var(--p0);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;color:#fff;cursor:pointer">'+m.user.charAt(0).toUpperCase()+'</div>';
-    var time=m.ts?new Date(m.ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'';
-    var isAdmin=m.isAdmin||m.user==='[ADMIN]';var isVerified=!!m.verified;var pmLabel=m.to?('<div style="font-size:10px;color:#7fffb3;margin-bottom:2px;padding-left:4px">🔒 Privat till '+m.to+'</div>'):'';
-    var cd=_profileCache[m.user]&&_profileCache[m.user].data?_profileCache[m.user].data:null;
-    var banner=(cd&&cd.profile_ext&&cd.profile_ext.customBanner&&!isMe)?'<div style="height:16px;border-radius:8px 8px 4px 4px;margin-bottom:4px;background:url('+cd.profile_ext.customBanner+') center/cover no-repeat;border:1px solid var(--line)"></div>':'';
-    return'<div style="display:flex;align-items:flex-end;gap:6px;margin:6px 0;'+(isMe?'flex-direction:row-reverse':'')+'">'+ avatarHtml+'<div style="max-width:70%">'+'<div style="font-size:10px;color:var(--d);margin-bottom:2px;padding-left:4px;cursor:pointer" onclick="viewProfile(\'' + m.user + '\')">'+(isAdmin?'🛡 ':'')+m.user+(isVerified?' ✔️':'')+'</div>'+banner+pmLabel+'<div style="background:'+(isAdmin?'rgba(255,80,0,.25)':isMe?'var(--p0)':'var(--glass2)')+';color:var(--w);padding:7px 11px;border-radius:'+(isMe?'14px 14px 4px 14px':'14px 14px 14px 4px')+';font-size:13px;word-break:break-word">'+m.text+'</div><div style="font-size:10px;color:var(--d);margin-top:2px;text-align:'+(isMe?'right':'left')+'">'+time+'</div></div></div>';
-  }).join('');
-  el.scrollTop=el.scrollHeight;
-  /* Async: fetch and inject missing avatars */
-  var needed={};
-  msgs.forEach(function(m){
-    if(m.user!==state.user&&!(_profileCache[m.user]&&_profileCache[m.user].data&&(_profileCache[m.user].data.avatar||(_profileCache[m.user].data.settings&&_profileCache[m.user].data.settings._avatar))))needed[m.user]=1;
-  });
-  Object.keys(needed).forEach(function(u){
-    _fetchUserProfile(u,function(d){
-      if(!d)return;
-      var av2=d.avatar||((d.settings&&d.settings._avatar)||'');if(!av2)return;
-      var chatEl=document.getElementById('chatMessages');if(!chatEl)return;
-      chatEl.querySelectorAll('[data-chat-av="'+u+'"]').forEach(function(ph){
-        var img=document.createElement('img');img.src=av2;
-        img.setAttribute('data-u',u);
-        img.setAttribute('onclick','viewProfile(this.getAttribute(\'data-u\'))');
-        img.style.cssText='width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid var(--p1);cursor:pointer';
-        if(ph.parentNode)ph.parentNode.replaceChild(img,ph);
-      });
-    });
-  });
-}
-function _chatCol(){return _rtdb?_rtdb.ref('chat_messages'):null;}
-function _fetchChat(cb){var c=_chatCol();if(!c){cb([]);return;}c.orderByChild('timestamp').limitToLast(300).once('value').then(function(snap){var arr=[];snap.forEach(function(d){arr.push(d.val()||{});});cb(arr);}).catch(function(){cb([]);});}
-function _insertChat(doc,cb){var c=_chatCol();if(!c){cb&&cb(false);return;}c.push(doc).then(function(){cb&&cb(true);}).catch(function(){cb&&cb(false);});}
-function loadChatMsgs(){
-  var sel=document.getElementById('chatTarget');if(sel&&state.user){
-    var friends=JSON.parse(localStorage.getItem('friends_'+state.user)||'[]');
-    sel.innerHTML='<option value="">Alla</option>'+friends.map(function(f){return '<option value="'+f+'">Privat: '+f+'</option>';}).join('');
-  }
-  if(_rtdb){
-    _fetchChat(function(rows){
-      var msgs=rows.map(function(r){return{user:r.username||r.user||'?',text:r.text||'',ts:r.timestamp||Date.now(),isAdmin:!!r.is_admin,to:r.to||null,verified:!!r.verified};});
-      msgs=msgs.filter(function(m){return !m.to||m.to==='all'||m.to===state.user||m.user===state.user;});
-      _renderChatMsgs(msgs);
-    });
-    return;
-  }
-  var msgs=JSON.parse(localStorage.getItem('globalChat')||'[]');
-  msgs=msgs.filter(function(m){return !m.to||m.to===state.user||m.user===state.user;});
-  _renderChatMsgs(msgs);
-}
-
-function sendChat(){
-  if(!state.user){toast("Logga in för att chatta");return;}
-  if(!isChatEnabled()){toast("Chatten är stannad av admin","error");updateChatStatusUI();return;}
-  var _cd=new Date().toDateString();var _ck='chatSent_'+state.user+'_'+_cd;
-  localStorage.setItem(_ck,(parseInt(localStorage.getItem(_ck)||'0')+1));
-  var inp=document.getElementById("chatInput");
-  var txt=inp.value.trim();if(!txt)return;
-  if(_containsBadWords(txt)){toast("Meddelandet innehåller förbjudna ord","error");return;}
-  var toSel=document.getElementById("chatTarget");
-  var to=(toSel&&toSel.value)?toSel.value:"";
-  if(!state.isAdmin){
-    if(state.coins<1){toast("Du behöver minst 1 mynt för att chatta","error");return;}
-    state.coins-=1;updateHUD();saveState();
-  }
-  var msg={user:state.user,text:txt,ts:Date.now(),isAdmin:!!state.isAdmin,to:to||null,verified:isVerifiedUser(state.user)};
-  inp.value="";updateQuests('chat');
-  if(_rtdb){
-    _insertChat({username:state.user,text:txt,timestamp:msg.ts,is_admin:!!state.isAdmin,to:to||'all',verified:isVerifiedUser(state.user)},function(ok){
-      if(!ok){var msgs=JSON.parse(localStorage.getItem("globalChat")||"[]");msgs.push(msg);localStorage.setItem("globalChat",JSON.stringify(msgs));}
-      loadChatMsgs();
-    });
-  }else{
-    var msgs=JSON.parse(localStorage.getItem("globalChat")||"[]");
-    msgs.push(msg);if(msgs.length>300)msgs.splice(0,msgs.length-300);
-    localStorage.setItem("globalChat",JSON.stringify(msgs));
-    loadChatMsgs();
-  }
-}
-function chatKey(e){if(e.key==="Enter")sendChat();}
-function adminBroadcast(){var msg=document.getElementById('adminBroadcastMsg');if(!msg||!msg.value.trim())return toast('Skriv ett meddelande','error');var txt='📢 '+msg.value.trim();if(_rtdb){_insertChat({username:'[ADMIN]',text:txt,timestamp:Date.now(),is_admin:true,to:'all',verified:true},function(){loadChatMsgs();});}else{var msgs=JSON.parse(localStorage.getItem('globalChat')||'[]');msgs.push({user:'[ADMIN]',text:txt,ts:Date.now(),isAdmin:true,to:'all'});localStorage.setItem('globalChat',JSON.stringify(msgs));}msg.value='';toast('Broadcast skickat!','ok');if(document.getElementById('chatMessages'))loadChatMsgs();}
+function openChat(){toast('Chatten är borttagen.','error');}
+function closeChat(){}
+function loadChatMsgs(){}
+function sendChat(){}
+function chatKey(e){}
+function adminBroadcast(){toast('Chatten är borttagen.','error');}
 function adminGiveCoins(){var uEl=document.getElementById('adminCoinUser');var aEl=document.getElementById('adminCoinAmount');if(!uEl||!aEl||!uEl.value.trim())return toast('Ange ett användarnamn','error');var amount=parseInt(aEl.value)||0;if(amount<=0)return toast('Ange ett giltigt antal mynt','error');if(uEl.value.trim()===state.user){state.coins+=amount;saveState();updateHUD();}else{var key='jspel_'+uEl.value.trim();var data=JSON.parse(localStorage.getItem(key)||'{}');data.coins=(data.coins||0)+amount;localStorage.setItem(key,JSON.stringify(data));}toast(amount+' mynt gavs till '+uEl.value.trim(),'ok');uEl.value='';aEl.value='';renderAdminPanel();}
 function adminKick(u){if(u===state.user)return toast('Kan inte kicka dig själv','error');toast(u+' kickades','ok');}
 function adminBan(u){if(u===state.user)return toast('Kan inte banna dig själv','error');var banned=JSON.parse(localStorage.getItem('bannedUsers')||'[]');if(banned.indexOf(u)<0){banned.push(u);localStorage.setItem('bannedUsers',JSON.stringify(banned));}toast(u+' bannades','ok');renderAdminPanel();}
 function adminUnban(u){var banned=JSON.parse(localStorage.getItem('bannedUsers')||'[]');var idx=banned.indexOf(u);if(idx>=0){banned.splice(idx,1);localStorage.setItem('bannedUsers',JSON.stringify(banned));}toast(u+' avbannades','ok');renderAdminPanel();}
-function adminClearChat(){if(!confirm('Rensa all chatt?'))return;localStorage.setItem('globalChat','[]');if(_rtdb){_chatCol().remove().catch(function(){});}toast('Chatten rensades','ok');renderAdminPanel();if(document.getElementById('chatMessages'))loadChatMsgs();}
+function adminClearChat(){toast('Chatten är borttagen.','error');renderAdminPanel();}
 function showSiteAnnouncements(){
   var ann=JSON.parse(localStorage.getItem('admin_announcements')||'[]');
   var dismissed=JSON.parse(localStorage.getItem('dismissed_announcements')||'[]');
@@ -3075,11 +2882,7 @@ function _doRenderProfileCard(card,username,sbData){
   /* Actions */
   var actionsHTML="";
   if(!isSelf&&state.user){
-    if(isFriend){
-      actionsHTML='<button onclick="removeFriend(\'' + username + '\');closeViewProfile();toast(\'Vän borttagen\')" style="background:rgba(255,50,50,.2);color:#ff6b6b;border:1px solid rgba(255,50,50,.3);flex:1;padding:9px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer">✕ Ta bort vän</button>';
-    }else{
-      actionsHTML='<button onclick="addFriendDirect(\'' + username + '\');closeViewProfile();toast(\'+Vän tillagd ✨\',\'ok\')" style="background:var(--p0);color:#fff;flex:1;padding:9px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;border:none">+ Lägg till vän</button>';
-    }
+    actionsHTML='';
   }
   if(isSelf){
     actionsHTML='<button onclick="openProfileEditModal()" style="background:var(--p0);color:#fff;border:none;flex:1;padding:9px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer">✏️ Redigera</button>';
@@ -3389,9 +3192,6 @@ document.addEventListener("DOMContentLoaded",function(){
   if(invWin&&invBar)makeDraggable(invWin,invBar);
   var pCard=document.getElementById('profileCard');
   if(pCard)makeDraggable(pCard,pCard);
-  var chatWin=document.getElementById('chatWin');
-  var chatBar=document.getElementById('chatWinBar');
-  if(chatWin&&chatBar)makeDraggable(chatWin,chatBar);
   var sbWin=document.getElementById('soundboardWin');
   var sbBar=document.getElementById('soundboardWinBar');
   if(sbWin&&sbBar)makeDraggable(sbWin,sbBar);
@@ -3428,19 +3228,17 @@ document.addEventListener("DOMContentLoaded",function(){
   if(!state.settings.lang)state.settings.lang='sv';if(state.settings&&state.settings.theme&&state.settings.theme!=="purple")applyTheme(state.settings.theme);
   applyDarkMode(state.settings&&state.settings.darkMode===true);
   _pullGlobalFlags();
-  setTimeout(updateChatStatusUI,300);
   setInterval(function(){
-    if(document.getElementById("chatOverlay").classList.contains("open"))loadChatMsgs();
   },3000);
 
   // ---- LIVE PRESENCE COUNTER (Realtime DB + fallback) ----
   var _presenceId=(state.user?('user_'+state.user):('guest_'+Math.random().toString(36).slice(2,8)));
   function updatePresenceCount(){
-    if(_rtdb){
+    if(window._onlineRtdb){
       var now=Date.now();
-      var ref=_rtdb.ref('online_users/'+_presenceId);
+      var ref=window._onlineRtdb.ref('online_users/'+_presenceId);
       ref.set({id:_presenceId,user:state.user||null,ts:now}).then(function(){
-        return _rtdb.ref('online_users').once('value');
+        return window._onlineRtdb.ref('online_users').once('value');
       }).then(function(snap){
         var el=document.getElementById('onlineCount');
         var all=snap.val()||{};
@@ -3457,7 +3255,7 @@ document.addEventListener("DOMContentLoaded",function(){
   }
   updatePresenceCount();
   setInterval(updatePresenceCount,20000);
-  window.addEventListener('beforeunload',function(){if(_rtdb){_rtdb.ref('online_users/'+_presenceId).remove().catch(function(){});}});
+  window.addEventListener('beforeunload',function(){if(window._onlineRtdb){window._onlineRtdb.ref('online_users/'+_presenceId).remove().catch(function(){});}});
   applyLang();
   setTimeout(hideLoader, 600);
 });
@@ -3471,7 +3269,7 @@ en:{heroTitle:"Coola Mattespel V4",pill_games:"🎮 1,946 games",pill_coins:"�
   back:"← Back",fullscreen:"⛶ Fullscreen",chatTitle:"💬 Chat",
   chatPlaceholder:"Write a message...",sendBtn:"Send",
   nav_favs:"Favorites",nav_profile:"Profile",nav_themes:"Themes",nav_suggest:"Suggest",
-  nav_settings:"Settings",nav_chat:"Chat",nav_admin:"Admin",
+  nav_settings:"Settings",nav_admin:"Admin",
   sett_title:"Settings",sett_animations:"Animations",sett_sound:"Sound",
   sett_dark:"Dark mode",sett_lang:"Language",sett_account:"Account",sett_logout:"Log out",
   themeTitle:"Choose theme",sugTitle:"Suggest a game",
@@ -3491,7 +3289,7 @@ sv:{heroTitle:"Coola Mattespel V4",pill_games:"🎮 1 946 spel",pill_coins:"🏆
   back:"← Tillbaka",fullscreen:"⛶ Fullskärm",chatTitle:"💬 Chatt",
   chatPlaceholder:"Skriv ett meddelande...",sendBtn:"Skicka",
   nav_favs:"Favoriter",nav_profile:"Profil",nav_themes:"Teman",nav_suggest:"Förslag",
-  nav_settings:"Inställningar",nav_chat:"Chatt",nav_admin:"Admin",
+  nav_settings:"Inställningar",nav_admin:"Admin",
   sett_title:"Inställningar",sett_animations:"Animationer",sett_sound:"Ljud",
   sett_dark:"Mörkt läge",sett_lang:"Språk",sett_account:"Konto",sett_logout:"Logga ut",
   themeTitle:"Välj tema",sugTitle:"Föreslå ett spel",
@@ -3511,7 +3309,7 @@ es:{heroTitle:"Coola Mattespel V4",pill_games:"🎮 1.946 juegos",pill_coins:"�
   back:"← Volver",fullscreen:"⛶ Pantalla completa",chatTitle:"💬 Chat",
   chatPlaceholder:"Escribe un mensaje...",sendBtn:"Enviar",
   nav_favs:"Favoritos",nav_profile:"Perfil",nav_themes:"Temas",nav_suggest:"Sugerir",
-  nav_settings:"Ajustes",nav_chat:"Chat",nav_admin:"Admin",
+  nav_settings:"Ajustes",nav_admin:"Admin",
   sett_title:"Ajustes",sett_animations:"Animaciones",sett_sound:"Sonido",
   sett_dark:"Modo oscuro",sett_lang:"Idioma",sett_account:"Cuenta",sett_logout:"Cerrar sesión",
   themeTitle:"Elegir tema",sugTitle:"Sugerir un juego",
@@ -3531,7 +3329,7 @@ fr:{heroTitle:"Coola Mattespel V4",pill_games:"🎮 1 946 jeux",pill_coins:"🏆
   back:"← Retour",fullscreen:"⛶ Plein écran",chatTitle:"💬 Chat",
   chatPlaceholder:"Écrire un message...",sendBtn:"Envoyer",
   nav_favs:"Favoris",nav_profile:"Profil",nav_themes:"Thèmes",nav_suggest:"Suggérer",
-  nav_settings:"Paramètres",nav_chat:"Chat",nav_admin:"Admin",
+  nav_settings:"Paramètres",nav_admin:"Admin",
   sett_title:"Paramètres",sett_animations:"Animations",sett_sound:"Son",
   sett_dark:"Mode sombre",sett_lang:"Langue",sett_account:"Compte",sett_logout:"Déconnexion",
   themeTitle:"Choisir un thème",sugTitle:"Suggérer un jeu",
@@ -3551,7 +3349,7 @@ de:{heroTitle:"Coola Mattespel V4",pill_games:"🎮 1 946 Spiele",pill_coins:"�
   back:"← Zurück",fullscreen:"⛶ Vollbild",chatTitle:"💬 Chat",
   chatPlaceholder:"Nachricht schreiben...",sendBtn:"Senden",
   nav_favs:"Favoriten",nav_profile:"Profil",nav_themes:"Themen",nav_suggest:"Vorschlag",
-  nav_settings:"Einstellungen",nav_chat:"Chat",nav_admin:"Admin",
+  nav_settings:"Einstellungen",nav_admin:"Admin",
   sett_title:"Einstellungen",sett_animations:"Animationen",sett_sound:"Ton",
   sett_dark:"Dunkelmodus",sett_lang:"Sprache",sett_account:"Konto",sett_logout:"Abmelden",
   themeTitle:"Thema wählen",sugTitle:"Spiel vorschlagen",
@@ -3571,7 +3369,7 @@ ru:{heroTitle:"Coola Mattespel V4",pill_games:"🎮 1 946 игр",pill_coins:"�
   back:"← Назад",fullscreen:"⛶ Полный экран",chatTitle:"💬 Чат",
   chatPlaceholder:"Написать сообщение...",sendBtn:"Отправить",
   nav_favs:"Избранное",nav_profile:"Профиль",nav_themes:"Темы",nav_suggest:"Предложить",
-  nav_settings:"Настройки",nav_chat:"Чат",nav_admin:"Админ",
+  nav_settings:"Настройки",nav_admin:"Админ",
   sett_title:"Настройки",sett_animations:"Анимации",sett_sound:"Звук",
   sett_dark:"Тёмный режим",sett_lang:"Язык",sett_account:"Аккаунт",sett_logout:"Выйти",
   themeTitle:"Выбрать тему",sugTitle:"Предложить игру",
@@ -3591,7 +3389,7 @@ zh:{heroTitle:"Coola Mattespel V4",pill_games:"🎮 1,946个游戏",pill_coins:"
   back:"← 返回",fullscreen:"⛶ 全屏",chatTitle:"💬 聊天",
   chatPlaceholder:"输入消息...",sendBtn:"发送",
   nav_favs:"收藏",nav_profile:"个人资料",nav_themes:"主题",nav_suggest:"建议",
-  nav_settings:"设置",nav_chat:"聊天",nav_admin:"管理员",
+  nav_settings:"设置",nav_admin:"管理员",
   sett_title:"设置",sett_animations:"动画",sett_sound:"声音",
   sett_dark:"深色模式",sett_lang:"语言",sett_account:"账户",sett_logout:"退出登录",
   themeTitle:"选择主题",sugTitle:"建议游戏",
