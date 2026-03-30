@@ -420,6 +420,7 @@ html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:var
   function isAllowedUrl(url){
     try{
       var parsed=new URL(url,window.location.href);
+      if(parsed.protocol==="about:")return true;
       if(parsed.origin===window.location.origin)return true;
       return ADS_HOST_SUFFIXES.some(function(suffix){
         return parsed.hostname===suffix||parsed.hostname.endsWith('.'+suffix);
@@ -571,6 +572,7 @@ html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:var
     <div style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0">
       <button class="gameBarBtn" onclick="toggleGameFav()" id="gameFavBtn" title="Favorit" style="font-size:16px;padding:5px 10px">☆</button>
       <button class="gameBarBtn" id="igpReloadBtn" title="Ladda om" style="padding:5px 10px">🔄</button>
+      <button class="gameBarBtn" id="igpOpenTabBtn" title="Öppna i ny flik" style="padding:5px 12px">➕ Öppna i ny flik</button>
     </div>
   </div>
   <div class="igp-row">
@@ -605,10 +607,6 @@ html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:var
       </div>
     </div>
     <div class="igp-ad-stack">
-      <div class="adSlot horizontal insideGame" data-ad-slot-id="game-top-right">
-        <ins class="adsbygoogle" data-ad-client="ca-pub-7426183460653362" data-ad-slot="1000000003" data-ad-format="auto" data-full-width-responsive="true"></ins>
-        <div class="adFallback">Stäng av din AD-Blocker!!! :(</div>
-      </div>
       <div class="igp-ad-grid">
         <div class="adSlot vertical insideGame" data-ad-slot-id="game-mid-right">
           <ins class="adsbygoogle" data-ad-client="ca-pub-7426183460653362" data-ad-slot="1000000004" data-ad-format="auto" data-full-width-responsive="true"></ins>
@@ -1525,7 +1523,58 @@ function updateGameRatingDisplay(idx){
   if(info.count)html+='<span style="font-size:11px;color:var(--d);margin-left:6px">'+info.avg+' ('+info.count+')</span>';
   el.innerHTML=html;
 }
-function openGame(i){var g=GAMES[i];if(!g)return;if(gameIsLocked(i)){toast('Lås upp spelet i butiken!','error');return;}var gName=_titleCaseGameName(g.name);_currentGameIdx=i;var fb=document.getElementById('gameFavBtn');if(fb)fb.textContent=(state.favorites.indexOf(i)>=0)?'★':'☆';var si=document.getElementById('gameSubInfo');if(si)si.textContent='';var gt=document.getElementById('gameTitle');if(gt)gt.textContent=gName;var ie=document.getElementById('igpInfoEmoji');if(ie)ie.textContent=g.emoji||'🎮';var it=document.getElementById('igpInfoTitle');if(it)it.textContent=gName;var ic=document.getElementById('igpInfoCat');if(ic)ic.textContent=g.cat||'';/* Hide header ui, keep game grid visible below */var filterBar=document.querySelector('.filterBar');var searchWrap=document.querySelector('.searchWrap');var hero=document.querySelector('.hero');var recWrap=document.getElementById('recommendedWrap');if(filterBar)filterBar.style.display='none';if(searchWrap)searchWrap.style.display='none';if(hero)hero.style.display='none';if(recWrap)recWrap.style.display='none';var panel=document.getElementById('inlineGamePanel');if(panel){panel.style.display='flex';setTimeout(function(){try{panel.scrollIntoView({behavior:'smooth',block:'start'});}catch(e){window.scrollTo({top:0,behavior:'smooth'});}},20);}else{window.scrollTo({top:0,behavior:'smooth'});}/* Reload btn */var rb=document.getElementById('igpReloadBtn');if(rb)rb.onclick=function(){var f=document.getElementById('gameFrame');if(f)f.src=f.src;};/* Show inline loader */var ldr=document.getElementById('igpLoader');if(ldr)ldr.style.display='flex';var fr=document.getElementById('gameFrame');if(fr){fr.onload=function(){var l=document.getElementById('igpLoader');if(l)l.style.display='none';fr.onload=null;};var remoteSrc=_remoteGameUrlMap[g.f]||'';fr.src=remoteSrc||('UGS-Files/'+g.f);}var recent=JSON.parse(localStorage.getItem('recentGames')||'[]');var today=_todayKeyDate();if(!recent.find(function(r){return r.f===g.f&&r.date===today;})){recent.unshift({f:g.f,name:g.name,date:today});if(recent.length>50)recent.pop();localStorage.setItem('recentGames',JSON.stringify(recent));state.gamesPlayed=(state.gamesPlayed||0)+1;}window._gameStartTime=Date.now();updateQuests();saveState();setTimeout(updateGameQuestWidget,200);_cloudPullRating(i,function(){updateGameRatingDisplay(i);});checkAchievements();}
+function openGame(i){
+  var g=GAMES[i];
+  if(!g)return;
+  if(gameIsLocked(i)){toast('Lås upp spelet i butiken!','error');return;}
+  var gName=_titleCaseGameName(g.name);
+  _currentGameIdx=i;
+  var fb=document.getElementById('gameFavBtn');if(fb)fb.textContent=(state.favorites.indexOf(i)>=0)?'★':'☆';
+  var si=document.getElementById('gameSubInfo');if(si)si.textContent='';
+  var gt=document.getElementById('gameTitle');if(gt)gt.textContent=gName;
+  var ie=document.getElementById('igpInfoEmoji');if(ie)ie.textContent=g.emoji||'🎮';
+  var it=document.getElementById('igpInfoTitle');if(it)it.textContent=gName;
+  var ic=document.getElementById('igpInfoCat');if(ic)ic.textContent=g.cat||'';
+  var gameSrc=(_remoteGameUrlMap[g.f]||('UGS-Files/'+g.f));
+  /* Hide header ui, keep game grid visible below */
+  var filterBar=document.querySelector('.filterBar');var searchWrap=document.querySelector('.searchWrap');var hero=document.querySelector('.hero');var recWrap=document.getElementById('recommendedWrap');
+  if(filterBar)filterBar.style.display='none';if(searchWrap)searchWrap.style.display='none';if(hero)hero.style.display='none';if(recWrap)recWrap.style.display='none';
+  var panel=document.getElementById('inlineGamePanel');
+  if(panel){panel.style.display='flex';setTimeout(function(){try{panel.scrollIntoView({behavior:'smooth',block:'start'});}catch(e){window.scrollTo({top:0,behavior:'smooth'});}},20);}else{window.scrollTo({top:0,behavior:'smooth'});}
+  /* Reload btn */
+  var rb=document.getElementById('igpReloadBtn');
+  if(rb)rb.onclick=function(){var f=document.getElementById('gameFrame');if(f)f.src=f.src;};
+  /* Open in new tab button */
+  var ob=document.getElementById('igpOpenTabBtn');
+  if(ob){
+    ob.textContent='➕ Öppna '+gName+' i ny flik';
+    ob.onclick=function(){
+      var nw=window.open('about:blank','_blank');
+      if(!nw){toast('Kunde inte öppna ny flik','error');return;}
+      try{
+        nw.document.title=gName;
+        nw.document.body.style.margin='0';
+        nw.document.body.style.background='#000';
+        var frame=nw.document.createElement('iframe');
+        frame.src=gameSrc;
+        frame.style.cssText='border:none;width:100vw;height:100vh;display:block';
+        frame.allow='fullscreen;autoplay';
+        frame.allowFullscreen=true;
+        nw.document.body.appendChild(frame);
+      }catch(e){
+        nw.location.href=gameSrc;
+      }
+    };
+  }
+  /* Show inline loader */
+  var ldr=document.getElementById('igpLoader');if(ldr)ldr.style.display='flex';
+  var fr=document.getElementById('gameFrame');
+  if(fr){fr.onload=function(){var l=document.getElementById('igpLoader');if(l)l.style.display='none';fr.onload=null;};fr.src=gameSrc;}
+  var recent=JSON.parse(localStorage.getItem('recentGames')||'[]');
+  var today=_todayKeyDate();
+  if(!recent.find(function(r){return r.f===g.f&&r.date===today;})){recent.unshift({f:g.f,name:g.name,date:today});if(recent.length>50)recent.pop();localStorage.setItem('recentGames',JSON.stringify(recent));state.gamesPlayed=(state.gamesPlayed||0)+1;}
+  window._gameStartTime=Date.now();updateQuests();saveState();setTimeout(updateGameQuestWidget,200);_cloudPullRating(i,function(){updateGameRatingDisplay(i);});checkAchievements();
+}
 var _currentGameIdx=-1;
 function toggleGameFav(){
   if(_currentGameIdx<0)return;
