@@ -192,6 +192,8 @@ html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:var
 .gameCard:hover{transform:translateY(-4px);box-shadow:var(--shadow2);border-color:rgba(181,108,255,.4);}
 .gameCard.locked .gameIconBox::after{content:'🔒';position:absolute;top:6px;right:8px;font-size:13px;}
 .gameIconBox{height:90px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;background:linear-gradient(135deg,var(--p1),var(--p0));}
+.gameCardThumb{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;z-index:0;filter:saturate(1.06) contrast(1.04);}
+.gameIconBox.hasImage::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.08),rgba(0,0,0,.28));z-index:1;}
 .gameCardEmoji{font-size:34px;position:relative;z-index:1;filter:drop-shadow(0 2px 6px rgba(0,0,0,.35));}
 .gameInfo{padding:9px 10px 8px;}
 .gameName{font-size:12px;font-weight:700;color:var(--w);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:5px;}
@@ -1010,6 +1012,10 @@ var ZONES_URLS=[
 ];
 var HTML_URL="https://cdn.jsdelivr.net/npm/gn-math.github.io-main@1.0.5/html-main";
 var _remoteGameUrlMap={};
+var _remoteGameImageMap={};
+function _normFileKey(file){
+  return String(file||"").trim().toLowerCase();
+}
 function _extractFileNameFromZoneUrl(raw){
   if(!raw||typeof raw!=="string")return"";
   var resolved=raw.replace(/\{HTML_URL\}/g,HTML_URL);
@@ -1019,6 +1025,33 @@ function _extractFileNameFromZoneUrl(raw){
     var last=parts[parts.length-1]||"";
     return decodeURIComponent(last);
   }catch(e){return"";}
+}
+function _resolveZoneAssetUrl(raw){
+  if(!raw||typeof raw!=="string")return"";
+  var value=String(raw).trim();
+  if(!value)return"";
+  value=value.replace(/\{HTML_URL\}/g,HTML_URL);
+  try{
+    return new URL(value,HTML_URL+"/").href;
+  }catch(e){
+    return"";
+  }
+}
+function _extractZoneImage(zone){
+  if(!zone||typeof zone!=="object")return"";
+  var keys=["image","img","thumbnail","thumb","poster","cover","icon","banner","preview"];
+  for(var i=0;i<keys.length;i++){
+    var v=_resolveZoneAssetUrl(zone[keys[i]]);
+    if(v)return v;
+  }
+  if(zone.assets&&typeof zone.assets==="object"){
+    var assetKeys=["image","thumbnail","thumb","poster","cover"];
+    for(var j=0;j<assetKeys.length;j++){
+      var a=_resolveZoneAssetUrl(zone.assets[assetKeys[j]]);
+      if(a)return a;
+    }
+  }
+  return"";
 }
 async function _loadRemoteGameUrlMap(){
   for(var i=0;i<ZONES_URLS.length;i++){
@@ -1032,6 +1065,12 @@ async function _loadRemoteGameUrlMap(){
         if(file&&zone&&zone.url){
           var resolved=String(zone.url).replace(/\{HTML_URL\}/g,HTML_URL);
           _remoteGameUrlMap[file]=resolved;
+          _remoteGameUrlMap[_normFileKey(file)]=resolved;
+          var img=_extractZoneImage(zone);
+          if(img){
+            _remoteGameImageMap[file]=img;
+            _remoteGameImageMap[_normFileKey(file)]=img;
+          }
         }
       });
       return;
@@ -1626,8 +1665,24 @@ function renderGames(){
     card.dataset.idx=realIdx;
     card.dataset.file=game.f||"";
     var iconBox=document.createElement("div");iconBox.className="gameIconBox";
+    var fileKey=(game&&game.f)||"";
+    var thumbUrl=_remoteGameImageMap[fileKey]||_remoteGameImageMap[_normFileKey(fileKey)]||"";
+    if(thumbUrl){
+      var thumb=document.createElement("img");
+      thumb.className="gameCardThumb";
+      thumb.src=thumbUrl;
+      thumb.alt=_titleCaseGameName(displayName);
+      thumb.loading="lazy";
+      thumb.onerror=function(){
+        this.remove();
+        if(this.parentNode)this.parentNode.classList.remove("hasImage");
+      };
+      iconBox.classList.add("hasImage");
+      iconBox.appendChild(thumb);
+    }
     var emoji=document.createElement("div");emoji.className="gameCardEmoji";
     emoji.textContent=getGameIcon(displayName);
+    if(thumbUrl)emoji.style.display="none";
     iconBox.appendChild(emoji);
     var info=document.createElement("div");info.className="gameInfo";
     var nm=document.createElement("div");nm.className="gameName";nm.textContent=_titleCaseGameName(displayName);
@@ -3109,7 +3164,7 @@ function renderInventoryWin(){
 document.addEventListener("DOMContentLoaded",function(){
   // Show loader immediately on page load
   showLoader("Coola Mattespel V4");
-  _loadRemoteGameUrlMap();
+  _loadRemoteGameUrlMap().then(function(){renderGames();});
   document.querySelectorAll(".filterBtn").forEach(function(btn){
     btn.addEventListener("click",function(){
       document.querySelectorAll(".filterBtn").forEach(function(b){b.classList.remove("active");});
