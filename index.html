@@ -581,7 +581,7 @@ html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:var
         <iframe class="gameFrame" id="gameFrame" src="about:blank" allowfullscreen allow="fullscreen;autoplay" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-downloads"></iframe>
         <div class="igp-loader" id="igpLoader">
           <div class="igp-spin"></div>
-          <div class="igp-loader-text" data-i18n="loading">Laddar...</div>
+          <div class="igp-loader-text" data-i18n="loading">Loading...</div>
         </div>
         <button class="igp-fullscreen-btn" onclick="goFullscreen()" data-i18n="fullscreen">⛶ Fullscreen</button>
       </div>
@@ -911,16 +911,16 @@ var _loaderMsgs=[
       "Tuffffffff", 
       "SPRID DENNA SIDAN TILL ALLA DU KÄNNER!!!", 
       "bla bla bla", 
-      "Laddar laddningen som laddar laddningen",
+      "Loading laddningen som laddar laddningen",
       "Ingen vet vem jag är förutom de som vet vem jag är",
       ":(",
       "Detta är helt värdelöst",
-      "Laddar kanske något",
+      "Loading kanske något",
       "RIP V2",
       "Coola Mattespel är bästa spelsidan",
       "Sprid denna sidan till alla ni känner!!!!!!!!!",
       "Just nu är det 01:67 på natten",
-      "Laddar absolut inget",
+      "Loading absolut inget",
       "Jag heter Bengt",
       "Five nights at freddis",
       "Hej alla gooners!",
@@ -1357,25 +1357,56 @@ function _cloudPullRating(idx,cb){
   }).catch(function(){cb&&cb();});
 }
 function toast(msg,dur){
+  msg=_toEnglishText(msg);
   var t=document.createElement("div");t.className="toast";t.textContent=msg;
   document.getElementById("toastContainer").appendChild(t);
   setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t);},dur||3000);
 }
+function _toEnglishText(txt){
+  if(typeof txt!=="string"||!txt)return txt;
+  var out=txt;
+  var pairs=[
+    [/Logga in/g,"Log in"],[/Loggad ut/g,"Logged out"],[/Favoriter/g,"Favorites"],[/favoriter/g,"favorites"],
+    [/Spel/g,"Games"],[/spel/g,"games"],[/Nivå/g,"Level"],[/nivå/g,"level"],[/Meny/g,"Menu"],[/Inställningar/g,"Settings"],
+    [/Öppna/g,"Open"],[/Stäng/g,"Close"],[/Tillbaka/g,"Back"],[/Laddar/g,"Loading"],[/Hämta/g,"Claim"],
+    [/Dagliga/g,"Daily"],[/Milstolpar/g,"Milestones"],[/Vänner/g,"Friends"],[/Användare/g,"Users"],[/Konto/g,"Account"],
+    [/Sök/g,"Search"],[/sök/g,"search"],[/mynt/g,"coins"],[/Köpt/g,"Purchased"],[/Ägd/g,"Owned"],
+    [/borttagen/g,"removed"],[/inte/g,"not"],[/för/g,"for"],[/och/g,"and"],[/med/g,"with"],[/till/g,"to"]
+  ];
+  pairs.forEach(function(pair){out=out.replace(pair[0],pair[1]);});
+  return out;
+}
+function forceEnglishDOM(root){
+  var base=root||document.body;
+  if(!base)return;
+  var walker=document.createTreeWalker(base,NodeFilter.SHOW_TEXT,null);
+  var node;
+  while((node=walker.nextNode())){
+    if(!node.nodeValue||!node.nodeValue.trim())continue;
+    node.nodeValue=_toEnglishText(node.nodeValue);
+  }
+  base.querySelectorAll("[placeholder],[title],[aria-label]").forEach(function(el){
+    if(el.placeholder)el.placeholder=_toEnglishText(el.placeholder);
+    if(el.title)el.title=_toEnglishText(el.title);
+    var al=el.getAttribute("aria-label");
+    if(al)el.setAttribute("aria-label",_toEnglishText(al));
+  });
+}
 function updateHUD(){
   document.getElementById("coinDisplay").textContent=state.coins;
   var lvl=Math.floor(state.xp/100)+1;state.level=lvl;
-  document.getElementById("levelDisplay").textContent="Nivå "+lvl;
+  document.getElementById("levelDisplay").textContent="Level "+lvl;
   document.getElementById("xpFill").style.width=(state.xp%100)+"%";
 }
 var ACHIEVEMENTS=[
   {id:'first_game',name:'Första spelet',desc:'Spela ditt första spel',icon:'🎮',check:function(){return(state.gamesPlayed||0)>=1;}},
-  {id:'games_10',name:'10 spel',desc:'Spela 10 spel',icon:'🕹️',check:function(){return(state.gamesPlayed||0)>=10;}},
+  {id:'games_10',name:'10 spel',desc:'Play 10 games',icon:'🕹️',check:function(){return(state.gamesPlayed||0)>=10;}},
   {id:'games_100',name:'Spelentusiast',desc:'Spela 100 spel',icon:'🏅',check:function(){return(state.gamesPlayed||0)>=100;}},
-  {id:'coins_100',name:'Rik',desc:'Samla 100 mynt',icon:'💰',check:function(){return state.coins>=100;}},
-  {id:'coins_1000',name:'Rikaste',desc:'Samla 1000 mynt',icon:'🤑',check:function(){return state.coins>=1000;}},
+  {id:'coins_100',name:'Rik',desc:'Collect 100 coins',icon:'💰',check:function(){return state.coins>=100;}},
+  {id:'coins_1000',name:'Rikaste',desc:'Samla 1000 coins',icon:'🤑',check:function(){return state.coins>=1000;}},
   {id:'favs_5',name:'Samlare',desc:'Ha 5 favoriter',icon:'⭐',check:function(){return state.favorites.length>=5;}},
-  {id:'level_5',name:'Nivå 5',desc:'Nå nivå 5',icon:'🌟',check:function(){return state.level>=5;}},
-  {id:'level_10',name:'Veteran',desc:'Nå nivå 10',icon:'💎',check:function(){return state.level>=10;}},
+  {id:'level_5',name:'Level 5',desc:'Reach level 5',icon:'🌟',check:function(){return state.level>=5;}},
+  {id:'level_10',name:'Veteran',desc:'Reach level 10',icon:'💎',check:function(){return state.level>=10;}},
   {id:'streak_7',name:'En vecka',desc:'7 dagars inloggningsstreak',icon:'🔥',check:function(){var d=JSON.parse(localStorage.getItem('daily_streak_'+(state.user||''))||'{"streak":0}');return(d.streak||0)>=7;}},
 ];
 function checkAchievements(){
@@ -1419,7 +1450,7 @@ function addCoins(n,reason){
   state.coins+=gain;
   state.xp+=Math.floor((gain/2)*(xpBoost?2:1));
   saveState();updateHUD();
-  toast("+"+gain+" mynt — "+reason+(coinBoost?" (x2 boost)":""));
+  toast("+"+gain+" coins — "+reason+(coinBoost?" (x2 boost)":""));
   checkAchievements();
 }
 function addXP(n,reason){
@@ -1433,11 +1464,11 @@ function addXP(n,reason){
 }
 function gameIsLocked(idx){return false;}
 function unlockGame(idx){
-  if(state.coins<10){toast("Inte tillräckligt med mynt!");return;}
+  if(state.coins<10){toast("Not enough coins!");return;}
   state.coins-=10;
   var ul=JSON.parse(localStorage.getItem("unlocked_"+state.user)||"[]");
   ul.push(idx);localStorage.setItem("unlocked_"+state.user,JSON.stringify(ul));
-  saveState();updateHUD();toast("Spel upplåst!");renderGames();
+  saveState();updateHUD();toast("Game unlocked!");renderGames();
 }
 function rateGame(idx,stars){
   if(!state.user)return toast('Logga in för att betygsätta','error');
@@ -1449,7 +1480,7 @@ function rateGame(idx,stars){
   localStorage.setItem(allKey,JSON.stringify(all));
   _cloudPushRating(idx,stars);
   updateGameRatingDisplay(idx);
-  updateQuests('rate');toast('Betyg sparat: '+'★'.repeat(stars),'ok');
+  updateQuests('rate');toast('Rating saved: '+'★'.repeat(stars),'ok');
 }
 function getGameRating(idx){
   var all=JSON.parse(localStorage.getItem('ratings_'+idx)||'{}');
@@ -1565,7 +1596,7 @@ function closeRoadmapPage(){
 function renderLinksPanel(){
   var el=document.getElementById('linksOverlayBody');if(!el)return;
   var links=[
-    {url:'https://docs.google.com/forms/d/e/1FAIpQLScUxR7Ychb0ivMguYI-3BHwb8D3ZH2x7n1vkpXuYjNeVlU3Cg/viewform?usp=header',icon:'💡',name:'Skicka förslag',desc:'Öppna förslagsformuläret'},
+    {url:'https://docs.google.com/forms/d/e/1FAIpQLScUxR7Ychb0ivMguYI-3BHwb8D3ZH2x7n1vkpXuYjNeVlU3Cg/viewform?usp=header',icon:'💡',name:'Send suggestions',desc:'Öppna suggestionssformuläret'},
     {url:'https://alv3333.github.io/Coola-Mattespel-Soundboard.github.io/',icon:'🎵',name:'Soundboard',desc:'Öppna extern soundboard'}
   ];
   var h='<div style="display:flex;flex-direction:column;gap:8px;padding:4px 0">';
@@ -1636,7 +1667,7 @@ function renderGames(){
   grid.innerHTML="";
   if(!filtered.length){
     var p=document.createElement("p");p.style.cssText="color:var(--d);padding:24px;grid-column:1/-1;text-align:center;";
-    p.textContent=(state.filterCat==="favoriter"&&!state.user)?"Logga in för att se favoriter":"Inga spel hittades";
+    p.textContent=(state.filterCat==="favoriter"&&!state.user)?"Log in to see favorites":"No games found";
     grid.appendChild(p);return;
   }
   var _lastLetter='';
@@ -1657,7 +1688,7 @@ function renderGames(){
     }
     var locked=realIdx>=200&&!!state.user&&gameIsLocked(realIdx);
     var isFav=!!state.user&&state.favorites.indexOf(realIdx)>=0;
-    var displayName=((game&&game.name)?String(game.name):((game&&game.f)?String(game.f).replace(/\.html$/i,''):'Okänt spel'));
+    var displayName=((game&&game.name)?String(game.name):((game&&game.f)?String(game.f).replace(/\.html$/i,''):'Unknown game'));
     var card=document.createElement("div");
     card.className="gameCard"+(locked?" locked":"");
     card.dataset.idx=realIdx;
@@ -1724,7 +1755,7 @@ function renderLeaderboardPanel(targetEl){
     html+='<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:10px;background:'+(isMe?'rgba(123,44,255,.2)':'rgba(255,255,255,.03)')+';border:1px solid '+(isMe?'var(--p0)':'var(--line)')+';margin-bottom:4px">';
     html+='<span style="font-size:16px;width:24px;text-align:center">'+medal+'</span>';
     html+='<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;color:var(--w);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+r.user+'</div>';
-    html+='<div style="font-size:10px;color:var(--d)">Nivå '+r.level+' · '+r.xp+' XP</div></div>';
+    html+='<div style="font-size:10px;color:var(--d)">Level '+r.level+' · '+r.xp+' XP</div></div>';
     html+='<span style="font-size:11px;color:var(--p1);font-weight:700">'+r.coins+' 🪙</span>';
     html+='</div>';
   });
@@ -1745,11 +1776,11 @@ function switchSideTab(tab){
 }
 function renderFavsPanel(){
   var el=document.getElementById("favOverlayBody");
-  if(!state.user){el.innerHTML="<p style='color:var(--d);padding:14px;text-align:center'>Logga in för att se favoriter</p>";return;}
-  if(!state.favorites.length){el.innerHTML="<p style='color:var(--d);padding:14px;text-align:center'>Inga favoriter än<br><small>Klicka ☆ på ett spel</small></p>";return;}
+  if(!state.user){el.innerHTML="<p style='color:var(--d);padding:14px;text-align:center'>Log in to see favorites</p>";return;}
+  if(!state.favorites.length){el.innerHTML="<p style='color:var(--d);padding:14px;text-align:center'>No favorites yet<br><small>Click ☆ on a game</small></p>";return;}
   el.innerHTML="";
   var sec=document.createElement("div");sec.className="sideSection";
-  var h=document.createElement("h4");h.textContent="Dina favoriter ("+state.favorites.length+")";sec.appendChild(h);
+  var h=document.createElement("h4");h.textContent="Your favorites ("+state.favorites.length+")";sec.appendChild(h);
   state.favorites.forEach(function(idx){
     var g=GAMES[idx];if(!g)return;
     var item=document.createElement("div");item.className="favItem";item.dataset.idx=idx;
@@ -1895,31 +1926,31 @@ function getQuests(){
   var recent=JSON.parse(localStorage.getItem('recentGames')||'[]');
   var todayGames=recent.filter(function(r){return r.date===today;}).length;
   var quests=[
-    {id:'play_5',cat:'daily',name:'Spela 5 spel',desc:'Öppna 5 olika spel idag',goal:5,prog:Math.min(todayGames,5),reward:45},
-    {id:'play_10',cat:'daily',name:'Spela 10 spel',desc:'Öppna 10 olika spel idag',goal:10,prog:Math.min(todayGames,10),reward:80},
+    {id:'play_5',cat:'daily',name:'Play 5 games',desc:'Open 5 different games today',goal:5,prog:Math.min(todayGames,5),reward:45},
+    {id:'play_10',cat:'daily',name:'Play 10 games',desc:'Open 10 different games today',goal:10,prog:Math.min(todayGames,10),reward:80},
     /* Daily */
-    {id:'play_1',cat:'daily',name:'Spela ett spel',desc:'Öppna valfritt spel idag',goal:1,prog:Math.min(todayGames,1),reward:15},
-    {id:'play_3',cat:'daily',name:'Spela 3 spel',desc:'Öppna 3 olika spel idag',goal:3,prog:Math.min(todayGames,3),reward:30},
-    {id:'time_5',cat:'daily',name:'5 minuter spelande',desc:'Spela i 5 minuter totalt',goal:5,prog:Math.min(playtime,5),reward:20},
-    {id:'time_15',cat:'daily',name:'15 minuter spelande',desc:'Spela i 15 minuter totalt',goal:15,prog:Math.min(playtime,15),reward:50},
-    {id:'search_q',cat:'daily',name:'Sök ett spel',desc:'Använd sökfältet',goal:1,prog:Math.min(dp.searches||0,1),reward:5},
-    {id:'fav_q',cat:'daily',name:'Spara en favorit',desc:'Lägg till ett spel i favoriter',goal:1,prog:Math.min(dp.favs||0,1),reward:10},
+    {id:'play_1',cat:'daily',name:'Play one game',desc:'Open any game today',goal:1,prog:Math.min(todayGames,1),reward:15},
+    {id:'play_3',cat:'daily',name:'Play 3 games',desc:'Open 3 different games today',goal:3,prog:Math.min(todayGames,3),reward:30},
+    {id:'time_5',cat:'daily',name:'5 minutes played',desc:'Play for a total of 5 minutes',goal:5,prog:Math.min(playtime,5),reward:20},
+    {id:'time_15',cat:'daily',name:'15 minutes played',desc:'Play for a total of 15 minutes',goal:15,prog:Math.min(playtime,15),reward:50},
+    {id:'search_q',cat:'daily',name:'Search for a game',desc:'Use the search bar',goal:1,prog:Math.min(dp.searches||0,1),reward:5},
+    {id:'fav_q',cat:'daily',name:'Save a favorite',desc:'Add a game to favorites',goal:1,prog:Math.min(dp.favs||0,1),reward:10},
     /* Social */
-    {id:'chat_q',cat:'social',name:'Skicka ett meddelande',desc:'Skriv i chatten',goal:1,prog:Math.min(dp.chats||0,1),reward:10},
+    {id:'chat_q',cat:'social',name:'Send ett meddelande',desc:'Skriv i chatten',goal:1,prog:Math.min(dp.chats||0,1),reward:10},
     {id:'friend_q',cat:'social',name:'Lägg till en vän',desc:'Lägg till någon som vän',goal:1,prog:Math.min(dp.friends||0,1),reward:25},
     {id:'rate_q',cat:'social',name:'Rate game ett spel',desc:'Ge ett spel ett betyg',goal:1,prog:Math.min(dp.ratings||0,1),reward:10},
     /* Milestone */
-    {id:'ms_level2',cat:'milestone',name:'Nå nivå 2',desc:'Levla upp till nivå 2',goal:2,prog:Math.min(state.level,2),reward:100},
-    {id:'ms_level5',cat:'milestone',name:'Nå nivå 5',desc:'Levla upp till nivå 5',goal:5,prog:Math.min(state.level,5),reward:250},
-    {id:'ms_coins100',cat:'milestone',name:'Samla 100 mynt',desc:'Tjäna 100 mynt totalt',goal:100,prog:Math.min(state.coins,100),reward:0},
+    {id:'ms_level2',cat:'milestone',name:'Reach level 2',desc:'Level up to level 2',goal:2,prog:Math.min(state.level,2),reward:100},
+    {id:'ms_level5',cat:'milestone',name:'Reach level 5',desc:'Level up to level 5',goal:5,prog:Math.min(state.level,5),reward:250},
+    {id:'ms_coins100',cat:'milestone',name:'Collect 100 coins',desc:'Earn 100 coins total',goal:100,prog:Math.min(state.coins,100),reward:0},
     {id:'ms_favs5',cat:'milestone',name:'5 favoriter',desc:'Spara 5 favoriter',goal:5,prog:Math.min(state.favorites.length,5),reward:50},
-    {id:'ms_games10',cat:'milestone',name:'10 spel totalt',desc:'Spela 10 spel (alla dagar)',goal:10,prog:Math.min(state.gamesPlayed||0,10),reward:75},
+    {id:'ms_games10',cat:'milestone',name:'10 spel totalt',desc:'Play 10 games (alla dagar)',goal:10,prog:Math.min(state.gamesPlayed||0,10),reward:75},
     {id:'ms_games50',cat:'milestone',name:'50 spel totalt',desc:'Spela 50 spel',goal:50,prog:Math.min(state.gamesPlayed||0,50),reward:200},
     {id:'ms_games100',cat:'milestone',name:'100 spel totalt',desc:'Spela 100 spel',goal:100,prog:Math.min(state.gamesPlayed||0,100),reward:400},
-    {id:'ms_level10',cat:'milestone',name:'Nå nivå 10',desc:'Levla upp till nivå 10',goal:10,prog:Math.min(state.level,10),reward:500},
+    {id:'ms_level10',cat:'milestone',name:'Reach level 10',desc:'Level up to level 10',goal:10,prog:Math.min(state.level,10),reward:500},
     {id:'ms_favs20',cat:'milestone',name:'20 favoriter',desc:'Spara 20 favoriter',goal:20,prog:Math.min(state.favorites.length,20),reward:250},
-    {id:'chat_5',cat:'social',name:'Skicka 5 meddelanden',desc:'Skriv 5 meddelanden i chatten',goal:5,prog:Math.min(dp.chats||0,5),reward:40},
-    {id:'search_10',cat:'daily',name:'Sök 10 gånger',desc:'Använd sökrutan 10 gånger idag',goal:10,prog:Math.min(dp.searches||0,10),reward:35},
+    {id:'chat_5',cat:'social',name:'Send 5 meddelanden',desc:'Skriv 5 meddelanden i chatten',goal:5,prog:Math.min(dp.chats||0,5),reward:40},
+    {id:'search_10',cat:'daily',name:'Search 10 times',desc:'Use the search box 10 times today',goal:10,prog:Math.min(dp.searches||0,10),reward:35},
   ];
   quests.forEach(function(q){
     q.done=q.prog>=q.goal;
@@ -1932,16 +1963,16 @@ function renderQuestsPanel(targetEl){
   if(!el)return;
   if(!state.user){el.innerHTML="<p style='color:var(--d);padding:20px;text-align:center'>Logga in för att se quests</p>";return;}
   var quests=getQuests();
-  var cats={daily:'📅 Dagliga Quests',social:'👥 Sociala',milestone:'🏆 Milstolpar'};
+  var cats={daily:'📅 Daily Quests',social:'👥 Social',milestone:'🏆 Milestones'};
   var catOrder=['daily','social','milestone'];
   var h='<div style="padding:4px 0">';
   // XP/coins summary
   var totalClaimed=quests.filter(function(q){return q.claimed;}).length;
   var totalDone=quests.filter(function(q){return q.done&&!q.claimed;}).length;
   h+='<div style="background:var(--glass);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin-bottom:14px;display:flex;gap:16px;align-items:center">';
-  h+='<div style="text-align:center"><div style="font-size:20px;font-weight:900;color:var(--p1)">'+totalClaimed+'</div><div style="font-size:10px;color:var(--d)">Hämtade</div></div>';
+  h+='<div style="text-align:center"><div style="font-size:20px;font-weight:900;color:var(--p1)">'+totalClaimed+'</div><div style="font-size:10px;color:var(--d)">Claimede</div></div>';
   h+='<div style="text-align:center"><div style="font-size:20px;font-weight:900;color:#7fffb3">'+totalDone+'</div><div style="font-size:10px;color:var(--d)">Klara!</div></div>';
-  h+='<div style="text-align:center"><div style="font-size:20px;font-weight:900;color:var(--w)">'+quests.length+'</div><div style="font-size:10px;color:var(--d)">Totalt</div></div>';
+  h+='<div style="text-align:center"><div style="font-size:20px;font-weight:900;color:var(--w)">'+quests.length+'</div><div style="font-size:10px;color:var(--d)">Total</div></div>';
   h+='</div>';
   catOrder.forEach(function(cat){
     var cqs=quests.filter(function(q){return q.cat===cat;});
@@ -1957,7 +1988,7 @@ function renderQuestsPanel(targetEl){
       h+='<div style="font-size:11px;color:var(--d);margin-top:2px">'+q.desc+'</div></div>';
       h+='<div style="text-align:right;flex-shrink:0;margin-left:8px">';
       h+='<div style="font-size:11px;color:var(--p1)">🪙 '+q.reward+'</div>';
-      if(q.claimed){h+='<div style="font-size:10px;color:var(--d);margin-top:2px">✅ Hämtad</div>';}
+      if(q.claimed){h+='<div style="font-size:10px;color:var(--d);margin-top:2px">✅ Claimed</div>';}
       else if(q.done){h+='<button data-qid="'+q.id+'" class="claimQuestBtn" style="background:linear-gradient(135deg,var(--p0),var(--p2));color:#fff;border:none;border-radius:8px;padding:5px 12px;cursor:pointer;font-size:11px;font-weight:700;margin-top:4px">✨ Hämta XP!</button>';}
       else{h+='<div style="font-size:10px;color:var(--d);margin-top:2px">'+progText+'</div>';}
       h+='</div></div>';
@@ -2062,7 +2093,7 @@ function renderShopPanel(){
 }
 function buyItem(id,price){
   if(!state.user)return;
-  if(state.coins<price){toast("Inte tillräckligt med mynt!");return;}
+  if(state.coins<price){toast("Not enough coins!");return;}
   state.coins-=price;
   var owned=JSON.parse(localStorage.getItem("owned_"+state.user)||"[]");
   if(owned.indexOf(id)<0)owned.push(id);
@@ -2149,7 +2180,7 @@ function renderProfilePanel(){
     +'<div style="text-align:center;padding:0 12px 10px">'
     +'<div style="font-size:18px;font-weight:900;margin-bottom:2px" class="'+nameClass+'">'+state.user+'</div>'
     +(badgesHTML?'<div style="display:flex;justify-content:center;flex-wrap:wrap;gap:4px;margin:4px 0">'+badgesHTML+'</div>':'')
-    +'<div style="font-size:12px;color:var(--d)">Nivå '+state.level+' · '+state.xp+' XP</div>'
+    +'<div style="font-size:12px;color:var(--d)">Level '+state.level+' · '+state.xp+' XP</div>'
     +'<div style="font-size:10px;color:var(--d);margin-top:3px">Klicka på bilden för att ändra</div></div>'
     +'<div style="display:flex;gap:8px;margin:4px 12px 10px"><div class="statBox"><span>'+coins+'</span><small>Mynt</small></div>'
     +'<div class="statBox"><span>'+favs+'</span><small>Favorites</small></div>'
@@ -2182,7 +2213,7 @@ function renderAdminPanel(){
       +'<div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--p0),var(--p2));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0;color:#fff;border:2px solid rgba(255,255,255,.16)">'+u.charAt(0).toUpperCase()+'</div>'
       +'<div style="flex:1;min-width:0">'
       +'<div style="font-size:13px;font-weight:800;color:var(--w);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+u+(verified?' <span style="color:#7ec8ff">✔️</span>':'')+(isBanned?' <span style="color:#ff8888">(Bannad)</span>':'')+'</div>'
-      +'<div style="font-size:10px;color:var(--d);margin-top:2px">🪙 '+(uData.coins||0)+' · 🎚️ Nivå '+(uData.level||1)+'</div>'
+      +'<div style="font-size:10px;color:var(--d);margin-top:2px">🪙 '+(uData.coins||0)+' · 🎚️ Level '+(uData.level||1)+'</div>'
       +'<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">'+actions+verifyBtn+'</div>'
       +'</div></div>';
   }).join('');
@@ -2206,18 +2237,18 @@ function renderAdminPanel(){
 
     +'<div style="background:var(--glass);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px">'
       +'<div style="font-size:11px;color:var(--d);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">👥 Användare ('+users.length+')</div>'
-      +'<div style="max-height:320px;overflow-y:auto;padding-right:2px">'+(userRows||'<div style="font-size:11px;color:var(--d);text-align:center;padding:10px">Inga användare ännu</div>')+'</div>'
+      +'<div style="max-height:320px;overflow-y:auto;padding-right:2px">'+(userRows||'<div style="font-size:11px;color:var(--d);text-align:center;padding:10px">No users yet</div>')+'</div>'
     +'</div>'
 
-    +'<div style="background:var(--glass);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px"><div style="font-size:11px;color:var(--d);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">📢 Broadcast</div><textarea id="adminBroadcastMsg" data-i18n-ph="chatPlaceholder" placeholder="Write a message..." style="width:100%;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:8px;padding:8px;color:var(--w);font-size:12px;font-family:inherit;resize:vertical;min-height:60px;box-sizing:border-box"></textarea><button onclick="adminBroadcast()" style="width:100%;margin-top:6px;background:var(--p0);color:#fff;border:none;border-radius:8px;padding:8px;cursor:pointer;font-size:12px;font-weight:600">📤 Skicka</button></div>'
+    +'<div style="background:var(--glass);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px"><div style="font-size:11px;color:var(--d);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">📢 Broadcast</div><textarea id="adminBroadcastMsg" data-i18n-ph="chatPlaceholder" placeholder="Write a message..." style="width:100%;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:8px;padding:8px;color:var(--w);font-size:12px;font-family:inherit;resize:vertical;min-height:60px;box-sizing:border-box"></textarea><button onclick="adminBroadcast()" style="width:100%;margin-top:6px;background:var(--p0);color:#fff;border:none;border-radius:8px;padding:8px;cursor:pointer;font-size:12px;font-weight:600">📤 Send</button></div>'
 
-    +'<div style="background:var(--glass);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px"><div style="font-size:11px;color:var(--d);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">📌 Tillkännagivanden</div><div style="display:flex;gap:6px;margin-bottom:8px"><input id="adminAnnounceInput" placeholder="Nytt tillkännagivande..." style="flex:1;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:8px;padding:7px;color:var(--w);font-size:12px"><button onclick="addAnnouncement()" style="background:var(--p0);color:#fff;border:none;border-radius:8px;padding:7px 10px;cursor:pointer;font-size:12px">+</button></div>'+(announcements.length?announcements.map(function(a,i){return'<div style="background:rgba(255,255,255,.05);border-radius:6px;padding:6px 8px;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--m)"><span>'+a+'</span><button onclick="removeAnnouncement('+i+')" style="background:rgba(255,50,50,.2);color:#ff6b6b;border:none;border-radius:4px;padding:2px 6px;cursor:pointer;font-size:10px">✕</button></div>';}).join(''):'<div style="font-size:11px;color:var(--d);text-align:center;padding:8px">Inga tillkännagivanden</div>')+'</div>'
+    +'<div style="background:var(--glass);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px"><div style="font-size:11px;color:var(--d);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">📌 Announcementn</div><div style="display:flex;gap:6px;margin-bottom:8px"><input id="adminAnnounceInput" placeholder="Nytt tillkännagivande..." style="flex:1;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:8px;padding:7px;color:var(--w);font-size:12px"><button onclick="addAnnouncement()" style="background:var(--p0);color:#fff;border:none;border-radius:8px;padding:7px 10px;cursor:pointer;font-size:12px">+</button></div>'+(announcements.length?announcements.map(function(a,i){return'<div style="background:rgba(255,255,255,.05);border-radius:6px;padding:6px 8px;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--m)"><span>'+a+'</span><button onclick="removeAnnouncement('+i+')" style="background:rgba(255,50,50,.2);color:#ff6b6b;border:none;border-radius:4px;padding:2px 6px;cursor:pointer;font-size:10px">✕</button></div>';}).join(''):'<div style="font-size:11px;color:var(--d);text-align:center;padding:8px">Inga tillkännagivanden</div>')+'</div>'
 
-    +'<div style="background:var(--glass);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px"><div style="font-size:11px;color:var(--d);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">💰 Ge mynt</div><div style="display:flex;gap:6px;margin-bottom:6px"><input id="adminCoinUser" placeholder="Användarnamn" style="flex:1;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:8px;padding:7px;color:var(--w);font-size:12px"><input id="adminCoinAmount" type="number" placeholder="Antal" min="1" max="9999" style="width:70px;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:8px;padding:7px;color:var(--w);font-size:12px"></div><button onclick="adminGiveCoins()" style="width:100%;background:linear-gradient(135deg,#ffaa00,#ff6b00);color:#000;border:none;border-radius:8px;padding:8px;cursor:pointer;font-size:12px;font-weight:600">🪙 Ge mynt</button></div>'
+    +'<div style="background:var(--glass);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px"><div style="font-size:11px;color:var(--d);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">💰 Ge coins</div><div style="display:flex;gap:6px;margin-bottom:6px"><input id="adminCoinUser" placeholder="Username" style="flex:1;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:8px;padding:7px;color:var(--w);font-size:12px"><input id="adminCoinAmount" type="number" placeholder="Antal" min="1" max="9999" style="width:70px;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:8px;padding:7px;color:var(--w);font-size:12px"></div><button onclick="adminGiveCoins()" style="width:100%;background:linear-gradient(135deg,#ffaa00,#ff6b00);color:#000;border:none;border-radius:8px;padding:8px;cursor:pointer;font-size:12px;font-weight:600">🪙 Ge coins</button></div>'
 
-    +'<div style="background:var(--glass);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px"><div style="font-size:11px;color:var(--d);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">🛡️ Admin-rättigheter</div><div style="display:flex;gap:6px;margin-bottom:6px"><input id="adminRoleUser" placeholder="Användarnamn" style="flex:1;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:8px;padding:7px;color:var(--w);font-size:12px"><button onclick="var u=document.getElementById(\"adminRoleUser\").value.trim();if(u)adminToggleAdmin(u);" style="background:linear-gradient(135deg,var(--p0),var(--p2));color:#fff;border:none;border-radius:8px;padding:7px 12px;cursor:pointer;font-size:12px;font-weight:600">Ge / Ta admin</button></div><div style="font-size:10px;color:var(--d)">Nuvarande admins: '+getAdminList().join(', ')+'</div></div>'
+    +'<div style="background:var(--glass);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px"><div style="font-size:11px;color:var(--d);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">🛡️ Admin-rättigheter</div><div style="display:flex;gap:6px;margin-bottom:6px"><input id="adminRoleUser" placeholder="Username" style="flex:1;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:8px;padding:7px;color:var(--w);font-size:12px"><button onclick="var u=document.getElementById(\"adminRoleUser\").value.trim();if(u)adminToggleAdmin(u);" style="background:linear-gradient(135deg,var(--p0),var(--p2));color:#fff;border:none;border-radius:8px;padding:7px 12px;cursor:pointer;font-size:12px;font-weight:600">Ge / Ta admin</button></div><div style="font-size:10px;color:var(--d)">Nuvarande admins: '+getAdminList().join(', ')+'</div></div>'
 
-    +'<div style="background:var(--glass);border:1px solid var(--line);border-radius:12px;padding:12px"><div style="font-size:11px;color:var(--d);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">🗑️ Rensa chatt</div><button onclick="adminClearChat()" style="width:100%;background:rgba(255,50,50,.2);color:#ff6b6b;border:1px solid rgba(255,50,50,.3);border-radius:8px;padding:8px;cursor:pointer;font-size:12px;font-weight:600">🗑️ Rensa all chatt</button></div>'
+    +'<div style="background:var(--glass);border:1px solid var(--line);border-radius:12px;padding:12px"><div style="font-size:11px;color:var(--d);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">🗑️ Rensa chatt</div><button onclick="adminClearChat()" style="width:100%;background:rgba(255,50,50,.2);color:#ff6b6b;border:1px solid rgba(255,50,50,.3);border-radius:8px;padding:8px;cursor:pointer;font-size:12px;font-weight:600">🗑️ Clear all chat</button></div>'
     +'</div>';
 }
 function getAllUsers(){
@@ -2340,7 +2371,7 @@ function updateChatStatusUI(){
   var input=document.getElementById('chatInput');
   var sendBtn=document.querySelector('#chatOverlay .chatInputRow .pill.primary');
   var enabled=isChatEnabled();
-  if(input){input.disabled=!enabled;input.placeholder=enabled?'Skriv ett meddelande...':'Chatten är stannad av admin';}
+  if(input){input.disabled=!enabled;input.placeholder=enabled?'Write a message...':'Chatten är stannad av admin';}
   if(sendBtn)sendBtn.disabled=!enabled;
 }
 function toggleChatEnabled(){
@@ -2458,24 +2489,24 @@ function doLogin(){
   var p=document.getElementById("loginPass").value;
   var mode=document.getElementById("loginModal").dataset.mode;
   var err=document.getElementById("loginError");
-  if(!u||!p){err.textContent="Fyll i alla fält";err.style.display="block";return;}
-  if(!_safeUsername(u)){err.textContent="Användarnamn måste vara 3-24 tecken (a-z, 0-9, _ eller -) och får inte innehålla förbjudna ord";err.style.display="block";return;}
+  if(!u||!p){err.textContent="Fill in all fields";err.style.display="block";return;}
+  if(!_safeUsername(u)){err.textContent="Username måste vara 3-24 tecken (a-z, 0-9, _ eller -) och får inte innehålla förbjudna ord";err.style.display="block";return;}
 
   if(isUserAdmin(u)&&btoa(btoa(p))===ADMINPW){
     loadState(u);state.user=u;state.isAdmin=true;
     localStorage.setItem("lastUser",u);
     localStorage.setItem("acc_"+u,btoa(p));
     closeLoginModal();finishLogin();
-    toast("Välkommen, "+u+"! (Admin)");
+    toast("Welcome, "+u+"! (Admin)");
     return;
   }
 
   if(_rtdb||_sb){
     if(mode==="reg"){
       _findCloudAccount(u).then(function(existing){
-        if(existing){err.textContent="Användarnamn taget";err.style.display="block";return;}
+        if(existing){err.textContent="Username taget";err.style.display="block";return;}
         return _claimUsername(u).then(function(claimed){
-          if(!claimed){err.textContent="Användarnamn taget";err.style.display="block";return;}
+          if(!claimed){err.textContent="Username taget";err.style.display="block";return;}
           var initSettings={animations:true,sounds:true,darkMode:true,theme:"purple",lang:"en"};
           return _createCloudAccount(u,p).then(function(){
             if(_rtdb)_rtdb.ref('user_data/'+u).update({username:u,coins:50,xp:0,level:1,favorites:[],games_played:0,settings:initSettings}).catch(function(){});
@@ -2488,7 +2519,7 @@ function doLogin(){
             toast("Konto skapat! Logga in för att fortsätta.","ok");
           }).catch(function(e){
             _releaseUsernameClaim(u);
-            err.textContent="Fel vid registrering: "+((e&&e.message)||"okänt fel");
+            err.textContent="Registration error: "+((e&&e.message)||"okänt fel");
             err.style.display="block";
           });
         });
@@ -2497,10 +2528,10 @@ function doLogin(){
     }
 
     _findCloudAccount(u).then(function(acc){
-      if(!acc){err.textContent="Fel användarnamn eller lösenord";err.style.display="block";return;}
-      if(acc.banned){err.textContent="Ditt konto är bannat";err.style.display="block";return;}
+      if(!acc){err.textContent="Wrong username or password";err.style.display="block";return;}
+      if(acc.banned){err.textContent="Your account is banned";err.style.display="block";return;}
       _verifyPassword(acc,p).then(function(okPw){
-        if(!okPw){err.textContent="Fel användarnamn eller lösenord";err.style.display="block";return;}
+        if(!okPw){err.textContent="Wrong username or password";err.style.display="block";return;}
         var resolvedUser=acc.username||u;
         if(_rtdb&&acc.password_salt==null){
           var ns=_randomSalt();
@@ -2519,33 +2550,33 @@ function doLogin(){
           localStorage.setItem("lastUser",resolvedUser);
           localStorage.setItem("jspel_"+resolvedUser,JSON.stringify({coins:state.coins,xp:state.xp,level:state.level,favorites:state.favorites,gamesPlayed:state.gamesPlayed,settings:state.settings}));
           closeLoginModal();finishLogin();
-          toast("Välkommen tillbaka, "+resolvedUser+"!");
+          toast("Welcome tillbaka, "+resolvedUser+"!");
           applyDarkMode(state.settings.darkMode===true);
           if(state.settings.theme&&state.settings.theme!=="purple")applyTheme(state.settings.theme);
         });
       });
     }).catch(function(e){
-      err.textContent="Fel vid inloggning: "+((e&&e.message)||"okänt fel");
+      err.textContent="Login error: "+((e&&e.message)||"okänt fel");
       err.style.display="block";
     });
     return;
   }
 
   if(mode==="reg"){
-    if(_getLocalAccountByUsername(u)){err.textContent="Användarnamn taget";err.style.display="block";return;}
+    if(_getLocalAccountByUsername(u)){err.textContent="Username taget";err.style.display="block";return;}
     localStorage.setItem("acc_"+u,btoa(p));
     loadState(u);state.user=u;state.isAdmin=isUserAdmin(u);
     localStorage.setItem("lastUser",u);
     addCoins(50,"Välkomstbonus!");
-    toast("Välkommen, "+u+"! +50 mynt");
+    toast("Welcome, "+u+"! +50 coins");
   }else{
     var localAcc=_getLocalAccountByUsername(u);
-    if(!localAcc||localAcc.password_hash!==btoa(p)){err.textContent="Fel användarnamn eller lösenord";err.style.display="block";return;}
-    if(localAcc.banned){err.textContent="Ditt konto är bannat";err.style.display="block";return;}
+    if(!localAcc||localAcc.password_hash!==btoa(p)){err.textContent="Wrong username or password";err.style.display="block";return;}
+    if(localAcc.banned){err.textContent="Your account is banned";err.style.display="block";return;}
     loadState(localAcc.username);state.user=localAcc.username;
     state.isAdmin=isUserAdmin(localAcc.username)||(btoa(btoa(p))===ADMINPW);
     localStorage.setItem("lastUser",localAcc.username);
-    toast("Välkommen tillbaka, "+localAcc.username+"!");
+    toast("Welcome tillbaka, "+localAcc.username+"!");
   }
   closeLoginModal();
   finishLogin();
@@ -2568,7 +2599,7 @@ function checkDailyStreak(){
   var bonus=Math.min(data.streak*5,50);
   addCoins(bonus,'Daglig inloggning dag '+data.streak);
   setTimeout(function(){
-    toast('🔥 Dag '+data.streak+' streak! +'+bonus+' mynt','ok');
+    toast('🔥 Dag '+data.streak+' streak! +'+bonus+' coins','ok');
   },1500);
   updateHUD();
 }
@@ -2603,19 +2634,19 @@ function doLogout(){
   document.getElementById("userInfo").style.display="none";
   var adminNav=document.getElementById("adminNav");if(adminNav)adminNav.style.display="none";
   updateHUD();closeSidebar();renderGames();
-  toast("Loggad ut");
+  toast("Logged out");
 }
-function openChat(){toast('Chatten är borttagen.','error');}
+function openChat(){toast('Chat has been removed.','error');}
 function closeChat(){}
 function loadChatMsgs(){}
 function sendChat(){}
 function chatKey(e){}
-function adminBroadcast(){toast('Chatten är borttagen.','error');}
-function adminGiveCoins(){var uEl=document.getElementById('adminCoinUser');var aEl=document.getElementById('adminCoinAmount');if(!uEl||!aEl||!uEl.value.trim())return toast('Ange ett användarnamn','error');var amount=parseInt(aEl.value)||0;if(amount<=0)return toast('Ange ett giltigt antal mynt','error');if(uEl.value.trim()===state.user){state.coins+=amount;saveState();updateHUD();}else{var key='jspel_'+uEl.value.trim();var data=JSON.parse(localStorage.getItem(key)||'{}');data.coins=(data.coins||0)+amount;localStorage.setItem(key,JSON.stringify(data));}toast(amount+' mynt gavs till '+uEl.value.trim(),'ok');uEl.value='';aEl.value='';renderAdminPanel();}
-function adminKick(u){if(u===state.user)return toast('Kan inte kicka dig själv','error');toast(u+' kickades','ok');}
-function adminBan(u){if(u===state.user)return toast('Kan inte banna dig själv','error');var banned=JSON.parse(localStorage.getItem('bannedUsers')||'[]');if(banned.indexOf(u)<0){banned.push(u);localStorage.setItem('bannedUsers',JSON.stringify(banned));}toast(u+' bannades','ok');renderAdminPanel();}
-function adminUnban(u){var banned=JSON.parse(localStorage.getItem('bannedUsers')||'[]');var idx=banned.indexOf(u);if(idx>=0){banned.splice(idx,1);localStorage.setItem('bannedUsers',JSON.stringify(banned));}toast(u+' avbannades','ok');renderAdminPanel();}
-function adminClearChat(){toast('Chatten är borttagen.','error');renderAdminPanel();}
+function adminBroadcast(){toast('Chat has been removed.','error');}
+function adminGiveCoins(){var uEl=document.getElementById('adminCoinUser');var aEl=document.getElementById('adminCoinAmount');if(!uEl||!aEl||!uEl.value.trim())return toast('Enter a username','error');var amount=parseInt(aEl.value)||0;if(amount<=0)return toast('Enter a valid coin amount','error');if(uEl.value.trim()===state.user){state.coins+=amount;saveState();updateHUD();}else{var key='jspel_'+uEl.value.trim();var data=JSON.parse(localStorage.getItem(key)||'{}');data.coins=(data.coins||0)+amount;localStorage.setItem(key,JSON.stringify(data));}toast(amount+' coins were given to '+uEl.value.trim(),'ok');uEl.value='';aEl.value='';renderAdminPanel();}
+function adminKick(u){if(u===state.user)return toast('You can't kick yourself','error');toast(u+' was kicked','ok');}
+function adminBan(u){if(u===state.user)return toast('You can't ban yourself','error');var banned=JSON.parse(localStorage.getItem('bannedUsers')||'[]');if(banned.indexOf(u)<0){banned.push(u);localStorage.setItem('bannedUsers',JSON.stringify(banned));}toast(u+' was banned','ok');renderAdminPanel();}
+function adminUnban(u){var banned=JSON.parse(localStorage.getItem('bannedUsers')||'[]');var idx=banned.indexOf(u);if(idx>=0){banned.splice(idx,1);localStorage.setItem('bannedUsers',JSON.stringify(banned));}toast(u+' avwas banned','ok');renderAdminPanel();}
+function adminClearChat(){toast('Chat has been removed.','error');renderAdminPanel();}
 function showSiteAnnouncements(){
   var ann=JSON.parse(localStorage.getItem('admin_announcements')||'[]');
   var dismissed=JSON.parse(localStorage.getItem('dismissed_announcements')||'[]');
@@ -2646,10 +2677,10 @@ function dismissSiteAnnouncement(){
   var main=document.querySelector('.main');
   if(main)main.style.paddingTop='';
 }
-function addAnnouncement(){var inp=document.getElementById('adminAnnounceInput');if(!inp||!inp.value.trim())return toast('Skriv ett tillkännagivande','error');var ann=JSON.parse(localStorage.getItem('admin_announcements')||'[]');ann.unshift(inp.value.trim());if(ann.length>10)ann.pop();localStorage.setItem('admin_announcements',JSON.stringify(ann));inp.value='';localStorage.removeItem('dismissed_announcements');showSiteAnnouncements();toast('Tillkännagivande publicerat! 📣','ok');renderAdminPanel();}
-function removeAnnouncement(i){var ann=JSON.parse(localStorage.getItem('admin_announcements')||'[]');ann.splice(i,1);localStorage.setItem('admin_announcements',JSON.stringify(ann));toast('Borttaget','ok');showSiteAnnouncements();renderAdminPanel();}
-function handleAvatarUpload(input){if(!input.files||!input.files[0])return;var file=input.files[0];if(!file.type.startsWith('image/')){toast('Bara bildfiler är tillåtna','error');return;}if(file.size>5242880){toast('Bilden är för stor (max 5MB)','error');return;}var reader=new FileReader();reader.onload=function(e){var b64=e.target.result;localStorage.setItem('avatar_'+state.user,b64);_cloudPush();/* Update topbar avatar */var ud=document.getElementById('userAvatarDisplay');if(ud){ud.innerHTML='';var img=document.createElement('img');img.src=b64;img.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:50%';ud.appendChild(img);}toast('Profilbild uppdaterad! 📸','ok');renderProfilePanel();};reader.readAsDataURL(file);}
-function claimQuest(id){var today=_todayKeyDate();var key='quests_'+state.user+'_'+today;var saved=JSON.parse(localStorage.getItem(key)||'{"claimed":[]}');if(!saved.claimed)saved.claimed=[];if(saved.claimed.indexOf(id)>=0)return toast('Quest redan hämtad!','error');var quests=getQuests();var q=quests.find(function(q){return q.id===id;});if(!q||!q.done)return toast('Quest ej klar!','error');saved.claimed.push(id);localStorage.setItem(key,JSON.stringify(saved));addXP(q.reward,'Quest belöning');_cloudPush();toast('+'+q.reward+' XP! Quest klar!','ok');renderQuestsPanel();}
+function addAnnouncement(){var inp=document.getElementById('adminAnnounceInput');if(!inp||!inp.value.trim())return toast('Write an announcement','error');var ann=JSON.parse(localStorage.getItem('admin_announcements')||'[]');ann.unshift(inp.value.trim());if(ann.length>10)ann.pop();localStorage.setItem('admin_announcements',JSON.stringify(ann));inp.value='';localStorage.removeItem('dismissed_announcements');showSiteAnnouncements();toast('Announcement publicerat! 📣','ok');renderAdminPanel();}
+function removeAnnouncement(i){var ann=JSON.parse(localStorage.getItem('admin_announcements')||'[]');ann.splice(i,1);localStorage.setItem('admin_announcements',JSON.stringify(ann));toast('Removed','ok');showSiteAnnouncements();renderAdminPanel();}
+function handleAvatarUpload(input){if(!input.files||!input.files[0])return;var file=input.files[0];if(!file.type.startsWith('image/')){toast('Only image files are allowed','error');return;}if(file.size>5242880){toast('Image is too large (max 5MB)','error');return;}var reader=new FileReader();reader.onload=function(e){var b64=e.target.result;localStorage.setItem('avatar_'+state.user,b64);_cloudPush();/* Update topbar avatar */var ud=document.getElementById('userAvatarDisplay');if(ud){ud.innerHTML='';var img=document.createElement('img');img.src=b64;img.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:50%';ud.appendChild(img);}toast('Profile picture updated! 📸','ok');renderProfilePanel();};reader.readAsDataURL(file);}
+function claimQuest(id){var today=_todayKeyDate();var key='quests_'+state.user+'_'+today;var saved=JSON.parse(localStorage.getItem(key)||'{"claimed":[]}');if(!saved.claimed)saved.claimed=[];if(saved.claimed.indexOf(id)>=0)return toast('Quest already claimed!','error');var quests=getQuests();var q=quests.find(function(q){return q.id===id;});if(!q||!q.done)return toast('Quest not complete!','error');saved.claimed.push(id);localStorage.setItem(key,JSON.stringify(saved));addXP(q.reward,'Quest reward');_cloudPush();toast('+'+q.reward+' XP! Quest completed!','ok');renderQuestsPanel();}
 function applyTheme(name){var themes={purple:{"--p0":"#7b2cff","--p1":"#b56cff","--p2":"#3a00b7","--bg0":"#050008","--bg1":"#0b0014","--bg2":"#120022"},neon:{"--p0":"#00ffcc","--p1":"#00e5ff","--p2":"#007a5e","--bg0":"#000a08","--bg1":"#00150f","--bg2":"#001a10"},gold:{"--p0":"#ffaa00","--p1":"#ffd166","--p2":"#a06800","--bg0":"#0a0600","--bg1":"#130900","--bg2":"#1a0d00"},red:{"--p0":"#ff2d55","--p1":"#ff6b6b","--p2":"#8b0000","--bg0":"#080003","--bg1":"#100008","--bg2":"#160005"},blue:{"--p0":"#2979ff","--p1":"#82b1ff","--p2":"#0040ca","--bg0":"#000510","--bg1":"#000a1f","--bg2":"#000e2b"},pink:{"--p0":"#e91e8c","--p1":"#ff80c8","--p2":"#9c006a","--bg0":"#08000a","--bg1":"#120010","--bg2":"#180015"}};var t=themes[name]||themes.purple;var r=document.documentElement;var isLight=state&&state.settings&&state.settings.darkMode===false;Object.keys(t).forEach(function(k){if(isLight&&(k==="--bg0"||k==="--bg1"||k==="--bg2"))return;r.style.setProperty(k,t[k]);});if(isLight)Object.keys(_LIGHT_BG).forEach(function(k){r.style.setProperty(k,_LIGHT_BG[k]);});var p0=t['--p0'];document.querySelectorAll('[class*="bg-orb"]').forEach(function(el,i){if(i===0)el.style.background='radial-gradient(circle,'+p0+'44,transparent 70%)';else if(i===1)el.style.background='radial-gradient(circle,'+p0+'33,transparent 70%)';else el.style.background='radial-gradient(circle,'+p0+'22,transparent 70%)';});document.querySelectorAll('.bg-grid').forEach(function(el){el.style.backgroundImage='linear-gradient('+p0+'18 1px,transparent 1px),linear-gradient(90deg,'+p0+'18 1px,transparent 1px)';});state.settings.theme=name;localStorage.setItem('jspel_'+state.user,JSON.stringify({coins:state.coins,xp:state.xp,level:state.level,favorites:state.favorites,gamesPlayed:state.gamesPlayed,settings:state.settings}));}
 
 /* ---- COSMETIC HELPERS ---- */
@@ -2901,7 +2932,7 @@ function _doRenderProfileCard(card,username,sbData){
     +'<div class="pc-name-row"><span class="pc-username '+nameClass+'">'+username+(isVerifiedUser(username)?' ✔️':'')+'</span></div>'
     +statusHTML
     +(badgesHTML?'<div class="pc-badges">'+badgesHTML+'</div>':'')
-    +'<div class="pc-level">Nivå '+level+(isSelf?' · 🧠 '+state.xp+' XP':'')+'</div>'
+    +'<div class="pc-level">Level '+level+(isSelf?' · 🧠 '+state.xp+' XP':'')+'</div>'
     +joinHTML
     +bioHTML
     +'<div class="pc-divider"></div>'
@@ -3035,7 +3066,7 @@ function _renderProfileWinBody(){
     +'<div style="font-size:18px;font-weight:900;margin-bottom:3px" class="'+nameClass+'">'+state.user+'</div>'
     +(ext.status?'<div style="font-size:12px;color:var(--d);display:flex;align-items:center;justify-content:center;gap:5px;margin-bottom:4px"><span style="width:8px;height:8px;border-radius:50%;background:#3ba55c;display:inline-block"></span>'+ext.status+'</div>':'')
     +(badgesHTML?'<div style="display:flex;justify-content:center;flex-wrap:wrap;gap:4px;margin:4px 0">'+badgesHTML+'</div>':'')
-    +'<div style="font-size:12px;color:var(--d);margin-bottom:4px">Nivå '+state.level+' · '+state.xp+' XP</div>'
+    +'<div style="font-size:12px;color:var(--d);margin-bottom:4px">Level '+state.level+' · '+state.xp+' XP</div>'
     +(ext.bio?'<div style="font-size:12px;color:var(--m);background:rgba(123,44,255,.08);border-radius:8px;padding:8px;margin:6px 0;border-left:2px solid var(--p0);text-align:left">'+ext.bio+'</div>':'')
     +'</div>'
     +'<div style="display:flex;gap:8px;margin:0 12px 10px"><div class="statBox"><span>'+state.coins+'</span><small>Mynt</small></div>'
@@ -3169,13 +3200,13 @@ document.addEventListener("DOMContentLoaded",function(){
   document.addEventListener("keydown",function(e){
     if(e.ctrlKey&&e.shiftKey&&String(e.key).toLowerCase()==="a"){
       e.preventDefault();
-      var adminPass=prompt('Skriv in admin lösenord:');
+      var adminPass=prompt('Enter admin password:');
       if(adminPass===null)return;
       if(adminPass==='SigmaSkibidiAdmin1234!'){
         openPanelOverlay('admin');
         renderAdminPanel();
       }else{
-        toast('Fel admin lösenord','error');
+        toast('Wrong admin password','error');
       }
       return;
     }
@@ -3209,7 +3240,7 @@ document.addEventListener("DOMContentLoaded",function(){
     var fb=e.target.closest(".favBtn");if(fb){e.stopPropagation();toggleFav(parseInt(fb.dataset.idx));return;}
     var card=e.target.closest(".gameCard");if(!card)return;
     var idx=parseInt(card.dataset.idx);
-    if(gameIsLocked(idx)){if(confirm("Lås upp för 10 mynt?"))unlockGame(idx);}else openGame(idx);
+    if(gameIsLocked(idx)){if(confirm("Unlock for 10 coins?"))unlockGame(idx);}else openGame(idx);
   });
   document.getElementById("favOverlayBody").addEventListener("click",function(e){
     var item=e.target.closest(".favItem");if(item){openGame(parseInt(item.dataset.idx));closeSidebar();}
@@ -3228,6 +3259,9 @@ document.addEventListener("DOMContentLoaded",function(){
   _pullGlobalFlags();
   setInterval(function(){
   },3000);
+  forceEnglishDOM();
+  var _enObs=new MutationObserver(function(){forceEnglishDOM();});
+  _enObs.observe(document.body,{childList:true,subtree:true,characterData:true});
 
   // ---- LIVE PRESENCE COUNTER (Realtime DB + fallback) ----
   var _presenceId=(state.user?('user_'+state.user):('guest_'+Math.random().toString(36).slice(2,8)));
@@ -3281,25 +3315,25 @@ en:{heroTitle:"Coola Mattespel V4",pill_games:"🎮 1,946 games",pill_coins:"�
   colors_purple:"Purple",colors_neon:"Neon",colors_gold:"Gold",
   colors_red:"Red",colors_blue:"Blue",colors_pink:"Pink",online:"online now",close:"Close",loading:"Loading...",add_friend:"Add friend",remove_friend:"Remove friend",nav_quests:"Quests",nav_leaderboard:"Leaderboard",nav_achievements:"Achievements",nav_soundboard:"Soundboard",nav_shop:"Shop",nav_inventory:"Inventory",quest_claim:"Claim",quest_claimed:"✅ Claimed",quest_daily:"Daily",quest_social:"Social",quest_milestone:"Milestones",quest_no_login:"Log in to see quests",ach_no_login:"Log in to see achievements",lb_title:"Leaderboard",shop_title:"Shop",inv_title:"Inventory",streak_days:"day streak 🔥",rate_title:"Rate game",profile_edit:"Edit",profile_view:"View profile",profile_joined:"Joined",profile_showcase:"Showcase",profile_pinned:"Pinned games",rec_worldguessr:"Gissa Länder",rec_eaglercraft:"Minecraft fast tuff",rec_summerrider:"Snowrider utan snow",nav_links:"Coola Mattespel länkar",recTitle:"✨ Recommended games"},
 
-sv:{heroTitle:"Coola Mattespel V4",pill_games:"🎮 1 946 spel",pill_coins:"🏆 Samla mynt",
+sv:{heroTitle:"Coola Mattespel V4",pill_games:"🎮 1 946 spel",pill_coins:"🏆 Samla coins",
   pill_favs:"⭐ Spara favoriter",pill_quests:"📋 Slutför quests",allGames:"All games",
   favBtnLabel:"⭐ Favorites",searchPlaceholder:"Sök bland 1 946 spel...",
   back:"← Back",fullscreen:"⛶ Fullscreen",chatTitle:"💬 Chatt",
-  chatPlaceholder:"Skriv ett meddelande...",sendBtn:"Skicka",
+  chatPlaceholder:"Write a message...",sendBtn:"Send",
   nav_favs:"Favorites",nav_profile:"Profil",nav_themes:"Teman",nav_suggest:"Suggestions",
   nav_settings:"Settings",nav_admin:"Admin",
   sett_title:"Settings",sett_animations:"Animationer",sett_sound:"Ljud",
   sett_dark:"Mörkt läge",sett_lang:"Språk",sett_account:"Konto",sett_logout:"Logga ut",
   themeTitle:"Välj tema",sugTitle:"Föreslå ett spel",
-  sugPlaceholder1:"Spelnamn...",sugPlaceholder2:"Beskriv spelet...",sugBtn:"Skicka förslag",
-  stat_coins:"Mynt",stat_favs:"Favorites",stat_played:"Spel",stat_level:"Nivå",
-  loginTitle:"Logga in",regTitle:"Registrera",userLabel:"Användarnamn",passLabel:"Lösenord",
+  sugPlaceholder1:"Spelnamn...",sugPlaceholder2:"Beskriv spelet...",sugBtn:"Send suggestions",
+  stat_coins:"Mynt",stat_favs:"Favorites",stat_played:"Spel",stat_level:"Level",
+  loginTitle:"Logga in",regTitle:"Registrera",userLabel:"Username",passLabel:"Lösenord",
   userPlaceholder:"ditt användarnamn...",passPlaceholder:"ditt lösenord...",
   loginBtn:"Logga in",regBtn:"Registrera",
   switchToReg:"Inget konto? Registrera",switchToLogin:"Har konto? Logga in",
-  noFavs:"Inga favoriter än\nKlicka ☆ på ett spel",notLoggedFavs:"Logga in för att se favoriter",
+  noFavs:"No favorites yet\nClick ☆ on a game",notLoggedFavs:"Log in to see favorites",
   colors_purple:"Lila",colors_neon:"Neon",colors_gold:"Guld",
-  colors_red:"Röd",colors_blue:"Blå",colors_pink:"Rosa",online:"online nu",close:"Close",loading:"Laddar...",add_friend:"Lägg till vän",remove_friend:"Ta bort vän",nav_quests:"Quests",nav_leaderboard:"Leaderboard",nav_achievements:"Achievements",nav_soundboard:"Soundboard",nav_shop:"Butik",nav_inventory:"Inventory",quest_claim:"Hämta",quest_claimed:"✅ Hämtad",quest_daily:"Dagliga",quest_social:"Social",quest_milestone:"Milstolpar",quest_no_login:"Logga in för att se quests",ach_no_login:"Logga in för att se achievements",lb_title:"Leaderboard",shop_title:"Butik",inv_title:"Inventory",streak_days:"dagars streak 🔥",rate_title:"Rate game spel",profile_edit:"Redigera",profile_view:"Visa profil",profile_joined:"Gick med",profile_showcase:"Showcase",profile_pinned:"Pinnade spel",rec_worldguessr:"Gissa länder på Street View",rec_eaglercraft:"Minecraft i webbläsaren",rec_summerrider:"Surfa vågorna i sommar",nav_links:"Coola Mattespel länkar",recTitle:"✨ Recommended games"},
+  colors_red:"Röd",colors_blue:"Blå",colors_pink:"Rosa",online:"online nu",close:"Close",loading:"Loading...",add_friend:"Lägg till vän",remove_friend:"Ta bort vän",nav_quests:"Quests",nav_leaderboard:"Leaderboard",nav_achievements:"Achievements",nav_soundboard:"Soundboard",nav_shop:"Butik",nav_inventory:"Inventory",quest_claim:"Hämta",quest_claimed:"✅ Claimed",quest_daily:"Dagliga",quest_social:"Social",quest_milestone:"Milestones",quest_no_login:"Logga in för att se quests",ach_no_login:"Logga in för att se achievements",lb_title:"Leaderboard",shop_title:"Butik",inv_title:"Inventory",streak_days:"dagars streak 🔥",rate_title:"Rate game spel",profile_edit:"Redigera",profile_view:"Visa profil",profile_joined:"Gick med",profile_showcase:"Showcase",profile_pinned:"Pinnade spel",rec_worldguessr:"Gissa länder på Street View",rec_eaglercraft:"Minecraft i webbläsaren",rec_summerrider:"Surfa vågorna i sommar",nav_links:"Coola Mattespel länkar",recTitle:"✨ Recommended games"},
 
 es:{heroTitle:"Coola Mattespel V4",pill_games:"🎮 1.946 juegos",pill_coins:"🏆 Coleccionar monedas",
   pill_favs:"⭐ Guardar favoritos",pill_quests:"📋 Completar misiones",allGames:"Todos los juegos",
@@ -3416,6 +3450,7 @@ function applyLang(){
   // Update login modal dynamic labels
   var lt=document.getElementById("loginTitle");
   if(lt)lt.textContent=T("loginTitle");
+  forceEnglishDOM();
 }
 // =================== END i18n ===================
 </script>
