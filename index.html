@@ -2642,8 +2642,8 @@ function sendChat(){}
 function chatKey(e){}
 function adminBroadcast(){toast('Chat has been removed.','error');}
 function adminGiveCoins(){var uEl=document.getElementById('adminCoinUser');var aEl=document.getElementById('adminCoinAmount');if(!uEl||!aEl||!uEl.value.trim())return toast('Enter a username','error');var amount=parseInt(aEl.value)||0;if(amount<=0)return toast('Enter a valid coin amount','error');if(uEl.value.trim()===state.user){state.coins+=amount;saveState();updateHUD();}else{var key='jspel_'+uEl.value.trim();var data=JSON.parse(localStorage.getItem(key)||'{}');data.coins=(data.coins||0)+amount;localStorage.setItem(key,JSON.stringify(data));}toast(amount+' coins were given to '+uEl.value.trim(),'ok');uEl.value='';aEl.value='';renderAdminPanel();}
-function adminKick(u){if(u===state.user)return toast('You can't kick yourself','error');toast(u+' was kicked','ok');}
-function adminBan(u){if(u===state.user)return toast('You can't ban yourself','error');var banned=JSON.parse(localStorage.getItem('bannedUsers')||'[]');if(banned.indexOf(u)<0){banned.push(u);localStorage.setItem('bannedUsers',JSON.stringify(banned));}toast(u+' was banned','ok');renderAdminPanel();}
+function adminKick(u){if(u===state.user)return toast("You can't kick yourself",'error');toast(u+' was kicked','ok');}
+function adminBan(u){if(u===state.user)return toast("You can't ban yourself",'error');var banned=JSON.parse(localStorage.getItem('bannedUsers')||'[]');if(banned.indexOf(u)<0){banned.push(u);localStorage.setItem('bannedUsers',JSON.stringify(banned));}toast(u+' was banned','ok');renderAdminPanel();}
 function adminUnban(u){var banned=JSON.parse(localStorage.getItem('bannedUsers')||'[]');var idx=banned.indexOf(u);if(idx>=0){banned.splice(idx,1);localStorage.setItem('bannedUsers',JSON.stringify(banned));}toast(u+' avwas banned','ok');renderAdminPanel();}
 function adminClearChat(){toast('Chat has been removed.','error');renderAdminPanel();}
 function showSiteAnnouncements(){
