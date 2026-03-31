@@ -1011,6 +1011,7 @@ var ZONES_URLS=[
   "https://cdn.jsdelivr.net/gh/gnmathcopy/assets/zones.json"
 ];
 var HTML_URL="https://cdn.jsdelivr.net/npm/gn-math.github.io-main@1.0.5/html-main";
+var COVERS_BASE_URL="https://cdn.jsdelivr.net/gh/gn-math/covers@main/";
 var _remoteGameUrlMap={};
 var _remoteGameImageMap={};
 function _normFileKey(file){
@@ -1052,6 +1053,10 @@ function _extractZoneImage(zone){
     }
   }
   return"";
+}
+function _coverUrlByIndex(i){
+  if(typeof i!=="number"||i<0)return"";
+  return COVERS_BASE_URL+String(i+1)+".png";
 }
 async function _loadRemoteGameUrlMap(){
   for(var i=0;i<ZONES_URLS.length;i++){
@@ -1666,7 +1671,7 @@ function renderGames(){
     card.dataset.file=game.f||"";
     var iconBox=document.createElement("div");iconBox.className="gameIconBox";
     var fileKey=(game&&game.f)||"";
-    var thumbUrl=_remoteGameImageMap[fileKey]||_remoteGameImageMap[_normFileKey(fileKey)]||"";
+    var thumbUrl=_remoteGameImageMap[fileKey]||_remoteGameImageMap[_normFileKey(fileKey)]||_coverUrlByIndex(realIdx)||"";
     if(thumbUrl){
       var thumb=document.createElement("img");
       thumb.className="gameCardThumb";
