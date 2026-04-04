@@ -213,6 +213,9 @@ html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:var
 .igp-title{font-size:17px;font-weight:800;color:var(--w);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0;}
 .igp-layout{display:flex;flex-direction:column;gap:8px;padding-top:10px;max-width:540px;}
 .igp-row{display:grid;grid-template-columns:minmax(320px,560px) minmax(260px,1fr);gap:16px;align-items:start;}
+.igp-descCard{background:var(--glass);border:1px solid var(--line);border-radius:12px;padding:14px 16px;min-height:140px;}
+.igp-descCard h4{font-size:11px;color:var(--d);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;}
+.igp-descCard p{font-size:13px;color:var(--m);line-height:1.6;}
 .igp-box{position:relative;border-radius:12px;overflow:hidden;background:#000;aspect-ratio:16/9;width:100%;border:1px solid var(--line);box-shadow:0 6px 28px rgba(0,0,0,.5);}
 .igp-box .gameFrame{position:absolute;inset:0;width:100%;height:100%;border:none;border-radius:0;}
 .igp-loader{position:absolute;inset:0;background:linear-gradient(135deg,rgba(15,8,30,.97),rgba(25,10,50,.99));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:10;border-radius:12px;transition:opacity .4s;}
@@ -584,6 +587,10 @@ html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:var
         </div>
       </div>
     </div>
+    <aside class="igp-descCard">
+      <h4>About this game</h4>
+      <p id="igpGameDescription">Starta ett spel för att se en kort beskrivning här.</p>
+    </aside>
   </div>
 </div>
 
@@ -1366,6 +1373,11 @@ function updateGameRatingDisplay(idx){
   if(info.count)html+='<span style="font-size:11px;color:var(--d);margin-left:6px">'+info.avg+' ('+info.count+')</span>';
   el.innerHTML=html;
 }
+function buildGameDescriptionText(g,gName){
+  var shortDesc=(g&&g.desc)?String(g.desc).trim():'';
+  if(!shortDesc)shortDesc=gName+' är ett snabbt och underhållande browser-spel som är lätt att komma igång med.';
+  return shortDesc+' Spelet passar bra för korta rundor, men har ofta nog med utmaning för att du ska vilja försöka igen och slå ditt bästa resultat.';
+}
 function openGame(i){
   var g=GAMES[i];
   if(!g)return;
@@ -1378,6 +1390,7 @@ function openGame(i){
   var ie=document.getElementById('igpInfoEmoji');if(ie)ie.textContent=g.emoji||'🎮';
   var it=document.getElementById('igpInfoTitle');if(it)it.textContent=gName;
   var ic=document.getElementById('igpInfoCat');if(ic)ic.textContent=g.cat||'';
+  var gd=document.getElementById('igpGameDescription');if(gd)gd.textContent=buildGameDescriptionText(g,gName);
   var gameSrc=(_remoteGameUrlMap[g.f]||('UGS-Files/'+g.f));
   /* Hide header ui, keep game grid visible below */
   var filterBar=document.querySelector('.filterBar');var searchWrap=document.querySelector('.searchWrap');var hero=document.querySelector('.hero');var recWrap=document.getElementById('recommendedWrap');
